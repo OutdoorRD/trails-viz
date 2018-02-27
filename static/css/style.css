@@ -1,0 +1,44 @@
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background: #fefefe;
+	width: 1000px;
+	margin: 0 auto;
+}
+
+#trail-viz {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+}
+
+#fig-holder {
+	width: 100%;
+	height: 750px;
+	position: relative;
+}
+
+#trail-select, #trail-map, #line-plot {
+	position: absolute;
+}
+
+#trail-map {
+	top: 20px;
+	width: 1000px;
+	height: 500px;
+}
+
+#line-plot {
+	top: 520px;
+	width: 800px;
+	height: 500px;
+	padding-top: 10px;
+}
+
+#trail-select {
+	top: 520px;
+	width: 150px;
+	left: 820px;
+	height: 200px;
+	padding-top: 10px;
+}
+
