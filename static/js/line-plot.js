@@ -56,6 +56,9 @@
 			                format: '%Y-%m-%d'
 			            }
 			        }
+			    },
+			     zoom: {
+			        enabled: true
 			    }
 				});
 
