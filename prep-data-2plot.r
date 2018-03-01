@@ -75,7 +75,7 @@ dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
 # dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
 lines@data <- dat2
 
-writeOGR(lines, "static/data/trails.geojon", layer="trails", driver="GeoJSON")
+writeOGR(lines, "static/data/trails", layer="trails", driver="GeoJSON", overwrite_layer = T)
 
 # library(ggplot2)
 # library(lubridate)
