@@ -3,6 +3,7 @@ library(foreign)
 library(raster)
 library(tidyr)
 library(lubridate)
+library(rgdal)
 
 setwd('~/mbsnf/trails-viz/')
 
@@ -54,14 +55,14 @@ write.csv(out_mon2, 'static/data/hikers_monthly.csv', row.names = F)
 write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 
 
-## monthly avg for lines
-avgmon <- out2 %>%
-  group_by(AllTRLs_ID, month) %>%
-  summarize(avg_pred=mean(predicted, na.rm=T))
-
-avgmon$month <- month.abb[avgmon$month]
-
-avgmon_wide <- spread(avgmon, month, c(avg_pred))
+# ## monthly avg for lines
+# avgmon <- out2 %>%
+#   group_by(AllTRLs_ID, month) %>%
+#   summarize(avg_pred=mean(predicted, na.rm=T))
+# 
+# avgmon$month <- month.abb[avgmon$month]
+# 
+# avgmon_wide <- spread(avgmon, month, c(avg_pred))
 
 ## add data to lines
 lines <- shapefile("scratch/SARL_AllTrls.shp")
@@ -71,9 +72,10 @@ dat$AllTRLs_ID <- as.numeric(dat$AllTRLs_ID)
 
 ## join trail name
 dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
-dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
+# dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
+lines@data <- dat2
 
-
+writeOGR(lines, "static/data/trails.geojon", layer="trails", driver="GeoJSON")
 
 # library(ggplot2)
 # library(lubridate)
