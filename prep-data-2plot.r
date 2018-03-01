@@ -64,18 +64,21 @@ write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 # 
 # avgmon_wide <- spread(avgmon, month, c(avg_pred))
 
-## add data to lines
-lines <- shapefile("scratch/SARL_AllTrls.shp")
-dat <- lines@data
-names(dat) <- "AllTRLs_ID"
-dat$AllTRLs_ID <- as.numeric(dat$AllTRLs_ID)
-
-## join trail name
-dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
-# dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
-lines@data <- dat2
-
-writeOGR(lines, "static/data/trails", layer="trails", driver="GeoJSON", overwrite_layer = T)
+# ## add data to lines
+# lines <- shapefile("scratch/SARL_AllTrls.shp")
+# dat <- lines@data
+# names(dat) <- "AllTRLs_ID"
+# dat$AllTRLs_ID <- as.numeric(dat$AllTRLs_ID)
+# 
+# ## join trail name
+# dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
+# # dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
+# lines@data <- dat2
+# 
+# # THIS DOES WORK - don't use rgdal for this.
+# writeOGR(lines, dsn="static/data/trails.geojson", layer="layer", driver="GeoJSON")
+# # this works, wtf
+# writeOGR(lines, dsn="static/data/trails", layer="layer", driver="GeoJSON")
 
 # library(ggplot2)
 # library(lubridate)
