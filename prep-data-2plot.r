@@ -6,29 +6,44 @@ library(lubridate)
 
 setwd('~/mbsnf/trails-viz/')
 
-mon_pr <- read.csv('scratch/viz_model_mbs_trails_v5_mmm_20180227.csv')
-mon_ir <- read.csv('scratch/viz_model_mbs_trails_v5_mmmir_20180227.csv')
+# idvars <- c("trail", "d2p", "month")
+idvars <- c("trail", "d2p")
+prediction <- "jjmm"
+response <- "resp.ss"
 
-idvars <- c("trail", "d2p", "month")
+## load monthly
+mon_pr <- read.csv('scratch/viz_model_mbs_trails_v6_mmm_20180227.csv')
+mon_ir <- read.csv('scratch/viz_model_mbs_trails_v6_mmmir_20180227.csv')
 
-prediction <- "jjlmexp"
 mon_pr <- mon_pr[ ,c(idvars, prediction)]
-
-response <- "ir.ss"
 mon_ir <- mon_ir[ ,c(idvars, response)]
 
 monthly <- left_join(mon_pr, mon_ir, by=idvars)
-names(monthly) <- c("AllTRLs_ID", "date", "month", "predicted", "actual")
+names(monthly) <- c("AllTRLs_ID", "date", "predicted", "actual")
+# names(monthly) <- c("AllTRLs_ID", "date", "month", "predicted", "actual")
+
+## load weekly
+week_pr <- read.csv('scratch/viz_model_mbs_trails_v6_www_20180227.csv')
+week_ir <- read.csv('scratch/viz_model_mbs_trails_v6_wwwir_20180227.csv')
+
+week_pr <- week_pr[ ,c(idvars, prediction)]
+week_ir <- week_ir[ ,c(idvars, response)]
+
+weekly <- left_join(week_pr, week_ir, by=idvars)
+names(weekly) <- c("AllTRLs_ID", "date", "predicted", "actual")
 
 ## subset sarah's trails
 trails <- read.dbf("scratch/SARL_AllTrls.dbf")
-out <- monthly[which(monthly$AllTRLs_ID %in% trails$ALLTRLs_ID),]
+out_mon <- monthly[which(monthly$AllTRLs_ID %in% trails$ALLTRLs_ID),]
+out_week <- weekly[which(weekly$AllTRLs_ID %in% trails$ALLTRLs_ID),]
 
 ## join trail name
 link <- read.dbf("/home/dmf/mbsnf/mbs-trails/gis/AllTRLs_v4.dbf")
-out2 <- left_join(out, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
+out_mon2 <- left_join(out_mon, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
+out_week2 <- left_join(out_week, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
 
-write.csv(out2, 'static/data/hikers_monthly.csv', row.names = F)
+write.csv(out_mon2, 'static/data/hikers_monthly.csv', row.names = F)
+write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 
 
 ## monthly avg for lines
