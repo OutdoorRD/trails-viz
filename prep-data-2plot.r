@@ -14,8 +14,7 @@ response <- "resp.ss"
 
 ## load monthly
 mon_pr <- read.csv('scratch/viz_model_mbs_trails_v7_mmm_20180315.csv')
-# mon_pr <- read.csv('scratch/viz_model_mbs_trails_v6_mmm_20180227.csv')
-mon_ir <- read.csv('scratch/viz_model_mbs_trails_v6_mmmir_20180227.csv')
+mon_ir <- read.csv('scratch/viz_model_mbs_trails_v7_mmmir_20180315.csv')
 
 mon_pr <- mon_pr[ ,c(idvars, prediction)]
 mon_ir <- mon_ir[ ,c(idvars, response)]
