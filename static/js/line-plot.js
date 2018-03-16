@@ -5,8 +5,8 @@
 		.defer(d3.csv, "static/data/hikers_monthly.csv")
 		.await(ready);
 
-	function ready(error, hikers_monthly){
-		console.log(hikers_monthly);
+	function ready(error, hikers_timeseries){
+		console.log(hikers_timeseries);
 
 		var select = d3.select("#trail-select")
 	      .append("div")
@@ -17,7 +17,7 @@
 	        var trail_id = d3.select(this).property("value");
 	        console.log(trail_id);
 
-	        var traildata = hikers_monthly.filter(function(d) { return d.AllTRLs_ID == trail_id })
+	        var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
 		    console.log(traildata);
 
 		    var date = [],
@@ -65,8 +65,8 @@
 	      });
 
 	    select.selectAll("option")
-	      .data(d3.map(hikers_monthly, function(d){return d.Trail_name;}).values())
-	      // .data(hikers_monthly)
+	      .data(d3.map(hikers_timeseries, function(d){return d.Trail_name;}).values())
+	      // .data(hikers_timeseries)
 	      .enter()
 	        .append("option")
 	        .attr("value", function (d) { return d.AllTRLs_ID; })
