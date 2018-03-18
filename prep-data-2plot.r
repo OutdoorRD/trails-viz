@@ -55,30 +55,38 @@ write.csv(out_mon2, 'static/data/hikers_monthly.csv', row.names = F)
 write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 
 
-# ## monthly avg for lines
-# avgmon <- out2 %>%
-#   group_by(AllTRLs_ID, month) %>%
-#   summarize(avg_pred=mean(predicted, na.rm=T))
-# 
-# avgmon$month <- month.abb[avgmon$month]
-# 
-# avgmon_wide <- spread(avgmon, month, c(avg_pred))
+## monthly avg 
+avgmon <- out_mon2 %>%
+  group_by(AllTRLs_ID, month) %>%
+  summarize(avg_pred=mean(predicted, na.rm=T))
 
-# ## add data to lines
-# lines <- shapefile("scratch/SARL_AllTrls.shp")
-# dat <- lines@data
-# names(dat) <- "AllTRLs_ID"
-# dat$AllTRLs_ID <- as.numeric(dat$AllTRLs_ID)
-# 
-# ## join trail name
-# dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
-# # dat3 <- left_join(dat2, avgmon_wide, by="AllTRLs_ID")
-# lines@data <- dat2
-# 
-# # THIS DOES WORK - don't use rgdal for this.
+avgmon$month <- month.abb[avgmon$month]
+avgmon_wide <- spread(avgmon, month, c(avg_pred))
+
+## annual avg
+annual <- out_mon2 %>%
+  filter(year(date) == "2017") %>%
+  group_by(AllTRLs_ID) %>%
+  summarize(annual=sum(predicted, na.rm=T))
+annual$annual <- log(annual$annual)
+
+## load lines
+lines <- shapefile("scratch/SARL_AllTrls.shp")
+lines <- spTransform(lines, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+dat <- lines@data
+names(dat) <- "AllTRLs_ID"
+dat$AllTRLs_ID <- as.numeric(dat$AllTRLs_ID)
+
+# join data to lines
+dat2 <- left_join(dat, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
+dat3 <- left_join(dat2, annual, by="AllTRLs_ID")
+lines@data <- dat3
+#
+# THIS DOES NOT WORK - don't use rgdal for this.
 # writeOGR(lines, dsn="static/data/trails.geojson", layer="layer", driver="GeoJSON")
-# # this works, wtf
-# writeOGR(lines, dsn="static/data/trails", layer="layer", driver="GeoJSON")
+# this works, wtf
+writeOGR(lines, dsn="static/data/trails", layer="layer", driver="GeoJSON")
+system("mv static/data/trails static/data/trails.geojson")
 
 # library(ggplot2)
 # library(lubridate)

@@ -22,14 +22,29 @@
 			ext: 'png'
 		}).addTo(map);
 
-		var trailstyle = {
-		    "color": "#ff7800",
-		    "weight": 2,
-		    "opacity": 1.0
+		var getStyle = function(feature){
+		  var weight;
+		  weight = (feature.properties.annual*0.17)**4
+		  // console.log((feature.properties.annual*0.2)**2)
+		  console.log(weight);
+		  // weight = 2
+
+		  return {
+		    color: '#ff7800',
+		    "opacity": 0.95,
+		    weight: weight
+		  }
 		};
 
+		// var trailstyle = {
+		//     "color": "#ff7800",
+		//     "weight": 2,
+		//     "opacity": 1.0
+		// };
+
 		var layer = L.geoJSON(geojsontrails, {
-			style: trailstyle
+			// style: trailstyle
+			style: getStyle
 		});
 
 		layer.addTo(map);
