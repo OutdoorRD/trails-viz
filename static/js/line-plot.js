@@ -53,7 +53,9 @@
 			        x: {
 			            type: 'timeseries',
 			            tick: {
-			                format: '%Y-%m-%d'
+			            	// culling: {max: 6},
+			                format: '%Y-%m',
+			                fit: false
 			            }
 			        }
 			    },
