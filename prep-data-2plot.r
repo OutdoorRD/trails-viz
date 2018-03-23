@@ -12,16 +12,21 @@ idvars <- c("trail", "d2p")
 prediction <- "jjmm"
 response <- "resp.ss"
 
+out_fieldnames <- c("AllTRLs_ID", "date", "predicted", "actual")
+
 ## load monthly
 mon_pr <- read.csv('scratch/viz_model_mbs_trails_v7_mmm_20180315.csv')
 mon_ir <- read.csv('scratch/viz_model_mbs_trails_v7_mmmir_20180315.csv')
 
-mon_pr <- mon_pr[ ,c(idvars, prediction)]
-mon_ir <- mon_ir[ ,c(idvars, response)]
-
+mon_pr <- mon_pr[, c(idvars, prediction)]
+mon_ir <- mon_ir[, c(idvars, response)]
 monthly <- left_join(mon_pr, mon_ir, by=idvars)
-names(monthly) <- c("AllTRLs_ID", "date", "predicted", "actual")
-# names(monthly) <- c("AllTRLs_ID", "date", "month", "predicted", "actual")
+
+monthly <- separate(data=monthly, col=d2p, into=c("year", "month", "day"), sep="-", remove=T)
+monthly$date <- paste(monthly$year, monthly$month, sep="-")
+monthly <- monthly[,c("trail", "date", prediction, response, "year", "month")]
+
+names(monthly) <- c(out_fieldnames, "year", "month")
 
 ## load weekly
 week_pr <- read.csv('scratch/viz_model_mbs_trails_v6_www_20180227.csv')
@@ -31,7 +36,7 @@ week_pr <- week_pr[ ,c(idvars, prediction)]
 week_ir <- week_ir[ ,c(idvars, response)]
 
 weekly <- left_join(week_pr, week_ir, by=idvars)
-names(weekly) <- c("AllTRLs_ID", "date", "predicted", "actual")
+names(weekly) <- out_fieldnames
 
 ## subset sarah's trails
 trails <- read.dbf("scratch/SARL_AllTrls.dbf")
@@ -51,21 +56,21 @@ out_mon2$actual <- out_mon2$actual/2
 out_week2$predicted <- round(out_week2$predicted/2, 2)
 out_week2$actual <- out_week2$actual/2
 
-write.csv(out_mon2, 'static/data/hikers_monthly.csv', row.names = F)
+write.csv(out_mon2[, c(out_fieldnames, "Trail_name")], 'static/data/hikers_monthly.csv', row.names = F)
 write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 
 
-## monthly avg 
-avgmon <- out_mon2 %>%
-  group_by(AllTRLs_ID, month) %>%
-  summarize(avg_pred=mean(predicted, na.rm=T))
-
-avgmon$month <- month.abb[avgmon$month]
-avgmon_wide <- spread(avgmon, month, c(avg_pred))
+# ## monthly avg 
+# avgmon <- out_mon2 %>%
+#   group_by(AllTRLs_ID, month) %>%
+#   summarize(avg_pred=mean(predicted, na.rm=T))
+# 
+# avgmon$month <- month.abb[avgmon$month]
+# avgmon_wide <- spread(avgmon, month, c(avg_pred))
 
 ## annual avg
 annual <- out_mon2 %>%
-  filter(year(date) == "2017") %>%
+  filter(year == "2017") %>%
   group_by(AllTRLs_ID) %>%
   summarize(annual=sum(predicted, na.rm=T))
 annual$annual <- log(annual$annual)
