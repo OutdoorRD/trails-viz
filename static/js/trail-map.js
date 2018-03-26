@@ -27,16 +27,23 @@
 		};
 
 		var getStyle = function(feature){
-		  var weight;
-		  weight = (feature.properties.annual*0.17)**4
-		  // console.log(weight);
-		  // weight = 2
+			// scale the line thickness to the annual value for each line
+			// trial and error led to the formula below
+			var weight;
+			weight = (feature.properties.annual*0.17)**4
 
-		  return {
-		    color: '#ff7800',
-		    "opacity": 0.95,
-		    weight: weight
-		  }
+			return {
+			color: '#ff7800',
+			"opacity": 0.95,
+			weight: weight
+			}
+		};
+
+		var onEachFeature = function(feature, layer){
+			if (feature.properties && feature.properties.Trail_name) {
+		        layer.bindTooltip(feature.properties.Trail_name);
+		        layer.bindPopup(feature.properties.Trail_name);
+		    }
 		};
 
 		// var trailstyle = {
@@ -46,7 +53,7 @@
 		// };
 
 		var layer = L.geoJSON(geojsontrails, {
-			// style: trailstyle
+			onEachFeature: onEachFeature,
 			style: getStyle
 		});
 
