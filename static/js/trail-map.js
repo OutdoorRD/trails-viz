@@ -34,9 +34,27 @@
 
 			return {
 			color: '#ff7800',
-			"opacity": 0.95,
+			opacity: 1.0,
 			weight: weight
 			}
+		};
+
+		var highlightFeature = function(e) {
+		    var line = e.target;
+
+		    line.setStyle({
+		        weight: 5,
+		        color: '#0087ff',
+		        opacity: 1.0
+		    });
+
+		    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+		        line.bringToFront();
+		    }
+		};
+
+		var resetHighlight = function(e) {
+		    layer.resetStyle(e.target);
 		};
 
 		var onEachFeature = function(feature, layer){
@@ -44,18 +62,17 @@
 		        layer.bindTooltip(feature.properties.Trail_name);
 		        layer.bindPopup(feature.properties.Trail_name);
 		    }
+		    layer.on({
+		    	mouseover: highlightFeature,
+		    	mouseout: resetHighlight
+		    })
 		};
-
-		// var trailstyle = {
-		//     "color": "#ff7800",
-		//     "weight": 2,
-		//     "opacity": 1.0
-		// };
 
 		var layer = L.geoJSON(geojsontrails, {
 			onEachFeature: onEachFeature,
 			style: getStyle
 		});
+
 
 		L.control.layers(baseMaps).addTo(map);
 		layer.addTo(map);
