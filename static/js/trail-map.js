@@ -65,7 +65,8 @@
 			layer._leaflet_id = feature.properties.AllTRLs_ID;
 	    layer.on({
 	    	mouseover: highlightFeature,
-	    	mouseout: resetHighlight
+	    	mouseout: resetHighlight,
+				click: changeSelect
 	    })
 		};
 
@@ -79,13 +80,24 @@
 		layer.addTo(map);
 		map.fitBounds(layer.getBounds());
 
+		function changeSelect() {
+			var id = this._leaflet_id;
+			console.log("Leaflet id" + id);
+			document.querySelector("#trail-select select").value = id;
+			var event = new Event("change");
+			logChange(document.querySelector("#trail-select select"));
+			document.querySelector("#trail-select select").dispatchEvent(event);
+		}
+
 		var trail_select = document.querySelector("#trail-select select");
 		var id;
 		var previd = 5;
-		trail_select.onchange = logChange;
+		trail_select.onchange = function() {
+			logChange(trail_select);
+		};
 
-		function logChange() {
-			id = this.value;
+		function logChange(select) {
+			id = select.value;
 			console.log(id);
 			var newlayer = layer.getLayer(id);
 			newlayer.removeFrom(map);
