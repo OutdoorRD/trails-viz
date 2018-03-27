@@ -23,7 +23,7 @@
 		    var date = [],
 			    predicted = [],
 			    actual = [];
-		    
+
 		    traildata.map(function(d) {
 			    date.push(d.date);
 			    predicted.push(+d.predicted);
@@ -70,8 +70,5 @@
 	        .append("option")
 	        .attr("value", function (d) { return d.AllTRLs_ID; })
 	        .text(function (d) { return d.Trail_name; });
-		
 	}
-
-	
 }(window.lineplot = window.lineplot || {}));

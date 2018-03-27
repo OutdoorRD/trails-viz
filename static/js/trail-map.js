@@ -1,4 +1,4 @@
-(function(trailmap) {
+(function() {
 	'use strict'
 
 	queue()
@@ -7,7 +7,7 @@
 
 	function ready(error, geojsontrails){
 		// leaflet coordinate pairs are always [lat(y), lon(x)] as opposed to [x, y]
-		var map = L.map('trail-map').setView([45, -105], 11); 
+		var map = L.map('trail-map').setView([45, -105], 9);
 
 		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
@@ -58,14 +58,15 @@
 		};
 
 		var onEachFeature = function(feature, layer){
-			if (feature.properties && feature.properties.Trail_name) {
+			if (feature.properties && feature.properties.Trail_name && feature.properties.annual) {
 		        layer.bindTooltip(feature.properties.Trail_name);
-		        layer.bindPopup(feature.properties.Trail_name);
-		    }
-		    layer.on({
-		    	mouseover: highlightFeature,
-		    	mouseout: resetHighlight
-		    })
+		        layer.bindPopup(String(feature.properties.annual));
+	    }
+			layer._leaflet_id = feature.properties.AllTRLs_ID;
+	    layer.on({
+	    	mouseover: highlightFeature,
+	    	mouseout: resetHighlight
+	    })
 		};
 
 		var layer = L.geoJSON(geojsontrails, {
@@ -77,9 +78,33 @@
 		L.control.layers(baseMaps).addTo(map);
 		layer.addTo(map);
 		map.fitBounds(layer.getBounds());
+
+		var trail_select = document.querySelector("#trail-select select");
+		var id;
+		var previd = 5;
+		trail_select.onchange = logChange;
+
+		function logChange() {
+			id = this.value;
+			console.log(id);
+			var newlayer = layer.getLayer(id);
+			newlayer.removeFrom(map);
+			newlayer.setStyle({
+					weight: 5,
+					color: '#0087ff',
+					opacity: 1.0
+			});
+			newlayer.addTo(map)
+			var prevlayer = layer.getLayer(previd);
+			prevlayer.setStyle({
+				color: '#ff7800',
+				opacity: 1.0,
+				weight: (prevlayer.feature.properties.annual*0.17)**4
+			});
+			prevlayer.addTo(map);
+			previd = id;
+		}
+
 	}
 
-	
-}(window.trailmap = window.trailmap || {}));
-
-
+})();
