@@ -58,14 +58,26 @@
 		};
 
 		var onEachFeature = function(feature, layer){
-			if (feature.properties && feature.properties.Trail_name && feature.properties.annual) {
+			if (feature.properties && feature.properties.Trail_name){ //&& feature.properties.annual) {
 		        layer.bindTooltip(feature.properties.Trail_name);
 		        layer.bindPopup(String(feature.properties.annual));
 	    }
 			layer._leaflet_id = feature.properties.AllTRLs_ID;
 	    layer.on({
-	    	mouseover: highlightFeature,
-	    	mouseout: resetHighlight,
+	    	mouseover: function(e) {
+					//console.log(e.target.options.color);
+					if(e.target.options.color == "#ff7800") {
+						highlightFeature(e);
+					}
+				},
+				//highlightFeature,
+	    	mouseout: function(e) {
+					//console.log(e.target.options.color);
+					if (e.target.options.color != "#00ff00") {
+						resetHighlight(e)
+					}
+				},
+				//resetHighlight,
 				click: changeSelect
 	    })
 		};
@@ -85,13 +97,13 @@
 			console.log("Leaflet id" + id);
 			document.querySelector("#trail-select select").value = id;
 			var event = new Event("change");
-			logChange(document.querySelector("#trail-select select"));
 			document.querySelector("#trail-select select").dispatchEvent(event);
 		}
 
 		var trail_select = document.querySelector("#trail-select select");
 		var id;
 		var previd = 5;
+
 		trail_select.onchange = function() {
 			logChange(trail_select);
 		};
@@ -103,18 +115,20 @@
 			newlayer.removeFrom(map);
 			newlayer.setStyle({
 					weight: 5,
-					color: '#0087ff',
+					color: '#00ff00',
 					opacity: 1.0
 			});
 			newlayer.addTo(map)
 			var prevlayer = layer.getLayer(previd);
-			prevlayer.setStyle({
-				color: '#ff7800',
-				opacity: 1.0,
-				weight: (prevlayer.feature.properties.annual*0.17)**4
-			});
-			prevlayer.addTo(map);
-			previd = id;
+			if (previd !== id) {
+				prevlayer.setStyle({
+					color: '#ff7800',
+					opacity: 1.0,
+					weight: (prevlayer.feature.properties.annual*0.17)**4
+				});
+				prevlayer.addTo(map);
+				previd = id;
+			}
 		}
 
 	}
