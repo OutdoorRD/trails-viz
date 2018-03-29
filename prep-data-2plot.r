@@ -5,8 +5,6 @@ library(tidyr)
 library(lubridate)
 library(rgdal)
 
-setwd('~/mbsnf/trails-viz/')
-
 # idvars <- c("trail", "d2p", "month")
 idvars <- c("trail", "d2p")
 prediction <- "jjmm"
@@ -60,15 +58,30 @@ write.csv(out_mon2[, c(out_fieldnames, "Trail_name")], 'static/data/hikers_month
 write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
 
 
-# ## monthly avg 
-# avgmon <- out_mon2 %>%
-#   group_by(AllTRLs_ID, month) %>%
-#   summarize(avg_pred=mean(predicted, na.rm=T))
-# 
+## monthly avg for histograms
+avgmon <- out_mon2 %>%
+  group_by(AllTRLs_ID, month) %>%
+  summarize(avg_pred=round(mean(predicted, na.rm=T), digits=0))
+
+for(id in unique(avgmon$AllTRLs_ID)){
+  monout <- avgmon[avgmon$AllTRLs_ID == id,]
+  write.csv(monout, file=file.path("static/data/monthlies", paste0(id, ".csv")), row.names=F)
+}
+
 # avgmon$month <- month.abb[avgmon$month]
 # avgmon_wide <- spread(avgmon, month, c(avg_pred))
 
-## annual avg
+## annual avg for histograms
+avgann <- out_mon2 %>%
+  group_by(AllTRLs_ID, year) %>%
+  summarize(avg_pred=round(mean(predicted, na.rm=T), digits=0))
+
+for(id in unique(avgann$AllTRLs_ID)){
+  annout <- avgann[avgann$AllTRLs_ID == id,]
+  write.csv(annout, file=file.path("static/data/annuals", paste0(id, ".csv")), row.names=F)
+}
+
+## annual total for line weight
 annual <- out_mon2 %>%
   filter(year == "2017") %>%
   group_by(AllTRLs_ID) %>%
