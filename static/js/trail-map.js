@@ -6,9 +6,6 @@
 		.await(ready);
 
 	function ready(error, geojsontrails){
-		// creates the initial map
-		// leaflet coordinate pairs are always [lat(y), lon(x)] as opposed to [x, y]
-		var map = L.map('trail-map').setView([45, -105], 9);
 
 		// creates the streets/roads map layer
 		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -16,7 +13,7 @@
 									' contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 			maxZoom: 18,
 			id: 'osm',
-		});//.addTo(map);
+		});
 
 		// creates the terrain map layer
 		var terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
@@ -25,11 +22,11 @@
 										' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 			maxZoom: 18,
 			ext: 'png'
-		}).addTo(map);
+		})
 
 		var baseMaps = {
 		    "terrain": terrain,
-		    "streets": streets
+				"streets": streets
 		};
 
 		// sets the initial style for the trails
@@ -94,6 +91,14 @@
 			style: getStyle
 		});
 
+		// create the map variable to be displayed on the website with the default layers
+		// shown as the terrain layer and the trail layer
+		var map = L.map('trail-map', {
+			center: [45, -105],
+			zoom: 9,
+			layers: [terrain, layer]
+		})
+
 		// add map layers, including geoJSON data, to the leaflet map
 		L.control.layers(baseMaps).addTo(map);
 		layer.addTo(map);
@@ -110,9 +115,19 @@
 		// the DOM select box to choose a trail
 		var trail_select = document.querySelector("#trail-select select");
 
+		// set the initial trail highlighted in green
+		var initial_layer = layer.getLayer("5");
+		initial_layer.removeFrom(map);
+		initial_layer.setStyle({
+			weight: 5,
+			color: '#00ff00',
+			opacity: 1.0
+		});
+		initial_layer.addTo(map);
+
 		// keep track of the current and previous chosen trails
 		var id;
-		var previd = 0;
+		var previd = 5; // set to the id of the initial layer (Dingford Creek)
 
 		// triggers the map to change when a different trail is selected
 		trail_select.onchange = function() {
@@ -138,14 +153,12 @@
 			newlayer.addTo(map)
 			var prevlayer = layer.getLayer(previd);
 			if (previd !== id) {
-				if (previd !== 0) {
-					prevlayer.setStyle({
-						color: '#ff7800',
-						opacity: 1.0,
-						weight: (prevlayer.feature.properties.annual*0.17)**4
-					});
-					prevlayer.addTo(map);
-				}
+				prevlayer.setStyle({
+					color: '#ff7800',
+					opacity: 1.0,
+					weight: (prevlayer.feature.properties.annual*0.17)**4
+				});
+				prevlayer.addTo(map);
 				previd = id;
 			}
 		}
