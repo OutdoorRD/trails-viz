@@ -36,8 +36,8 @@
 			})
 
 			date.unshift('date')
-			predicted.unshift('predicted')
-			actual.unshift('actual')
+			predicted.unshift('modeled')
+			actual.unshift('on-site')
 			// console.log(date);
 
 			var chart = c3.generate({
