@@ -6,6 +6,7 @@
 		.await(ready);
 
 	function ready(error, hikers_timeseries){
+
 		console.log(hikers_timeseries);
 
 		var select = d3.select("#trail-select")
@@ -14,7 +15,7 @@
 
     select.on("change", function(d) {
         changeGraph(d, d3.select(this).property("value"));
-      });
+    });
 
 
 		function changeGraph(d, value) {
@@ -73,5 +74,10 @@
         .append("option")
         .attr("value", function (d) { return d.AllTRLs_ID; })
         .text(function (d) { return d.Trail_name; });
+
+		// Trigger a change event to display data as soon as the page is loaded
+		var changeEvent = new Event("change");
+		document.querySelector("#trail-select select").value = 5;
+		document.querySelector("#trail-select select").dispatchEvent(changeEvent);
 	}
 }(window.lineplot = window.lineplot || {}));
