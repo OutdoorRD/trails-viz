@@ -144,7 +144,7 @@
 						axis: {
 							y: {
 								label: {
-									text: 'Number of visits',
+									text: 'Modeled Number of Visits',
 									position: 'outer-middle'
 								}
 							}
