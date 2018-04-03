@@ -24,6 +24,7 @@
 			var filename = value + ".csv";
 
 			fillMonthly(filename);
+			document.getElementById('radioplot1').checked = 'checked';
 
 			document.getElementById('radioplot1').onclick = function() {
 				fillMonthly(filename);
@@ -68,6 +69,9 @@
 										format: '%Y-%m',
 										fit: false
 								}
+						},
+						y: {
+							label: 'Number of Visits'
 						}
 				},
 				 zoom: {
@@ -92,15 +96,25 @@
 
 	function fillMonthly(filename) {
 		d3.csv("static/data/monthlies/" + filename)
-			.row(function(a) { return [a.month, a.avg_pred]; })
+			.row(function(a) { return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
 			.get(function(error, rows) {
-				rows.unshift (["Month", "Average Modeled"]);
+				rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
 				var bar = c3.generate({
 						bindto: '#histplot-monthlies-annuals',
 						data: {
 							rows: rows,
-							x: 'Month',
+							// x: 'Month',
 							type: 'bar'
+						},
+						axis: {
+							x: {
+								type: 'category',
+								categories: ['January', 'February', 'March', 'April', 'May', 'June',
+															'July', 'August', 'September', 'October', 'November', 'December'],
+							},
+							y: {
+								label: 'Average Modeled Number of Visits'
+							}
 						}
 				});
 			});
@@ -117,6 +131,11 @@
 							rows: rows,
 							x: 'Year',
 							type: 'bar'
+						},
+						axis: {
+							y: {
+								label: 'Number of visits'
+							}
 						}
 				});
 			});
