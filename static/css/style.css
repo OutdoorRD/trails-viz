@@ -17,13 +17,14 @@ body {
 	position: relative;
 }
 
-#trail-select, #trail-map, #line-plot, #text-box {
+#trail-select, #trail-map, #line-plot, #text-box, #select-buttons {
 	position: absolute;
 }
 
 #trail-map {
 	top: 20px;
-	width: 1000px;
+	/*width: 1000px;*/
+	width: 70%;
 	height: 500px;
 }
 
@@ -34,7 +35,13 @@ body {
 	padding-top: 10px;
 }
 
-#trail-select {
+#histplot-monthlies-annuals {
+	top: 520px;
+	padding-top: 10px;
+	width: 800px;
+}
+
+#trail-select, #select-buttons {
 	top: 520px;
 	width: 150px;
 	left: 820px;
@@ -44,6 +51,14 @@ body {
 
 #text-box {
 	top: 550px;
+	width: 150px;
+	left: 820px;
+	height: 200px;
+	padding-top: 10px;
+}
+
+#select-buttons {
+	top: 830px;
 	width: 150px;
 	left: 820px;
 	height: 200px;

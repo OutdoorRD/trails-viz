@@ -14,8 +14,8 @@
 				<!-- <select></select> -->
 			</div>
 			<div id='text-box'>
-				<p><strong>"Predicted"</strong> values here are in draft form and <em>WILL</em> change, sometimes dramatically, as our methods improve.</p>
-				<p><strong>"Actual"</strong> values are on-site estimates from infrared counters and parking lot counts, where available.</p>
+				<p><strong>"Modeled"</strong> values here are in draft form and <em>WILL</em> change, sometimes dramatically, as our methods improve.</p>
+				<p><strong>"On-site"</strong> values are on-site estimates from infrared counters and parking lot counts, where available.</p>
 			</div>
 			<div id='trail-map'>
 				<div id='title'>Trail Map</div>
@@ -23,6 +23,17 @@
 			<div id='line-plot'>
 				<div id='title'>Monthly Trail visits</div>
 			</div>
+      <div id='select-buttons'>
+        <!-- insert radio button -->
+        <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly Averages</input>
+        <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual Averages</input>
+      </div>
+      <div id='histplot-monthlies-annuals'>
+        <div id='title'>Average Monthly/Annual Trail visits</div>
+      </div>
+      <!-- <div id='histplot-annuals'>
+        <div id='title'>Average Monthly Trail visits</div>
+      </div> -->
 		</div>
 	</div>
 
