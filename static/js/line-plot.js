@@ -21,9 +21,18 @@
 		function changeGraph(d, value) {
 			var trail_id = value;
 			// console.log(trail_id);
+			var filename = value + ".csv";
+
+			fillMonthly(filename);
+
+			document.getElementById('radioplot1').onclick = function() {
+				fillMonthly(filename);
+			};
+			document.getElementById('radioplot2').onclick = function() {
+				fillAnnual(filename);
+			};
 
 			var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
-			// console.log(traildata);
 
 			var date = [],
 				predicted = [],
@@ -80,4 +89,37 @@
 		document.querySelector("#trail-select select").value = 5;
 		document.querySelector("#trail-select select").dispatchEvent(changeEvent);
 	}
+
+	function fillMonthly(filename) {
+		d3.csv("static/data/monthlies/" + filename)
+			.row(function(a) { return [a.month, a.avg_pred]; })
+			.get(function(error, rows) {
+				rows.unshift (["Month", "Average Modeled"]);
+				var bar = c3.generate({
+						bindto: '#histplot-monthlies-annuals',
+						data: {
+							rows: rows,
+							x: 'Month',
+							type: 'bar'
+						}
+				});
+			});
+	}
+
+	function fillAnnual(filename) {
+		d3.csv("static/data/annuals/" + filename)
+			.row(function(a) { return [a.year, a.avg_pred]; })
+			.get(function(error, rows) {
+				rows.unshift (["Year", "Average Modeled"]);
+				var bar = c3.generate({
+						bindto: '#histplot-monthlies-annuals',
+						data: {
+							rows: rows,
+							x: 'Year',
+							type: 'bar'
+						}
+				});
+			});
+	}
+
 }(window.lineplot = window.lineplot || {}));
