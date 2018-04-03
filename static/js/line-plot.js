@@ -122,9 +122,9 @@
 
 	function fillAnnual(filename) {
 		d3.csv("static/data/annuals/" + filename)
-			.row(function(a) { return [a.year, a.avg_pred]; })
+			.row(function(a) { return [a.year, a.total_pred]; })
 			.get(function(error, rows) {
-				rows.unshift (["Year", "Average Modeled"]);
+				rows.unshift (["Year", "Total Annual"]);
 				var bar = c3.generate({
 						bindto: '#histplot-monthlies-annuals',
 						data: {
