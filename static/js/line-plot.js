@@ -71,7 +71,10 @@
 								}
 						},
 						y: {
-							label: 'Number of Visits'
+							label: {
+								text: 'Number of Visits',
+								position: 'outer-middle'
+							}
 						}
 				},
 				 zoom: {
@@ -113,8 +116,14 @@
 															'July', 'August', 'September', 'October', 'November', 'December'],
 							},
 							y: {
-								label: 'Average Modeled Number of Visits'
-							}
+								label: {
+									text: 'Average Modeled Number of Visits',
+									position: 'outer-middle'
+								}
+							}	
+						},
+						legend: {
+							show: false
 						}
 				});
 			});
@@ -134,8 +143,14 @@
 						},
 						axis: {
 							y: {
-								label: 'Number of visits'
+								label: {
+									text: 'Number of visits',
+									position: 'outer-middle'
+								}
 							}
+						},
+						legend: {
+							show: false
 						}
 				});
 			});
