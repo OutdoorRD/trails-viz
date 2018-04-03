@@ -1,0 +1,2 @@
+graft trails_site/templates
+graft trails_site/static
