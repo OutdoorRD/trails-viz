@@ -1,3 +1,4 @@
+/*global fetch*/
 (function() {
 	'use strict'
 
@@ -6,6 +7,14 @@
 		.await(ready);
 
 	function ready(error, geojsontrails){
+
+		console.log(window.location.href);
+
+		fetch(window.location.href + 'api/geojson')
+			.then(checkStatus)
+			.then(function(response) {
+				console.log(response);
+			})
 
 		// creates the streets/roads map layer
 		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -107,13 +116,14 @@
 		// changeSelect changes the select box value when a user clicks on a trail
 		// on the map and triggers a change event to occur
 		function changeSelect() {
+			var trail_select = document.querySelector("#trail-select select");
 			trail_select.value = this._leaflet_id;
 			var event = new Event("change");
 			trail_select.dispatchEvent(event);
 		}
 
 		// the DOM select box to choose a trail
-		var trail_select = document.querySelector("#trail-select select");
+		//var trail_select = document.querySelector("#trail-select select");
 
 		// set the initial trail highlighted in green
 		var initial_layer = layer.getLayer("5");
@@ -130,9 +140,14 @@
 		var previd = 5; // set to the id of the initial layer (Dingford Creek)
 
 		// triggers the map to change when a different trail is selected
-		trail_select.onchange = function() {
-			updateMap();
-		};
+		var checkForSelect = setInterval(function() {
+			if(document.querySelector("#trail-select select").length) {
+				document.querySelector("#trail-select select").onchange = function() {
+					updateMap();
+				};
+				clearInterval(checkForSelect);
+			}
+		}, 100);
 
 		// updateMap highlights the user-selected trail in green on the map and un-highlights the
 		// previous trail chosen by the user. If the user re-selects the same trail, nothing
@@ -141,7 +156,7 @@
 		// arguments:
 		// 		- select: the DOM select box to choose which trail is shown
 		function updateMap() {
-			id = trail_select.value;
+			id = document.querySelector("#trail-select select").value;
 			console.log(id);
 			var newlayer = layer.getLayer(id);
 			newlayer.removeFrom(map);
@@ -163,6 +178,14 @@
 			}
 		}
 
+	}
+
+	function checkStatus(response) {
+		if (response.status >= 200 && response.status < 300) {
+        return response.text();
+    } else {
+        return Promise.reject(new Error(response.status + ": " + response.statusText));
+    }
 	}
 
 })();
