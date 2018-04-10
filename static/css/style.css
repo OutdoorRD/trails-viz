@@ -69,7 +69,7 @@ header {
 }
 
 text.c3-axis-y-label {
-	font-size: 12px;
+	font-size: 14px;
 }
 
 #select-buttons {
@@ -81,10 +81,6 @@ text.c3-axis-y-label {
 	width: 100%;
 }
 
-/* #radioplot1, #radioplot2 {
-	width: 100%;
-} */
-
 #line-plot {
 	width: 95%;
 	margin-top: 50px;
@@ -93,6 +89,14 @@ text.c3-axis-y-label {
 #text-box {
 	width: 90%;
 	margin-top: 50px;
+}
+
+footer {
+	position: absolute;
+	width: 100%;
+	background-color: black;
+	color: white;
+	text-align: center;
 }
 
 /*
