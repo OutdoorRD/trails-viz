@@ -71,7 +71,10 @@
 								}
 						},
 						y: {
-							label: 'Number of Visits'
+							label: {
+								text: 'Number of Visits',
+								position: 'outer-middle'
+							}
 						}
 				},
 				 zoom: {
@@ -113,8 +116,14 @@
 															'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 							},
 							y: {
-								label: 'Average Modeled Number of Visits'
-							}
+								label: {
+									text: 'Average Modeled Number of Visits',
+									position: 'outer-middle'
+								}
+							}	
+						},
+						legend: {
+							show: false
 						}
 				});
 			});
@@ -122,9 +131,9 @@
 
 	function fillAnnual(filename) {
 		d3.csv("static/data/annuals/" + filename)
-			.row(function(a) { return [a.year, a.avg_pred]; })
+			.row(function(a) { return [a.year, a.total_pred]; })
 			.get(function(error, rows) {
-				rows.unshift (["Year", "Average Modeled"]);
+				rows.unshift (["Year", "Total Annual"]);
 				var bar = c3.generate({
 						bindto: '#histplot-monthlies-annuals',
 						data: {
@@ -134,8 +143,14 @@
 						},
 						axis: {
 							y: {
-								label: 'Number of visits'
+								label: {
+									text: 'Modeled Number of Visits',
+									position: 'outer-middle'
+								}
 							}
+						},
+						legend: {
+							show: false
 						}
 				});
 			});

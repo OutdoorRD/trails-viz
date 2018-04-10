@@ -71,10 +71,10 @@ for(id in unique(avgmon$AllTRLs_ID)){
 # avgmon$month <- month.abb[avgmon$month]
 # avgmon_wide <- spread(avgmon, month, c(avg_pred))
 
-## annual avg for histograms
+## annual totals for histograms
 avgann <- out_mon2 %>%
   group_by(AllTRLs_ID, year) %>%
-  summarize(avg_pred=round(mean(predicted, na.rm=T), digits=0))
+  summarize(total_pred=round(sum(predicted, na.rm=T), digits=0))
 
 for(id in unique(avgann$AllTRLs_ID)){
   annout <- avgann[avgann$AllTRLs_ID == id,]
