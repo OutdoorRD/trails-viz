@@ -69,6 +69,7 @@
 		        layer.bindTooltip(feature.properties.Trail_name);
 		        layer.bindPopup(String(feature.properties.annual));
 	    }
+			//layer.bindTooltip(layer.feature.properties.Trail_name);
 			layer._leaflet_id = feature.properties.AllTRLs_ID;
 	    layer.on({
 	    	mouseover: function(e) {
@@ -81,7 +82,11 @@
 						resetHighlight(e)
 					}
 				},
-				click: changeSelect
+				click: changeSelect,
+				// click: function(e) {
+				// 	// changeSelect();
+				// 	console.log(e.target.feature.properties.Trail_name);
+				// }
 	    })
 		};
 

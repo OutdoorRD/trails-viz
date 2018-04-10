@@ -109,8 +109,8 @@
 						axis: {
 							x: {
 								type: 'category',
-								categories: ['January', 'February', 'March', 'April', 'May', 'June',
-															'July', 'August', 'September', 'October', 'November', 'December'],
+								categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
+															'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 							},
 							y: {
 								label: 'Average Modeled Number of Visits'
