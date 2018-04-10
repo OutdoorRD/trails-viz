@@ -43,10 +43,11 @@ header {
 	font-size: 12pt;
 	padding-right: 4px;
 	width: 50%;
+	font-family: "Montserrat";
 }
 
 #trail-viz {
-	width: 90%;
+	width: 94%;
 	margin: 0 auto;
 	margin-top: 0;
 	display: flex;
@@ -57,14 +58,18 @@ header {
 #trail-map {
 	height: 400px;
 	margin-top: 100px;
-	width: 50%;
+	width: 45%;
 }
 
 #histplot-monthlies-annuals {
-	width: 28%;
+	width: 40%;
 	height: 400px;
 	margin-top: 100px;
-	padding-left: 2%;
+	padding-left: 1%;
+}
+
+text.c3-axis-y-label {
+	font-size: 12px;
 }
 
 #select-buttons {
