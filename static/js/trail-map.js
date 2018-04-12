@@ -65,28 +65,20 @@
 
 		// defines the behavior of the geoJSON trails on the map
 		var onEachFeature = function(feature, layer){
-			if (feature.properties && feature.properties.Trail_name){
-		        layer.bindTooltip(feature.properties.Trail_name);
-		        layer.bindPopup(String(feature.properties.annual));
-	    }
-			//layer.bindTooltip(layer.feature.properties.Trail_name);
+			layer.bindTooltip(feature.properties.Trail_name);
 			layer._leaflet_id = feature.properties.AllTRLs_ID;
 	    layer.on({
-	    	mouseover: function(e) {
+	    	mouseover: function(e, feature, layer) {
 					if(e.target.options.color == "#ff7800") {
 						highlightFeature(e);
 					}
 				},
-	    	mouseout: function(e) {
+	    	mouseout: function(e, layer, feature) {
 					if (e.target.options.color != "#00ff00") {
-						resetHighlight(e)
+						resetHighlight(e);
 					}
 				},
 				click: changeSelect,
-				// click: function(e) {
-				// 	// changeSelect();
-				// 	console.log(e.target.feature.properties.Trail_name);
-				// }
 	    })
 		};
 

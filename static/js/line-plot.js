@@ -114,13 +114,18 @@
 								type: 'category',
 								categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
 															'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+								tick: {
+									rotate: 60,
+									multiline: false
+								},
+								height: 40
 							},
 							y: {
 								label: {
 									text: 'Average Modeled Number of Visits',
 									position: 'outer-middle'
 								}
-							}	
+							}
 						},
 						legend: {
 							show: false
@@ -142,6 +147,13 @@
 							type: 'bar'
 						},
 						axis: {
+							x: {
+								tick: {
+									rotate: 60,
+									multiline: false
+								},
+								height: 40
+							},
 							y: {
 								label: {
 									text: 'Modeled Number of Visits',
