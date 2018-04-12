@@ -1,10 +1,105 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 body {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	background: #fefefe;
-	width: 1000px;
-	margin: 0 auto;
+	width: 100%;
+	margin-top: 0;
+	margin-left: 0;
 }
 
+header {
+	background-color: #9ACD32;
+	width: 100%;
+	height: 50px;
+	position: fixed;
+	z-index: 9999;
+}
+
+#header-space {
+	height: 50px;
+}
+
+#header-info {
+	display: flex;
+	height: inherit;
+	justify-content: space-between;
+}
+
+#title {
+	padding-left: 5%;
+	font-size: 30px;
+	margin: auto 0 auto 0;
+	font-family: "Montserrat";
+}
+
+#trail-select {
+	padding-right: 5%;
+	display: flex;
+	align-items: center;
+}
+
+#trail-select p {
+	font-size: 12pt;
+	padding-right: 4px;
+	width: 50%;
+	font-family: "Montserrat";
+}
+
+#trail-viz {
+	width: 94%;
+	margin: 0 auto;
+	margin-top: 0;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+}
+
+#trail-map {
+	height: 500px;
+	margin-top: 100px;
+	width: 60%;
+}
+
+#histplot-monthlies-annuals {
+	width: 25%;
+	height: 500px;
+	margin-top: 100px;
+	padding-left: 1%;
+}
+
+text.c3-axis-y-label {
+	font-size: 14px;
+}
+
+#select-buttons {
+	width: 10%;
+	margin-top: 100px;
+}
+
+#select-buttons div {
+	width: 100%;
+}
+
+#line-plot {
+	width: 95%;
+	margin-top: 50px;
+}
+
+#text-box {
+	width: 90%;
+	margin-top: 50px;
+}
+
+footer {
+	position: absolute;
+	width: 100%;
+	background-color: black;
+	color: white;
+	text-align: center;
+}
+
+/*
 #trail-viz {
 	position: absolute;
 	top: 10px;
@@ -21,9 +116,12 @@ body {
 	position: absolute;
 }
 
+header {
+	padding-bottom: 40px;
+}
+
 #trail-map {
 	top: 20px;
-	/*width: 1000px;*/
 	width: 70%;
 	height: 500px;
 }
@@ -63,4 +161,4 @@ body {
 	left: 820px;
 	height: 200px;
 	padding-top: 10px;
-}
+} */
