@@ -2,7 +2,8 @@
 	'use strict'
 
 	queue()
-		.defer(d3.csv, "./data/hikers_monthly.csv")
+	//	.defer(d3.csv, "./data/hikers_monthly.csv")
+		.defer(d3.json, window.location.href + 'api/hikers_monthly')
 		.await(ready);
 
 	function ready(error, hikers_timeseries){

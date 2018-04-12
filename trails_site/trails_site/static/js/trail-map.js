@@ -3,18 +3,12 @@
 	'use strict'
 
 	queue()
-		.defer(d3.json, "./data/trails.geojson")
+		.defer(d3.json, window.location.href + 'api/geojson')
 		.await(ready);
 
 	function ready(error, geojsontrails){
 
 		console.log(window.location.href);
-
-		fetch(window.location.href + 'api/geojson')
-			.then(checkStatus)
-			.then(function(response) {
-				console.log(response);
-			})
 
 		// creates the streets/roads map layer
 		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

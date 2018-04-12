@@ -1,6 +1,6 @@
 MANIFEST.in
 trails_site/__init__.py
-trails_site/trails-site.py
+trails_site/views.py
 trails_site.egg-info/PKG-INFO
 trails_site.egg-info/SOURCES.txt
 trails_site.egg-info/dependency_links.txt
