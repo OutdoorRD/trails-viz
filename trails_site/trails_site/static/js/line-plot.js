@@ -22,16 +22,16 @@
 		function changeGraph(d, value) {
 			var trail_id = value;
 			// console.log(trail_id);
-			var filename = value + ".csv";
+			// var filename = value + ".csv";
 
-			fillMonthly(filename);
+			fillMonthly(trail_id);
 			document.getElementById('radioplot1').checked = 'checked';
 
 			document.getElementById('radioplot1').onclick = function() {
-				fillMonthly(filename);
+				fillMonthly(trail_id);
 			};
 			document.getElementById('radioplot2').onclick = function() {
-				fillAnnual(filename);
+				fillAnnual(trail_id);
 			};
 
 			var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
@@ -95,51 +95,75 @@
 		document.querySelector("#trail-select select").dispatchEvent(changeEvent);
 	}
 
-	function fillMonthly(filename) {
-		d3.csv("./data/monthlies/" + filename)
-			.row(function(a) { return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
-			.get(function(error, rows) {
-				rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
-				var bar = c3.generate({
-						bindto: '#histplot-monthlies-annuals',
-						data: {
-							rows: rows,
-							// x: 'Month',
-							type: 'bar'
-						},
-						axis: {
-							x: {
-								type: 'category',
-								categories: ['January', 'February', 'March', 'April', 'May', 'June',
-															'July', 'August', 'September', 'October', 'November', 'December'],
-							},
-							y: {
-								label: 'Average Modeled Number of Visits'
-							}
-						}
-				});
-			});
+	function fillMonthly(id) {
+		console.log(window.location.href + 'api/monthlies/' + id);
+		fetch(window.location.href + 'api/monthlies/' + id)
+			.then(checkStatus)
+			.then(JSON.parse)
+			.then(function(response) {
+				generateMonthly(response);
+			})
+			.catch(alert);
 	}
 
-	function fillAnnual(filename) {
-		d3.csv("./data/annuals/" + filename)
-			.row(function(a) { return [a.year, a.avg_pred]; })
-			.get(function(error, rows) {
-				rows.unshift (["Year", "Average Modeled"]);
-				var bar = c3.generate({
-						bindto: '#histplot-monthlies-annuals',
-						data: {
-							rows: rows,
-							x: 'Year',
-							type: 'bar'
-						},
-						axis: {
-							y: {
-								label: 'Number of visits'
-							}
-						}
-				});
-			});
+	function fillAnnual(id) {
+		fetch(window.location.href + 'api/annuals/' + id)
+			.then(checkStatus)
+			.then(JSON.parse)
+			.then(function(response) {
+				generateAnnual(response);
+			})
+			.catch(alert);
+	}
+
+	function generateMonthly(data) {
+		var bar = c3.generate({
+			bindto: '#histplot-monthlies-annuals',
+			data: {
+				json: data,
+				keys: {
+					value: ['avg_pred']
+				},
+				type: 'bar'
+			},
+			axis: {
+				x: {
+					type: 'category',
+					categories: ['January', 'February', 'March', 'April', 'May', 'June',
+					 							'July', 'August', 'September', 'October', 'November', 'December']
+				},
+				y: {
+					label: 'Average Modeled Number of Visits'
+				}
+			}
+		});
+	}
+
+	function generateAnnual(data) {
+		var bar = c3.generate({
+			bindto: '#histplot-monthlies-annuals',
+			data: {
+				json: data,
+				keys: {
+					x: 'year',
+					value: ['avg_pred']
+				},
+				type: 'bar'
+			},
+			axis: {
+				y: {
+					label: 'Number of visits'
+				}
+			}
+		});
+	}
+
+	function checkStatus(response) {
+		if (response.status >= 200 && response.status < 300) {
+        return response.text();
+    } else {
+        return Promise.reject(new Error(response.status + ": " + response.statusText));
+    }
 	}
 
 }(window.lineplot = window.lineplot || {}));

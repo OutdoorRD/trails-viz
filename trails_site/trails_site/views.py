@@ -10,25 +10,35 @@ def get_page():
 
 @app.route('/api/geojson')
 def get_geojson():
-    with open(os.getcwd() + '/static/data/trails.geojson') as f:
+    with open(os.getcwd() + '/trails_site/static/data/trails.geojson') as f:
         d = json.load(f)
     return jsonify(d)
 
 @app.route('/api/hikers_monthly')
 def get_hikersmonthly():
-    d = open(os.getcwd() + '/static/data/hikers_monthly.csv')
-    #d = open(url_for('static', 'data/hikers_monthly.csv'))
-    # return jsonify(d.readlines())
-    return csv.writer(d)
+    d = open(os.getcwd() + '/trails_site/static/data/hikers_monthly.csv')
+    fieldnames = ("AllTRLs_ID","date","predicted","actual","Trail_name")
+    reader = csv.DictReader(d, fieldnames)
+    next(reader)
+    out = jsonify([row for row in reader])
+    return out
 
 @app.route('/api/annuals/<int:int>')
 def get_annuals(int):
     filename = str(int) + '.csv'
-    d = open(os.getcwd() + '/static/data/annuals/' + filename)
-    return jsonify(d.readlines())
+    d = open(os.getcwd() + '/trails_site/static/data/annuals/' + filename)
+    fieldnames = ("AllTRLs_ID","year","avg_pred")
+    reader = csv.DictReader(d, fieldnames)
+    next(reader)
+    out = jsonify([row for row in reader])
+    return out
 
 @app.route('/api/monthlies/<int:int>')
 def get_monthlies(int):
     filename = str(int) + '.csv'
-    d = open(os.getcwd() + '/static/data/monthlies/' + filename)
-    return jsonify(d.readlines())
+    d = open(os.getcwd() + '/trails_site/static/data/monthlies/' + filename)
+    fieldnames = ("AllTRLs_ID","month","avg_pred")
+    reader = csv.DictReader(d, fieldnames)
+    next(reader)
+    out = jsonify([row for row in reader])
+    return out
