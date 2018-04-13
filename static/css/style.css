@@ -96,6 +96,10 @@ text.c3-axis-y-label {
 	margin-top: 50px;
 }
 
+#line-plot .c3-line {
+    stroke-width: 2px;
+}
+
 #text-box {
 	/*width: 90%;*/
 	margin-top: 20px;
