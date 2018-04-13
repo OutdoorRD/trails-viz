@@ -11,18 +11,19 @@ body {
 header {
 	background-color: #9ACD32;
 	width: 100%;
-	height: 50px;
+	height: 70px;
 	position: fixed;
 	z-index: 9999;
 }
 
-#header-space {
+/*#header-space {
 	height: 50px;
-}
+}*/
 
 #header-info {
 	display: flex;
 	height: inherit;
+	align-items: baseline;
 	justify-content: space-between;
 }
 
@@ -33,8 +34,17 @@ header {
 	font-family: "Montserrat";
 }
 
+#subtitle {
+	padding-right: 25%;
+	padding-top: 0.7%; /*wanting bottom of title and subtitle aligned*/
+	font-size: 19px;
+	margin: auto 0 auto 0;
+	font-family: "Montserrat";
+}
+
 #trail-select {
 	padding-right: 5%;
+	padding-top: 1%; /*wanting bottom of title and subtitle aligned*/
 	display: flex;
 	align-items: center;
 }
@@ -87,16 +97,30 @@ text.c3-axis-y-label {
 }
 
 #text-box {
-	width: 90%;
-	margin-top: 50px;
+	/*width: 90%;*/
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: 9pt;
 }
 
 footer {
 	position: absolute;
 	width: 100%;
-	background-color: black;
+	/*background-color: #909090;*/
+	background-color: lightgray;
 	color: white;
 	text-align: center;
+}
+
+#footer-info {
+	display: flex;
+	height: inherit;
+	align-items: baseline;
+	justify-content: space-between;
+	padding-right: 5%;
+	padding-left: 5%;
+	padding-top: 1%;
+	padding-bottom: 1%;
 }
 
 /*
