@@ -6,6 +6,10 @@
 		.await(ready);
 
 	function ready(error, geojsontrails){
+		var MAPBOX_TOKEN = ''
+
+		var TRAIL_COLOR = '#ff5a3d';
+		var SELECTED_COLOR = '#a13dff';
 
 		// creates the streets/roads map layer
 		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -15,6 +19,14 @@
 			id: 'osm',
 		});
 
+		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' + 
+						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
+			maxZoom: 18,
+			ext: 'png'
+		});
+		
 		// creates the terrain map layer
 		var terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
 			attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
@@ -25,8 +37,9 @@
 		})
 
 		var baseMaps = {
+			"outdoors": outdoors,
 		    "terrain": terrain,
-				"streets": streets
+			"streets": streets
 		};
 
 		// sets the initial style for the trails
@@ -37,7 +50,7 @@
 			weight = (feature.properties.annual*0.17)**4
 
 			return {
-			color: '#ff7800',
+			color: TRAIL_COLOR,
 			opacity: 1.0,
 			weight: weight
 			}
@@ -69,12 +82,12 @@
 			layer._leaflet_id = feature.properties.AllTRLs_ID;
 	    layer.on({
 	    	mouseover: function(e, feature, layer) {
-					if(e.target.options.color == "#ff7800") {
+					if(e.target.options.color == TRAIL_COLOR) {
 						highlightFeature(e);
 					}
 				},
 	    	mouseout: function(e, layer, feature) {
-					if (e.target.options.color != "#00ff00") {
+					if (e.target.options.color != SELECTED_COLOR) {
 						resetHighlight(e);
 					}
 				},
@@ -93,7 +106,7 @@
 		var map = L.map('trail-map', {
 			center: [45, -105],
 			zoom: 9,
-			layers: [terrain, layer]
+			layers: [outdoors, layer]
 		})
 
 		// add map layers, including geoJSON data, to the leaflet map
@@ -117,7 +130,7 @@
 		initial_layer.removeFrom(map);
 		initial_layer.setStyle({
 			weight: 5,
-			color: '#00ff00',
+			color: SELECTED_COLOR,
 			opacity: 1.0
 		});
 		initial_layer.addTo(map);
@@ -144,14 +157,14 @@
 			newlayer.removeFrom(map);
 			newlayer.setStyle({
 					weight: 5,
-					color: '#00ff00',
+					color: SELECTED_COLOR,
 					opacity: 1.0
 			});
 			newlayer.addTo(map)
 			var prevlayer = layer.getLayer(previd);
 			if (previd !== id) {
 				prevlayer.setStyle({
-					color: '#ff7800',
+					color: TRAIL_COLOR,
 					opacity: 1.0,
 					weight: (prevlayer.feature.properties.annual*0.17)**4
 				});
