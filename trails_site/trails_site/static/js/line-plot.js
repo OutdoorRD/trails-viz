@@ -72,7 +72,8 @@
 								}
 						},
 						y: {
-							label: 'Number of Visits'
+							label: 'Number of Visits',
+							position: 'outer-middle'
 						}
 				},
 				 zoom: {
@@ -130,11 +131,20 @@
 				x: {
 					type: 'category',
 					categories: ['January', 'February', 'March', 'April', 'May', 'June',
-					 							'July', 'August', 'September', 'October', 'November', 'December']
+					 							'July', 'August', 'September', 'October', 'November', 'December'],
+					tick: {
+						rotate: 60,
+						multiline: false
+					},
+					height: 40
 				},
 				y: {
-					label: 'Average Modeled Number of Visits'
+					label: 'Average Modeled Number of Visits',
+					position: 'outer-middle'
 				}
+			},
+			legend: {
+				show: false
 			}
 		});
 	}
@@ -151,9 +161,20 @@
 				type: 'bar'
 			},
 			axis: {
+				x: {
+					tick: {
+						rotate: 60,
+						multiline: false
+					},
+					height: 40
+				},
 				y: {
-					label: 'Number of visits'
+					label: 'Number of visits',
+					position: 'outer-middle'
 				}
+			},
+			legend: {
+				show: false
 			}
 		});
 	}
