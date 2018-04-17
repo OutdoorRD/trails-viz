@@ -20,16 +20,25 @@
   </header>
 	<div id='trail-viz'>
     <div id="header-space"></div>
-		<div id='trail-map'>
-			<div id='title'>Trail Map</div>
-		</div>
-    <div id='histplot-monthlies-annuals'>
-      <div id='title'>Average Monthly/Annual Trail visits</div>
-    </div>
-    <div id='select-buttons'>
-      <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly</input>
-      <div></div>
-      <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual</input>
+    <div id='first-panel'>
+  		<div id='trail-map'>
+  			<div id='title'>Trail Map</div>
+  		</div>
+      <div id='select-averages'>
+        <div id="statistics-info">
+          <h3 id="trail-name"></h4>
+          <p id="total-annual-visits"></p>
+          <p id="total-summer-visits"></p>
+        </div>
+        <div id='select-buttons'>
+          <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly</input>
+          <div></div>
+          <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual</input>
+        </div>
+      </div>
+      <div id='histplot-monthlies-annuals'>
+        <div id='title'>Average Monthly/Annual Trail visits</div>
+      </div>
     </div>
     <div id='line-plot'>
 			<div id='title'>Monthly Trail visits</div>

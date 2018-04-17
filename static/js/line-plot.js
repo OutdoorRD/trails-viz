@@ -7,8 +7,6 @@
 
 	function ready(error, hikers_timeseries){
 
-		console.log(hikers_timeseries);
-
 		var select = d3.select("#trail-select")
 	      .append("div")
 	      .append("select")
@@ -24,6 +22,21 @@
 			var filename = value + ".csv";
 
 			fillMonthly(filename);
+
+			d3.csv("static/data/annuals/" + filename)
+				.row(function(a) { return [a.year, a.total_pred]; })
+				.get(function(error, rows) {
+					var sum = 0;
+					for (let i = 0; i < rows.length; i++) {
+						var row = rows[i];
+						sum += parseInt(row[1]);
+					}
+					sum = Math.round(sum / rows.length);
+					console.log(sum);
+					var annual_avg = document.getElementById('total-annual-visits');
+					annual_avg.innerText = "Average Annual Visits: " + sum;
+				});
+
 			document.getElementById('radioplot1').checked = 'checked';
 
 			document.getElementById('radioplot1').onclick = function() {
@@ -35,6 +48,10 @@
 
 			var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
 
+			name = traildata[0].Trail_name;
+
+			document.getElementById('trail-name').innerText = name;
+
 			var date = [],
 				predicted = [],
 				actual = [];
@@ -43,11 +60,11 @@
 				date.push(d.date);
 				predicted.push(+d.predicted);
 				actual.push(+d.actual);
-			})
+			});
 
-			date.unshift('date')
-			predicted.unshift('modeled')
-			actual.unshift('on-site')
+			date.unshift('date');
+			predicted.unshift('modeled');
+			actual.unshift('on-site');
 			// console.log(date);
 
 			var chart = c3.generate({
@@ -102,6 +119,10 @@
 			.row(function(a) { return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
 			.get(function(error, rows) {
 				rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
+				var sum = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
+				var summer = document.getElementById("total-summer-visits");
+				summer.innerText = "Average Summer Visits: " + sum;
+
 				var bar = c3.generate({
 						bindto: '#histplot-monthlies-annuals',
 						data: {
