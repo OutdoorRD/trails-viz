@@ -23,6 +23,7 @@
 
 			fillMonthly(filename);
 
+			// Adds the annual averages statistic to the panel of text about the current trail
 			d3.csv("static/data/annuals/" + filename)
 				.row(function(a) { return [a.year, a.total_pred]; })
 				.get(function(error, rows) {
@@ -50,6 +51,8 @@
 
 			name = traildata[0].Trail_name;
 
+			// Adds the trail name to the panel of text containing information about the current
+			// trail
 			document.getElementById('trail-name').innerText = name;
 
 			var date = [],
@@ -119,6 +122,9 @@
 			.row(function(a) { return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
 			.get(function(error, rows) {
 				rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
+
+				// Adds the summary about average summer visits to the panel with text about
+				// the current trail
 				var sum = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
 				var summer = document.getElementById("total-summer-visits");
 				summer.innerText = "Average Summer Visits: " + sum;
