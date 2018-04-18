@@ -65,16 +65,51 @@ header {
 	justify-content: space-evenly;
 }
 
+#first-panel {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	width: 100%;
+	height: 550px;
+	justify-content: space-between;
+}
+
 #trail-map {
 	height: 500px;
 	margin-top: 100px;
 	width: 60%;
 }
 
+#select-averages {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 40%;
+	justify-content: space-between;
+	/* align-items: flex-end; */
+}
+
+#statistics-info {
+	padding-left: 3%;
+	width: 50%;
+	height: 100px;
+	margin-top: 90px;
+}
+
+#trail-name {
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+#total-annual-visits, #total-summer-visits {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 #histplot-monthlies-annuals {
-	width: 25%;
-	height: 500px;
-	margin-top: 100px;
+	width: 38%;
+	height: 300px;
+	margin-top: 20px;
 	padding-left: 1%;
 }
 
@@ -83,8 +118,12 @@ text.c3-axis-y-label {
 }
 
 #select-buttons {
-	width: 10%;
+	/* width: 10%; */
 	margin-top: 100px;
+	padding-top: 30px;
+	padding-left: 1%;
+	width: 20%;
+	position: relative;
 }
 
 #select-buttons div {
