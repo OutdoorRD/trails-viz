@@ -104,12 +104,19 @@
 		}
 
     select.selectAll("option")
-      .data(d3.map(hikers_timeseries, function(d){return d.Trail_name;}).values())
+      .data(d3.map(hikers_timeseries, function(d){
+					//console.log(typeof(d));
+					return d.Trail_name;
+				})
+				.values())
       // .data(hikers_timeseries)
       .enter()
         .append("option")
         .attr("value", function (d) { return d.AllTRLs_ID; })
         .text(function (d) { return d.Trail_name; });
+
+		sortDropDown();
+
 
 		// Trigger a change event to display data as soon as the page is loaded
 		var changeEvent = new Event("change");
@@ -193,6 +200,28 @@
 						}
 				});
 			});
+	}
+
+	function sortDropDown() {
+		var dropdown, i, switching, b, shouldSwitch;
+		dropdown = document.querySelector('div select');
+		switching = true;
+
+		while(switching) {
+			switching = false;
+			b = dropdown.getElementsByTagName("OPTION");
+			for (i = 0; i < (b.length - 1); i++) {
+				shouldSwitch = false;
+				if (b[i].innerHTML.toLowerCase() > b[i + 1].innerHTML.toLowerCase()) {
+					shouldSwitch = true;
+					break;
+				}
+			}
+			if (shouldSwitch) {
+				b[i].parentNode.insertBefore(b[i + 1], b[i]);
+				switching = true;
+			}
+		}
 	}
 
 }(window.lineplot = window.lineplot || {}));
