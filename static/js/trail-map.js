@@ -6,18 +6,10 @@
 		.await(ready);
 
 	function ready(error, geojsontrails){
-		var MAPBOX_TOKEN = ''
-
+		
 		var TRAIL_COLOR = '#ff5a3d';
 		var SELECTED_COLOR = '#a13dff';
-
-		// creates the streets/roads map layer
-		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>' +
-									' contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-			maxZoom: 18,
-			id: 'osm',
-		});
+		var TRAIL_OPACITY = 0.75;
 
 		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
 			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' + 
@@ -27,19 +19,17 @@
 			ext: 'png'
 		});
 		
-		// creates the terrain map layer
-		var terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
-			attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
-			 							' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
-										' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		var satellite = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' + 
+						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
 			maxZoom: 18,
 			ext: 'png'
-		})
+		});
 
 		var baseMaps = {
 			"outdoors": outdoors,
-		    "terrain": terrain,
-			"streets": streets
+			"satellite": satellite
 		};
 
 		// sets the initial style for the trails
@@ -51,7 +41,7 @@
 
 			return {
 			color: TRAIL_COLOR,
-			opacity: 1.0,
+			opacity: TRAIL_OPACITY,
 			weight: weight
 			}
 		};
@@ -165,7 +155,7 @@
 			if (previd !== id) {
 				prevlayer.setStyle({
 					color: TRAIL_COLOR,
-					opacity: 1.0,
+					opacity: TRAIL_OPACITY,
 					weight: (prevlayer.feature.properties.annual*0.17)**4
 				});
 				prevlayer.addTo(map);
