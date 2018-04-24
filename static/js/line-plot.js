@@ -47,7 +47,13 @@
 				fillAnnual(filename);
 			};
 
-			var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
+			var traildata = hikers_timeseries.filter(function(d) {
+				return (d.AllTRLs_ID == trail_id);
+			});
+
+			var traildata2 = hikers_timeseries.filter(function(d) {
+				return (d.AllTRLs_ID == "95");
+			});
 
 			name = traildata[0].Trail_name;
 
@@ -57,7 +63,9 @@
 
 			var date = [],
 				predicted = [],
-				actual = [];
+				predicted1 = [],
+				actual = [],
+				actual1 = [];
 
 			traildata.map(function(d) {
 				date.push(d.date);
@@ -65,21 +73,29 @@
 				actual.push(+d.actual);
 			});
 
+			traildata2.map(function(d) {
+				predicted1.push(+d.predicted);
+				actual1.push(+d.actual);
+			});
+
+			console.log(traildata2);
+
 			date.unshift('date');
 			predicted.unshift('modeled');
+			predicted1.unshift('modeled1');
 			actual.unshift('on-site');
+			actual1.unshift('on-site1');
 			// console.log(date);
+			var plot_data = [date, predicted, actual, predicted1, actual1];
+
+			var selected = false;
 
 			var chart = c3.generate({
 				bindto: '#line-plot',
 				data: {
 						x: 'date',
 						xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
-						columns: [
-							date,
-							predicted,
-							actual
-						]
+						columns: plot_data
 				},
 				axis: {
 						x: {
@@ -99,8 +115,31 @@
 				},
 				 zoom: {
 						enabled: true
+				},
+				legend: {
+					item: {
+						onclick: function(d) {
+							if (selected) {
+								// chart.unselect(d);
+								// chart.defocus(d);
+								chart.revert();
+								selected = false;
+							} else {
+								chart.select(d);
+								chart.focus(d);
+								selected = true;
+							}
+						},
+						onmouseout: function(d) {
+							// prevent deselect on mouseout
+						},
+						onmouseover: function(d) {
+
+						}
+					}
 				}
 			});
+
 		}
 
     select.selectAll("option")
@@ -113,7 +152,8 @@
       .enter()
         .append("option")
         .attr("value", function (d) { return d.AllTRLs_ID; })
-        .text(function (d) { return d.Trail_name; });
+        .text(function (d) {
+					return d.Trail_name; });
 
 		sortDropDown();
 
