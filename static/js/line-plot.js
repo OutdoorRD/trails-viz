@@ -121,10 +121,6 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 
 			document.getElementById('radioplot1').checked = 'checked';
 
-			document.getElementById('radioplot2').onclick = function() {
-				fillAnnual(filename1);
-			};
-
 			var traildata1 = hikers_timeseries.filter(function(d) {
 				return (d.AllTRLs_ID == trail_id_1);
 			})
@@ -184,6 +180,14 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 					fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
 				} else {
 					fillMonthly(filename1, traildata1[0].Trail_name, null, null);
+				}
+			};
+
+			document.getElementById('radioplot2').onclick = function() {
+				if (d2 != null) {
+					fillAnnual(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+				} else {
+					fillAnnual(filename1, traildata1[0].Trail_name, null, null);
 				}
 			};
 
@@ -386,36 +390,7 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 					createMonthly(bar_data);
 			});
 		console.log(bar_data);
-	}
-	  // var bar = c3.generate({
-	  //   bindto: '#histplot-monthlies-annuals',
-	  //   data: {
-	  //     rows: bar_data,
-	  //     x: 'x',
-	  //     type: 'bar'
-	  //   },
-	  //   axis: {
-	  //     x: {
-	  //       type: 'category',
-	  //       // categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
-	  //       //               'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-	  //       tick: {
-	  //         rotate: 60,
-	  //         multiline: false
-	  //       },
-	  //       height: 40
-	  //     },
-	  //     y: {
-	  //       label: {
-	  //         text: 'Average Modeled Number of Visits',
-	  //         position: 'outer-middle'
-	  //       }
-	  //     }
-	  //   },
-	  //   legend: {
-	  //     show: false
-	  //   }
-	  // });
+		}
 	}
 
 	function createMonthly(bar_data) {
@@ -449,38 +424,108 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 			});
 	}
 
-	function fillAnnual(filename) {
-		d3.csv("static/data/annuals/" + filename)
-			.row(function(a) { return [a.year, a.total_pred]; })
-			.get(function(error, rows) {
-				rows.unshift (["Year", "Total Annual"]);
-				var bar = c3.generate({
-						bindto: '#histplot-monthlies-annuals',
-						data: {
-							rows: rows,
-							x: 'Year',
-							type: 'bar'
+	function fillAnnual(filename1, name1, filename2, name2) {
+		// d3.csv("static/data/annuals/" + filename)
+		// 	.row(function(a) { return [a.year, a.total_pred]; })
+		// 	.get(function(error, rows) {
+		// 		rows.unshift (["Year", "Total Annual"]);
+		// 		console.log(rows);
+		// 		var bar = c3.generate({
+		// 				bindto: '#histplot-monthlies-annuals',
+		// 				data: {
+		// 					rows: rows,
+		// 					x: 'Year',
+		// 					type: 'bar'
+		// 				},
+		// 				axis: {
+		// 					x: {
+		// 						tick: {
+		// 							rotate: 60,
+		// 							multiline: false
+		// 						},
+		// 						height: 40
+		// 					},
+		// 					y: {
+		// 						label: {
+		// 							text: 'Modeled Number of Visits',
+		// 							position: 'outer-middle'
+		// 						}
+		// 					}
+		// 				},
+		// 				legend: {
+		// 					show: false
+		// 				}
+		// 		});
+		// 	});
+		var bar_data = [];
+
+	  d3.csv("static/data/annuals/" + filename1)
+	    .row(function(a) {return [a.year, a.total_pred]; })
+	    .get(function(error, rows) {
+	      rows.unshift(["Year", name1 + " - Total Annual"]);
+	      bar_data[0] = [];
+	      bar_data[1] = [];
+	      for (var i = 0; i < rows.length; i++) {
+	        bar_data[0].push(rows[i][0]);
+	        bar_data[1].push(rows[i][1]);
+	      }
+	      if(filename2 == null) {
+	        createAnnual(bar_data);
+	      } else {
+					d3.csv("static/data/annuals/" + filename2)
+			      .row(function(a) {return [a.total_pred]; })
+			      .get(function(error, rows) {
+			        rows.unshift([name2 + " - Total Annual"]);
+			        bar_data[2] = [];
+			        for (var i = 0; i < rows.length; i++) {
+			          bar_data[2].push(rows[i][0]);
+			        }
+			        createAnnual(bar_data);
+			      });
+				}
+	    });
+
+	  // if(filename2 != null) {
+	  //   d3.csv("static/data/annuals/" + filename2)
+	  //     .row(function(a) {return [a.total_pred]; })
+	  //     .get(function(error, rows) {
+	  //       rows.unshift(["Year", name2 + " - Total Annual"]);
+	  //       bar_data[2] = [];
+	  //       for (var i = 0; i < rows.length; i++) {
+	  //         bar_data[2].push(rows[i][0]);
+	  //       }
+	  //       createAnnual(bar_data);
+	  //     });
+	  // }
+	}
+
+	function createAnnual(bar_data) {
+		var bar = c3.generate({
+				bindto: '#histplot-monthlies-annuals',
+				data: {
+					columns: bar_data,
+					x: 'Year',
+					type: 'bar'
+				},
+				axis: {
+					x: {
+						tick: {
+							rotate: 60,
+							multiline: false
 						},
-						axis: {
-							x: {
-								tick: {
-									rotate: 60,
-									multiline: false
-								},
-								height: 40
-							},
-							y: {
-								label: {
-									text: 'Modeled Number of Visits',
-									position: 'outer-middle'
-								}
-							}
-						},
-						legend: {
-							show: false
+						height: 40
+					},
+					y: {
+						label: {
+							text: 'Modeled Number of Visits',
+							position: 'outer-middle'
 						}
-				});
-			});
+					}
+				},
+				legend: {
+					show: false
+				}
+		});
 	}
 
 	function sortDropDown() {
