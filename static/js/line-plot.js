@@ -7,24 +7,95 @@
 
 	function ready(error, hikers_timeseries){
 
-		var select = d3.select("#trail-select")
-	      .append("div")
-	      .append("select")
+		var select = d3.select("#trail-select ul");
 
-    select.on("change", function(d) {
-        changeGraph(d, d3.select(this).property("value"));
-    });
+		select.selectAll("input")
+			.data(d3.map(hikers_timeseries, function(d) {
+				return d.Trail_name;
+			}).values())
+			.enter()
+			.append("li")
+			.append("input")
+			.attr("type", "checkbox")
+			.attr("value", function(d) { return d.AllTRLs_ID; });
+
+		console.log(select.selectAll("li"));
+
+		select.selectAll("li")
+			.append("span")
+			.text(function(d) {
+				return d.Trail_name;
+			});
+
+		var list = document.querySelectorAll("ul.items li");
+		for (var i = 0; i < list.length; i++) {
+			var input = list[i].getElementsByTagName("input")[0];
+			if (input.value == "5") {
+				input.checked = true;
+			}
+		}
+
+			var checkList = document.getElementById('list1');
+        checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
+            if (checkList.classList.contains('visible'))
+                checkList.classList.remove('visible');
+            else
+                checkList.classList.add('visible');
+        };
+
+    // select.on("change", function(d) {
+    //     changeGraph(d, d3.select(this).property("value"));
+    // });
+
+		var selectedTrails = [];
+
+		var selected = 1;
+		var inputs = d3.selectAll("li input");
+		inputs.on("change", function(d) {
+			if(this.checked == true) {
+				if(selected + 1 < 3) {
+					selectedTrails.push(this);
+					changeGraph(d, d3.select(this).property("value"), d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"));
+					selected++;
+				} else {
+					this.checked = false;
+					alert("A maximum of two trails can be selected at one time");
+				}
+			} else {
+				selected--;
+				if(selectedTrails.length == 1 || selectedTrails[0] == this) {
+					selectedTrails.shift();
+				} else {
+					selectedTrails.pop();
+				}
+				changeGraph(d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"),
+										null, null);
+			}
+		});
+
+/*
+some inputs 1 and 2 keep the two possible input data variables
+
+the function to change the graph contains four inputs now -- d1, value1, d2, value2
+when a trail is unselected (i.e. going to one trail view), the input containing that
+data is cleared and the change graph function is called with d2 and value2 as null parameters
+when a trail is selected and selected==0, the function is called again w/ d2 and value2 as null parameters
+when a trail is selected and selected==1, the function is called again w/ all function inputs filled
 
 
-		function changeGraph(d, value) {
-			var trail_id = value;
-			// console.log(trail_id);
-			var filename = value + ".csv";
+*/
 
-			fillMonthly(filename);
+
+
+		function changeGraph(d1, value1, d2, value2) {
+
+			var trail_id_1 = value1,
+				filename1 = value1 + ".csv";
+
+			fillMonthly(filename1);
 
 			// Adds the annual averages statistic to the panel of text about the current trail
-			d3.csv("static/data/annuals/" + filename)
+			d3.csv("static/data/annuals/" + filename1)
 				.row(function(a) { return [a.year, a.total_pred]; })
 				.get(function(error, rows) {
 					var sum = 0;
@@ -41,127 +112,177 @@
 			document.getElementById('radioplot1').checked = 'checked';
 
 			document.getElementById('radioplot1').onclick = function() {
-				fillMonthly(filename);
+				fillMonthly(filename1);
 			};
 			document.getElementById('radioplot2').onclick = function() {
-				fillAnnual(filename);
+				fillAnnual(filename1);
 			};
 
-			var traildata = hikers_timeseries.filter(function(d) {
-				return (d.AllTRLs_ID == trail_id);
-			});
+			var traildata1 = hikers_timeseries.filter(function(d) {
+				return (d.AllTRLs_ID == trail_id_1);
+			})
 
-			var traildata2 = hikers_timeseries.filter(function(d) {
-				return (d.AllTRLs_ID == "95");
-			});
-
-			name = traildata[0].Trail_name;
-
-			// Adds the trail name to the panel of text containing information about the current
-			// trail
+			var name1 = traildata1[0].Trail_name;
 			document.getElementById('trail-name').innerText = name;
 
 			var date = [],
-				predicted = [],
 				predicted1 = [],
-				actual = [],
 				actual1 = [];
 
-			traildata.map(function(d) {
+			traildata1.map(function(d) {
 				date.push(d.date);
-				predicted.push(+d.predicted);
-				actual.push(+d.actual);
-			});
-
-			traildata2.map(function(d) {
 				predicted1.push(+d.predicted);
 				actual1.push(+d.actual);
 			});
 
-			console.log(traildata2);
+			console.log(date);
 
+			predicted1.unshift(traildata1[0].Trail_name + ' - modeled');
+			actual1.unshift(traildata1[0].Trail_name + ' - actual');
 			date.unshift('date');
-			predicted.unshift('modeled');
-			predicted1.unshift('modeled1');
-			actual.unshift('on-site');
-			actual1.unshift('on-site1');
-			// console.log(date);
-			var plot_data = [date, predicted, actual, predicted1, actual1];
+
+			var plot_data = [];
+
+			if (d2 != null) {
+
+				var trail_id_2 = value2,
+					filename2 = value2 + ".csv";
+
+				var traildata2 = hikers_timeseries.filter(function(d) {
+					return (d.AllTRLs_ID == trail_id_2);
+				})
+
+				var predicted2 = [],
+					actual2 = [];
+
+				traildata2.map(function(d) {
+					predicted2.push(+d.predicted);
+					actual2.push(+d.actual);
+				})
+
+				predicted2.unshift(traildata2[0].Trail_name + ' - modeled');
+				actual2.unshift(traildata2[0].Trail_name + ' - on-site');
+
+				plot_data.push(date, predicted1, actual1, predicted2, actual2);
+
+			} else {
+				plot_data.push(date, predicted1, actual1);
+			}
 
 			var selected = false;
 
-			var chart = c3.generate({
-				bindto: '#line-plot',
-				data: {
-						x: 'date',
-						xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
-						columns: plot_data
-				},
-				axis: {
-						x: {
-								type: 'timeseries',
-								tick: {
-									// culling: {max: 6},
-										format: '%Y-%m',
-										fit: false
-								}
-						},
-						y: {
-							label: {
-								text: 'Number of Visits',
-								position: 'outer-middle'
-							}
-						}
-				},
-				 zoom: {
-						enabled: true
-				},
-				legend: {
-					item: {
-						onclick: function(d) {
-							if (selected) {
-								// chart.unselect(d);
-								// chart.defocus(d);
-								chart.revert();
-								selected = false;
-							} else {
-								chart.select(d);
-								chart.focus(d);
-								selected = true;
-							}
-						},
-						onmouseout: function(d) {
-							// prevent deselect on mouseout
-						},
-						onmouseover: function(d) {
+		  var chart = c3.generate({
+		    bindto: '#line-plot',
+		    data: {
+		        x: 'date',
+		        xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
+		        columns: plot_data
+		    },
+		    axis: {
+		        x: {
+		            type: 'timeseries',
+		            tick: {
+		              // culling: {max: 6},
+		                format: '%Y-%m',
+		                fit: false
+		            }
+		        },
+		        y: {
+		          label: {
+		            text: 'Number of Visits',
+		            position: 'outer-middle'
+		          }
+		        }
+		    },
+		     zoom: {
+		        enabled: true
+		    },
+		    legend: {
+		      item: {
+		        onclick: function(d) {
+		          if (selected) {
+		            // chart.unselect(d);
+		            // chart.defocus(d);
+		            chart.revert();
+		            selected = false;
+		          } else {
+		            chart.select(d);
+		            chart.focus(d);
+		            selected = true;
+		          }
+		        },
+		        onmouseout: function(d) {
+		          // prevent deselect on mouseout
+		        },
+		        onmouseover: function(d) {
 
-						}
-					}
-				}
-			});
+		        }
+		      }
+		    }
+		  });
 
+			//fillLine(plot_data);
 		}
-
-    select.selectAll("option")
-      .data(d3.map(hikers_timeseries, function(d){
-					//console.log(typeof(d));
-					return d.Trail_name;
-				})
-				.values())
-      // .data(hikers_timeseries)
-      .enter()
-        .append("option")
-        .attr("value", function (d) { return d.AllTRLs_ID; })
-        .text(function (d) {
-					return d.Trail_name; });
-
-		sortDropDown();
 
 
 		// Trigger a change event to display data as soon as the page is loaded
 		var changeEvent = new Event("change");
 		document.querySelector("#trail-select select").value = 5;
 		document.querySelector("#trail-select select").dispatchEvent(changeEvent);
+}
+
+	function fillLine(plot_data) {
+	  var selected = false;
+
+	  var chart = c3.generate({
+	    bindto: '#line-plot',
+	    data: {
+	        x: 'date',
+	        xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
+	        columns: plot_data
+	    },
+	    axis: {
+	        x: {
+	            type: 'timeseries',
+	            tick: {
+	              // culling: {max: 6},
+	                format: '%Y-%m',
+	                fit: false
+	            }
+	        },
+	        y: {
+	          label: {
+	            text: 'Number of Visits',
+	            position: 'outer-middle'
+	          }
+	        }
+	    },
+	     zoom: {
+	        enabled: true
+	    },
+	    legend: {
+	      item: {
+	        onclick: function(d) {
+	          if (selected) {
+	            // chart.unselect(d);
+	            // chart.defocus(d);
+	            chart.revert();
+	            selected = false;
+	          } else {
+	            chart.select(d);
+	            chart.focus(d);
+	            selected = true;
+	          }
+	        },
+	        onmouseout: function(d) {
+	          // prevent deselect on mouseout
+	        },
+	        onmouseover: function(d) {
+
+	        }
+	      }
+	    }
+	  });
 	}
 
 	function fillMonthly(filename) {

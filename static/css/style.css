@@ -43,18 +43,20 @@ header {
 }
 
 #trail-select {
+	min-width: 220px;
 	padding-right: 5%;
 	padding-top: 1%; /*wanting bottom of title and subtitle aligned*/
 	display: flex;
-	align-items: center;
+	/* align-items: center; */
+	flex-wrap: nowrap;
 }
 
-#trail-select p {
+/* #trail-select p {
 	font-size: 12pt;
 	padding-right: 4px;
 	width: 50%;
 	font-family: "Montserrat";
-}
+} */
 
 #trail-viz {
 	width: 94%;
@@ -229,3 +231,72 @@ header {
 	height: 200px;
 	padding-top: 10px;
 } */
+
+
+/* .dropdown-check-list {
+  display: inline-block;
+} */
+.dropdown-check-list .anchor {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  /* padding: 5px 50px 5px 10px; */
+	padding: 2% 10% 2% 2%;
+	font-family: Montserrat;
+	margin-right: 10px;
+}
+#dropdown-symbol {
+  /* position: relative; */
+  /* content: ""; */
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 4px;
+  /* right: 0px; */
+  /* top: 20%; */
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+	/* margin-left: 60px; */
+}
+
+.arrow {
+	border: solid black;
+	border-width: 0 2px 2px 0;
+	display: inline-block;
+	padding: 3px;
+	margin-left: 20px;
+}
+
+.down {
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+}
+.dropdown-check-list .anchor:active:after {
+  right: 8px;
+  top: 21%;
+}
+.dropdown-check-list ul.items {
+  padding: 2px;
+  display: none;
+  margin: 0;
+  /* border: 1px solid #ccc; */
+  border-top: none;
+	background-color: white;
+}
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
+
+.dropdown-check-list.visible .items {
+  display: block;
+}
+
+.dropdown-check-list.visible {
+	background-color: white;
+}
+
+.dropdown-check-list {
+	width: 100%;
+}
