@@ -49,13 +49,17 @@
 
 		var selectedTrails = [];
 
-		var selected = 1;
+		var selected = 0;
 		var inputs = d3.selectAll("li input");
 		inputs.on("change", function(d) {
 			if(this.checked == true) {
 				if(selected + 1 < 3) {
 					selectedTrails.push(this);
-					changeGraph(d, d3.select(this).property("value"), d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"));
+					if (selected == 0) {
+						changeGraph(d, d3.select(this).property("value"), null, null);
+					} else {
+						changeGraph(d, d3.select(this).property("value"), d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"));
+					}
 					selected++;
 				} else {
 					this.checked = false;
@@ -68,10 +72,16 @@
 				} else {
 					selectedTrails.pop();
 				}
-				changeGraph(d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"),
+				if(selected == 1) {
+					changeGraph(d3.select(selectedTrails[0]), d3.select(selectedTrails[0]).property("value"),
 										null, null);
+				}
 			}
 		});
+
+		var startgraph = new Event("change");
+		var first = document.querySelector("ul li input");
+		first.dispatchEvent(startgraph);
 
 /*
 some inputs 1 and 2 keep the two possible input data variables
@@ -92,7 +102,7 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 			var trail_id_1 = value1,
 				filename1 = value1 + ".csv";
 
-			fillMonthly(filename1);
+
 
 			// Adds the annual averages statistic to the panel of text about the current trail
 			d3.csv("static/data/annuals/" + filename1)
@@ -111,9 +121,6 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 
 			document.getElementById('radioplot1').checked = 'checked';
 
-			document.getElementById('radioplot1').onclick = function() {
-				fillMonthly(filename1);
-			};
 			document.getElementById('radioplot2').onclick = function() {
 				fillAnnual(filename1);
 			};
@@ -165,9 +172,20 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 
 				plot_data.push(date, predicted1, actual1, predicted2, actual2);
 
+				fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+
 			} else {
 				plot_data.push(date, predicted1, actual1);
+				fillMonthly(filename1, traildata1[0].Trail_name, null, null);
 			}
+
+			document.getElementById('radioplot1').onclick = function() {
+				if (d2 != null) {
+					fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+				} else {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null);
+				}
+			};
 
 			var selected = false;
 
@@ -285,47 +303,149 @@ when a trail is selected and selected==1, the function is called again w/ all fu
 	  });
 	}
 
-	function fillMonthly(filename) {
-		d3.csv("static/data/monthlies/" + filename)
-			.row(function(a) { return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
-			.get(function(error, rows) {
-				rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
+	// function fillMonthly(filename) {
+	// 	d3.csv("static/data/monthlies/" + filename)
+	// 		.row(function(a) {
+	// 			console.log(a);
+	// 			return [a.avg_pred]; }) // [a.month, a.avg_pred]; })
+	// 		.get(function(error, rows) {
+	// 			console.log(rows);
+	// 			rows.unshift (["Average Modeled"]);// (["Month", "Average Modeled"]);
+	//
+	// 			// Adds the summary about average summer visits to the panel with text about
+	// 			// the current trail
+	// 			var sum = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
+	// 			var summer = document.getElementById("total-summer-visits");
+	// 			summer.innerText = "Average Summer Visits: " + sum;
+	//
+	// 			var bar = c3.generate({
+	// 					bindto: '#histplot-monthlies-annuals',
+	// 					data: {
+	// 						rows: rows,
+	// 						// x: 'Month',
+	// 						type: 'bar'
+	// 					},
+	// 					axis: {
+	// 						x: {
+	// 							type: 'category',
+	// 							categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
+	// 														'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+	// 							tick: {
+	// 								rotate: 60,
+	// 								multiline: false
+	// 							},
+	// 							height: 40
+	// 						},
+	// 						y: {
+	// 							label: {
+	// 								text: 'Average Modeled Number of Visits',
+	// 								position: 'outer-middle'
+	// 							}
+	// 						}
+	// 					},
+	// 					legend: {
+	// 						show: false
+	// 					}
+	// 			});
+	// 		});
+	// }
 
-				// Adds the summary about average summer visits to the panel with text about
-				// the current trail
-				var sum = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
-				var summer = document.getElementById("total-summer-visits");
-				summer.innerText = "Average Summer Visits: " + sum;
+	function fillMonthly(filename1, name1, filename2, name2) {
+	  var bar_data = [];
+		var data1, data2;
+	  d3.csv("static/data/monthlies/" + filename1)
+	    .row(function(a) {
+	      return [a.avg_pred]; })
+	    .get(function(error, rows) {
+	      rows.unshift([name1 + " - Average Modeled"]);
+				bar_data[0] = [];
+				for (var i = 0; i < rows.length; i++) {
+					bar_data[0].push(rows[i][0]);
+				}
+				if (filename2 == null) {
+					createMonthly(bar_data);
+				}
 
-				var bar = c3.generate({
-						bindto: '#histplot-monthlies-annuals',
-						data: {
-							rows: rows,
-							// x: 'Month',
-							type: 'bar'
-						},
-						axis: {
-							x: {
-								type: 'category',
-								categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
-															'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-								tick: {
-									rotate: 60,
-									multiline: false
-								},
-								height: 40
-							},
-							y: {
-								label: {
-									text: 'Average Modeled Number of Visits',
-									position: 'outer-middle'
-								}
-							}
-						},
-						legend: {
-							show: false
-						}
-				});
+	      // insert sum data here for trail1 stats info
+	      /*
+	      var sum = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
+	      var summer = document.getElementById("total-summer-visits");
+	      summer.innerText = "Average Summer Visits: " + sum;
+	      */
+	    });
+		if(filename2 !== null) {
+		  d3.csv("static/data/monthlies/" + filename2)
+		    .row(function(a) { return [a.avg_pred]; })
+		    .get(function(error, rows) {
+		      rows.unshift([name2 + " - Average Modeled"]);
+					bar_data[1] = [];
+					console.log(rows);
+		      for (var i = 0; i < rows.length; i++) {
+						bar_data[1].push(rows[i][0]);
+					}
+					createMonthly(bar_data);
+			});
+		console.log(bar_data);
+	}
+	  // var bar = c3.generate({
+	  //   bindto: '#histplot-monthlies-annuals',
+	  //   data: {
+	  //     rows: bar_data,
+	  //     x: 'x',
+	  //     type: 'bar'
+	  //   },
+	  //   axis: {
+	  //     x: {
+	  //       type: 'category',
+	  //       // categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
+	  //       //               'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+	  //       tick: {
+	  //         rotate: 60,
+	  //         multiline: false
+	  //       },
+	  //       height: 40
+	  //     },
+	  //     y: {
+	  //       label: {
+	  //         text: 'Average Modeled Number of Visits',
+	  //         position: 'outer-middle'
+	  //       }
+	  //     }
+	  //   },
+	  //   legend: {
+	  //     show: false
+	  //   }
+	  // });
+	}
+
+	function createMonthly(bar_data) {
+		var bar = c3.generate({
+			bindto: '#histplot-monthlies-annuals',
+			data: {
+				columns: bar_data,
+				type: 'bar'
+			},
+			axis: {
+				x: {
+					type: 'category',
+					categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June',
+												'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+					tick: {
+						rotate: 60,
+						multiline: false
+					},
+					height: 40
+				},
+				y: {
+					label: {
+						text: 'Average Modeled Number of Visits',
+						position: 'outer-middle'
+					}
+				}
+			},
+			legend: {
+				show: false
+			}
 			});
 	}
 
