@@ -91,7 +91,7 @@ header {
 	/* align-items: flex-end; */
 }
 
-#statistics-info {
+#statistics-info1, #statistics-info2 {
 	padding-left: 3%;
 	width: 50%;
 	height: 100px;
