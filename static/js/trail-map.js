@@ -6,21 +6,23 @@
 		.await(ready);
 
 	function ready(error, geojsontrails){
-		
+
 		var TRAIL_COLOR = '#ff5a3d';
 		var SELECTED_COLOR = '#a13dff';
 		var TRAIL_OPACITY = 0.75;
 
+		var selected = 1;
+
 		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
-			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' + 
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
 						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
 						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
 			maxZoom: 18,
 			ext: 'png'
 		});
-		
+
 		var satellite = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
-			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' + 
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
 						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
 						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
 			maxZoom: 18,
@@ -104,16 +106,69 @@
 		layer.addTo(map);
 		map.fitBounds(layer.getBounds());
 
-		// changeSelect changes the select box value when a user clicks on a trail
+		// changeSelect changes the checkbox values when a user clicks on a trail
 		// on the map and triggers a change event to occur
+		// if two trails are already selected, it will reset itself to only have one
+		// trail selected
 		function changeSelect() {
-			trail_select.value = this._leaflet_id;
-			var event = new Event("change");
-			trail_select.dispatchEvent(event);
+			var thisid = this._leaflet_id;
+
+			var isSelected = false;
+			var input;
+			var selectedInputs = [];
+			for (var i = 0; i < trail_inputs.length; i++) {
+				if (trail_inputs[i].value == thisid && trail_inputs[i].checked) {
+					input = trail_inputs[i];
+					isSelected = !isSelected;
+				} else if (trail_inputs[i].value == thisid) {
+					input = trail_inputs[i];
+				} else if (trail_inputs[i].checked) {
+					selectedInputs.push(trail_inputs[i]);
+				}
+			}
+			if(isSelected) {
+				selected--;
+				input.checked = !input.checked;
+				var event = new Event("change");
+				input.dispatchEvent(event);
+			} else {
+				if (selected == 0 || selected == 1) {
+					input.checked = !input.checked;
+					selected++;
+					var event = new Event("change");
+					input.dispatchEvent(event);
+				} else {
+					var event = new Event("change");
+					selected--;
+					console.log(selected);
+					selectedInputs[0].checked = !selectedInputs[0].checked;
+					console.log(selectedInputs[0].checked);
+					selectedInputs[0].dispatchEvent(event);
+					selectedInputs[1].checked = !selectedInputs[1].checked;
+					selectedInputs[1].dispatchEvent(event);
+					input.checked = !input.checked;
+					input.dispatchEvent(event);
+				}
+			}
 		}
 
-		// the DOM select box to choose a trail
-		var trail_select = document.querySelector("#trail-select select");
+		// array with all the checkbox inputs
+		var trail_inputs = document.querySelectorAll("ul.items li input");
+
+		// sets change functionality to all of the input checkboxes
+		for (var i = 0; i < trail_inputs.length; i++) {
+			trail_inputs[i].onchange = function() { updateMap(); };
+		}
+
+		// triggers a change event when the page is loaded for Dingford Creek
+		var selectedFirst;
+		for (var i = 0; i < trail_inputs.length; i++) {
+			if(trail_inputs[i].value == 5) {
+				selectedFirst = trail_inputs[i];
+				break;
+			}
+		}
+		selectedFirst.dispatchEvent(new Event("change"));
 
 		// set the initial trail highlighted in green
 		var initial_layer = layer.getLayer("5");
@@ -125,42 +180,66 @@
 		});
 		initial_layer.addTo(map);
 
-		// keep track of the current and previous chosen trails
-		var id;
-		var previd = 5; // set to the id of the initial layer (Dingford Creek)
+		// keeps track of the IDs of the selected trails
+		var currIds = [5];
 
-		// triggers the map to change when a different trail is selected
-		trail_select.onchange = function() {
-			updateMap();
-		};
-
-		// updateMap highlights the user-selected trail in green on the map and un-highlights the
-		// previous trail chosen by the user. If the user re-selects the same trail, nothing
-		// happens
-		//
-		// arguments:
-		// 		- select: the DOM select box to choose which trail is shown
+		// updateMap highlights the user-selected trail(s) in purple on the map and un-highlights the
+		// trails that have been unselected by the user. If the user re-selects the same trail, it is
+		// unselected
 		function updateMap() {
-			id = trail_select.value;
-			console.log(id);
-			var newlayer = layer.getLayer(id);
-			newlayer.removeFrom(map);
-			newlayer.setStyle({
+			// gets all the IDs of all checked trails
+			var checkedIds = [];
+			for (var i = 0; i < trail_inputs.length; i++) {
+				if (trail_inputs[i].checked) {
+					checkedIds.push(trail_inputs[i].value);
+				}
+			}
+			// combines and sorts the checked IDs with the previously current IDs
+			var combinedIds = checkedIds.concat(currIds);
+			combinedIds = combinedIds.sort();
+			var newIds = [];
+			// adds duplicate IDs to a variable newIds
+			for (var i = 0; i < combinedIds.length - 1; i++) {
+				if (combinedIds[i] == combinedIds[i + 1]) {
+					newIds.push(combinedIds[i]);
+				}
+			}
+			// removes newIds from currIds to identify which trails need to be
+			// unselected
+			for (var i = 0; i < newIds.length; i++) {
+				for (var j = 0; j < currIds.length; j++) {
+					if (newIds[i] == currIds[j]) {
+						currIds.splice(j, 1);
+						break;
+					}
+				}
+			}
+			// unselects trails that aren't selected anymore by using the
+			// filtered currIds, which now contains trails that need to be
+			// unselected
+			for (var i = 0; i < currIds.length; i++) {
+				var resetLayer = layer.getLayer(currIds[i]);
+				resetLayer.removeFrom(map);
+				resetLayer.setStyle({
+					color: TRAIL_COLOR,
+					opacity: TRAIL_OPACITY,
+					weight: (resetLayer.feature.properties.annual*0.17)**4
+				});
+				resetLayer.addTo(map);
+			}
+			// selects trails that are checked by matching them with
+			// the IDs in checkedIds
+			for (var i = 0; i < checkedIds.length; i++) {
+				var addLayer = layer.getLayer(checkedIds[i]);
+				addLayer.setStyle({
 					weight: 5,
 					color: SELECTED_COLOR,
 					opacity: 1.0
-			});
-			newlayer.addTo(map)
-			var prevlayer = layer.getLayer(previd);
-			if (previd !== id) {
-				prevlayer.setStyle({
-					color: TRAIL_COLOR,
-					opacity: TRAIL_OPACITY,
-					weight: (prevlayer.feature.properties.annual*0.17)**4
 				});
-				prevlayer.addTo(map);
-				previd = id;
+				addLayer.addTo(map);
 			}
+			// resets currIds to reflect the now-selected trails
+			currIds = checkedIds;
 		}
 
 	}

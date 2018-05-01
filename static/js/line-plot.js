@@ -79,9 +79,9 @@
 			}
 		});
 
-		var startgraph = new Event("change");
-		var first = document.querySelector("ul li input");
-		first.dispatchEvent(startgraph);
+		// var startgraph = new Event("change");
+		// var first = document.querySelector("ul li input");
+		// first.dispatchEvent(startgraph);
 
 
 		function changeGraph(d1, value1, d2, value2) {
@@ -255,9 +255,9 @@
 
 
 		// Trigger a change event to display data as soon as the page is loaded
-		var changeEvent = new Event("change");
-		document.querySelector("#trail-select select").value = 5;
-		document.querySelector("#trail-select select").dispatchEvent(changeEvent);
+		// var changeEvent = new Event("change");
+		// document.querySelector("#trail-select select").value = 5;
+		// document.querySelector("#trail-select select").dispatchEvent(changeEvent);
 }
 
 
