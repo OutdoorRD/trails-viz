@@ -12,9 +12,13 @@
       <p id="title">SocialTrails</p>
       <p id="subtitle">monitoring recreation with social media</p>
       <div id='trail-select'>
-        <p>Select Trail:</p>
         <!-- Trail -->
-        <!-- <select></select> -->
+        <div id='list1' class='dropdown-check-list'>
+          <span class='anchor'>Select Trails <i class="arrow down"></i></span>
+          <ul class='items'>
+
+          </ul>
+        </div>
       </div>
     </div>
   </header>
@@ -25,8 +29,13 @@
   			<div id='title'>Trail Map</div>
   		</div>
       <div id='select-averages'>
-        <div id="statistics-info">
-          <h3 id="trail-name"></h4>
+        <div id="statistics-info1">
+          <h3 id="trail-name"></h3>
+          <p id="total-annual-visits"></p>
+          <p id="total-summer-visits"></p>
+        </div>
+        <div id="statistics-info2">
+          <h3 id="trail-name"></h3>
           <p id="total-annual-visits"></p>
           <p id="total-summer-visits"></p>
         </div>
@@ -67,5 +76,5 @@
 
 	<script src="./static/js/trail-map.js"></script>
 	<script src="./static/js/line-plot.js"></script>
-
+  <script src="./static/js/mapbox-token.js"></script>
 </body>
