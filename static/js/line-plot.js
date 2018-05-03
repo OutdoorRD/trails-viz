@@ -43,6 +43,8 @@
                 checkList.classList.add('visible');
         };
 
+		sortDropDown();
+
     // select.on("change", function(d) {
     //     changeGraph(d, d3.select(this).property("value"));
     // });
@@ -392,15 +394,17 @@
 
 	function sortDropDown() {
 		var dropdown, i, switching, b, shouldSwitch;
-		dropdown = document.querySelector('div select');
+		dropdown = document.querySelector('div ul');
 		switching = true;
 
 		while(switching) {
 			switching = false;
-			b = dropdown.getElementsByTagName("OPTION");
+			b = dropdown.getElementsByTagName("LI");
 			for (i = 0; i < (b.length - 1); i++) {
 				shouldSwitch = false;
-				if (b[i].innerHTML.toLowerCase() > b[i + 1].innerHTML.toLowerCase()) {
+				var input1 = b[i].getElementsByTagName("SPAN");
+				var input2 = b[i + 1].getElementsByTagName("SPAN");
+				if (input1[0].innerHTML.toLowerCase() > input2[0].innerHTML.toLowerCase()) {
 					shouldSwitch = true;
 					break;
 				}
