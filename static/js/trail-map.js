@@ -3,15 +3,21 @@
 
 	queue()
 		.defer(d3.json, "static/data/trails.geojson")
+		.defer(d3.json, "static/data/trail_polygons.geojson")
 		.await(ready);
 
-	function ready(error, geojsontrails){
+	function ready(error, geojsontrails, geojsonpolygons){
+		console.log(geojsonpolygons);
 
 		var TRAIL_COLOR = '#ff5a3d';
 		var SELECTED_COLOR = '#a13dff';
 		var TRAIL_OPACITY = 0.75;
+		var POLYGON_COLOR = '#FF967F';
+		var POLYGON_HIGHLIGHT = '#578fff';
+		var POLYGON_SELECTED = '#CC8AFF';
 
 		var selected = 1;
+
 
 		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
 			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
@@ -29,9 +35,11 @@
 			ext: 'png'
 		});
 
+		console.log(geojsonpolygons);
+
 		var baseMaps = {
 			"outdoors": outdoors,
-			"satellite": satellite
+			"satellite": satellite,
 		};
 
 		// sets the initial style for the trails
@@ -48,9 +56,62 @@
 			}
 		};
 
+		var getPolygonStyle = function(feature) {
+			return {
+				color: POLYGON_COLOR,
+				weight: 2,
+				opacity: 0.75
+			}
+		}
+
+		var highlightPolygon = function(e) {
+			var polygon;
+			if(e.target) {
+				polygon = e.target;
+				console.log(e.target);
+			} else {
+				polygon = e;
+			}
+			polygon.setStyle({
+				color: POLYGON_HIGHLIGHT,
+				weight: 3,
+				opacity: 0.75
+			});
+		}
+
+		var resetPolygonHighlight = function(e) {
+			trailPolygon.resetStyle(e.target);
+		}
+
+		var onEachPolygon = function(feature, polylayer) {
+			polylayer._leaflet_id = (feature.properties.AllTRLs_ID) + 200;
+			polylayer.on({
+				mouseover: function(e, feature, polylayer) {
+					if(e.target.options.color == POLYGON_COLOR) {
+						highlightPolygon(e);
+						console.log(e.target.feature.properties.AllTRLs_ID);
+						console.log(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+						highlightFeature(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+					}
+				},
+				mouseout: function(e, feature, polylayer) {
+					if(e.target.options.color != POLYGON_SELECTED) {
+						resetPolygonHighlight(e);
+						resetHighlight(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+					}
+				},
+				click: changeSelect
+			})
+		}
+
 		// highlights a trail that is being hovered over by the user in blue
 		var highlightFeature = function(e) {
-		    var line = e.target;
+				var line;
+				if (e.target) {
+					line = e.target;
+				} else {
+					line = e;
+				}
 
 		    line.setStyle({
 		        weight: 5,
@@ -65,7 +126,11 @@
 
 		// resets the style of a highlighted trail
 		var resetHighlight = function(e) {
-		    layer.resetStyle(e.target);
+				if(e.target) {
+				//	if(e.target.options.color != SELECTED_COLOR) { layer.resetStyle(e.target); }
+				} else {
+					if(e.options.color != SELECTED_COLOR) { layer.resetStyle(e); }
+				}
 		};
 
 		// defines the behavior of the geoJSON trails on the map
@@ -76,6 +141,9 @@
 	    	mouseover: function(e, feature, layer) {
 					if(e.target.options.color == TRAIL_COLOR) {
 						highlightFeature(e);
+						console.log(e);
+						console.log(trailPolygon.getLayer(e.target.feature.properties.AllTRLs_ID + 200));
+						highlightPolygon(trailPolygon.getLayer(e.target.feature.properties.AllTRLs_ID + 200));
 					}
 				},
 	    	mouseout: function(e, layer, feature) {
@@ -93,18 +161,35 @@
 			style: getStyle
 		});
 
+		var trailPolygon = L.geoJSON(geojsonpolygons, {
+			onEachFeature: onEachPolygon,
+			style: getPolygonStyle
+		});
+
+		console.log(trailPolygon);
+
+		// var overlayMaps = {
+		// 	"trail areas": trailPolygon
+		// }
+
 		// create the map variable to be displayed on the website with the default layers
 		// shown as the terrain layer and the trail layer
 		var map = L.map('trail-map', {
 			center: [45, -105],
 			zoom: 9,
-			layers: [outdoors, layer]
+			layers: [outdoors, trailPolygon, layer]
 		})
 
 		// add map layers, including geoJSON data, to the leaflet map
 		L.control.layers(baseMaps).addTo(map);
-		layer.addTo(map);
+		// layer.addTo(map);
+	//	trailPolygon.addTo(map);
 		map.fitBounds(layer.getBounds());
+
+		function changePolygon() {
+			var trailid = this._leaflet_id - 200;
+			console.log(trailid);
+		}
 
 		// changeSelect changes the checkbox values when a user clicks on a trail
 		// on the map and triggers a change event to occur
@@ -112,6 +197,10 @@
 		// trail selected
 		function changeSelect() {
 			var thisid = this._leaflet_id;
+
+			if(thisid >= 200) {
+				thisid -= 200;
+			}
 
 			var isSelected = false;
 			var input;
@@ -172,12 +261,20 @@
 
 		// set the initial trail highlighted in green
 		var initial_layer = layer.getLayer("5");
+		var initial_polygon = trailPolygon.getLayer("205");
 		initial_layer.removeFrom(map);
+		initial_polygon.removeFrom(map);
 		initial_layer.setStyle({
 			weight: 5,
 			color: SELECTED_COLOR,
 			opacity: 1.0
 		});
+		initial_polygon.setStyle({
+			weight: 2,
+			color: POLYGON_SELECTED,
+			opacity: 0.75
+		});
+		initial_polygon.addTo(map);
 		initial_layer.addTo(map);
 
 		// keeps track of the IDs of the selected trails
@@ -219,23 +316,36 @@
 			// unselected
 			for (var i = 0; i < currIds.length; i++) {
 				var resetLayer = layer.getLayer(currIds[i]);
+				var resetPolygon = trailPolygon.getLayer(parseInt(currIds[i]) + 200);
 				resetLayer.removeFrom(map);
 				resetLayer.setStyle({
 					color: TRAIL_COLOR,
 					opacity: TRAIL_OPACITY,
 					weight: (resetLayer.feature.properties.annual*0.17)**4
 				});
+				resetPolygon.setStyle({
+					color: POLYGON_COLOR,
+					opacity: 0.75,
+					weight: 2
+				})
 				resetLayer.addTo(map);
 			}
 			// selects trails that are checked by matching them with
 			// the IDs in checkedIds
 			for (var i = 0; i < checkedIds.length; i++) {
 				var addLayer = layer.getLayer(checkedIds[i]);
+				var addPolygon = trailPolygon.getLayer(parseInt(checkedIds[i]) + 200);
 				addLayer.setStyle({
 					weight: 5,
 					color: SELECTED_COLOR,
 					opacity: 1.0
 				});
+				addPolygon.setStyle({
+					weight: 2,
+					color: POLYGON_SELECTED,
+					opacity: 0.75
+				})
+				addPolygon.addTo(map);
 				addLayer.addTo(map);
 			}
 			// resets currIds to reflect the now-selected trails
