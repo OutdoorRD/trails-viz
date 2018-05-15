@@ -363,6 +363,12 @@
 	}
 
 	function createMonthly(bar_data) {
+		var colors;
+		if (bar_data.length > 2) {
+			colors = ['#82cece', '#b7f4ef', '#23b5d3', '#407899'];
+		} else {
+			colors = ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2'];
+		}
 		var bar = c3.generate({
 			bindto: '#histplot-monthlies-annuals',
 			data: {
@@ -370,7 +376,7 @@
 				type: 'bar'
 			},
 			color: {
-				pattern: ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2']
+				pattern: colors
 			},
 			axis: {
 				x: {
@@ -440,6 +446,12 @@
 	}
 
 	function createAnnual(bar_data) {
+		var colors;
+		if (bar_data.length > 2) {
+			colors = ['#82cece', '#b7f4ef', '#23b5d3', '#407899'];
+		} else {
+			colors = ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2'];
+		}
 		var bar = c3.generate({
 				bindto: '#histplot-monthlies-annuals',
 				data: {
@@ -448,7 +460,7 @@
 					type: 'bar'
 				},
 				color: {
-					pattern: ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2']
+					pattern: colors
 				},
 				axis: {
 					x: {

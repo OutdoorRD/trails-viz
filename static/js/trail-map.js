@@ -7,8 +7,6 @@
 		.await(ready);
 
 	function ready(error, geojsontrails, geojsonpolygons){
-		console.log(geojsonpolygons);
-
 		var TRAIL_COLOR = '#ff5a3d';
 		var SELECTED_COLOR = '#a13dff';
 		var TRAIL_OPACITY = 0.75;
@@ -17,7 +15,6 @@
 		var POLYGON_SELECTED = '#CC8AFF';
 
 		var selected = 1;
-
 
 		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
 			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
@@ -35,7 +32,6 @@
 			ext: 'png'
 		});
 
-		console.log(geojsonpolygons);
 
 		var baseMaps = {
 			"outdoors": outdoors,
@@ -68,7 +64,6 @@
 			var polygon;
 			if(e.target) {
 				polygon = e.target;
-				console.log(e.target);
 			} else {
 				polygon = e;
 			}
@@ -87,11 +82,11 @@
 			polylayer._leaflet_id = (feature.properties.AllTRLs_ID) + 200;
 			polylayer.on({
 				mouseover: function(e, feature, polylayer) {
+					console.log(polylayer);
 					if(e.target.options.color == POLYGON_COLOR) {
 						highlightPolygon(e);
-						console.log(e.target.feature.properties.AllTRLs_ID);
-						console.log(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
 						highlightFeature(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+						console.log(e);
 					}
 				},
 				mouseout: function(e, feature, polylayer) {
@@ -103,6 +98,7 @@
 				click: changeSelect
 			})
 		}
+
 
 		// highlights a trail that is being hovered over by the user in blue
 		var highlightFeature = function(e) {
@@ -141,8 +137,6 @@
 	    	mouseover: function(e, feature, layer) {
 					if(e.target.options.color == TRAIL_COLOR) {
 						highlightFeature(e);
-						console.log(e);
-						console.log(trailPolygon.getLayer(e.target.feature.properties.AllTRLs_ID + 200));
 						highlightPolygon(trailPolygon.getLayer(e.target.feature.properties.AllTRLs_ID + 200));
 					}
 				},
@@ -166,7 +160,6 @@
 			style: getPolygonStyle
 		});
 
-		console.log(trailPolygon);
 
 		// var overlayMaps = {
 		// 	"trail areas": trailPolygon
@@ -177,7 +170,7 @@
 		var map = L.map('trail-map', {
 			center: [45, -105],
 			zoom: 9,
-			layers: [outdoors, trailPolygon, layer]
+			layers: [outdoors, layer, trailPolygon]
 		})
 
 		// add map layers, including geoJSON data, to the leaflet map
@@ -188,7 +181,6 @@
 
 		function changePolygon() {
 			var trailid = this._leaflet_id - 200;
-			console.log(trailid);
 		}
 
 		// changeSelect changes the checkbox values when a user clicks on a trail
@@ -229,9 +221,7 @@
 				} else {
 					var event = new Event("change");
 					selected--;
-					console.log(selected);
 					selectedInputs[0].checked = !selectedInputs[0].checked;
-					console.log(selectedInputs[0].checked);
 					selectedInputs[0].dispatchEvent(event);
 					selectedInputs[1].checked = !selectedInputs[1].checked;
 					selectedInputs[1].dispatchEvent(event);
