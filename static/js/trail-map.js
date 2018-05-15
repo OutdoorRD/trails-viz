@@ -239,6 +239,11 @@
 					input.dispatchEvent(event);
 				}
 			}
+			if (selected == 1 || selected == 0) {
+				toggleVisibility(true);
+			} else {
+				toggleVisibility(false);
+			}
 		}
 
 		// array with all the checkbox inputs
@@ -352,6 +357,18 @@
 			currIds = checkedIds;
 		}
 
+	}
+
+	// Takes a boolean value 'visible' representing whether
+	// the social select box should be visible (when one trail is selected)
+	// and changes it accordingly
+	function toggleVisibility(visible) {
+		var social = document.querySelector('.social-select');
+		if (visible) {
+			social.style.visibility = 'visible';
+		} else {
+			social.style.visibility = 'hidden';
+		}
 	}
 
 })();

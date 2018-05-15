@@ -28,7 +28,7 @@
   		<div id='trail-map'>
   			<div id='title'>Trail Map</div>
   		</div>
-      <div id='select-averages'>
+      <div id='averages'>
         <div id="statistics-info1">
           <h3 id="trail-name"></h3>
           <p id="total-annual-visits"></p>
@@ -39,10 +39,17 @@
           <p id="total-annual-visits"></p>
           <p id="total-summer-visits"></p>
         </div>
+      </div>
+      <div id='bar-selects'>
         <div id='select-buttons'>
           <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly</input>
           <div></div>
           <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual</input>
+        </div>
+        <div id='select-buttons' class='social-select'>
+          <input id='radioplotsocial1' type='radio' name='selectsocial' value='modeled' checked='checked'>Show Modeled</input>
+          <div></div>
+          <input id='radioplotsocial2' type='radio' name='selectsocial' value='social'>Show Social Media</input>
         </div>
       </div>
       <div id='histplot-monthlies-annuals'>

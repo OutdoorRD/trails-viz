@@ -2,7 +2,7 @@
 	'use strict'
 
 	queue()
-		.defer(d3.csv, "static/data/hikers_monthly.csv")
+		.defer(d3.csv, "static/data_test/hikers_monthly.csv")
 		.await(ready);
 
 	function ready(error, hikers_timeseries){
@@ -19,7 +19,7 @@
 			.attr("type", "checkbox")
 			.attr("value", function(d) { return d.AllTRLs_ID; });
 
-		console.log(select.selectAll("li"));
+		//console.log(select.selectAll("li"));
 
 		select.selectAll("li")
 			.append("span")
@@ -92,8 +92,8 @@
 				filename1 = value1 + ".csv";
 
 			// Adds the annual averages statistic to the panel of text about the current trail
-			d3.csv("static/data/annuals/" + filename1)
-				.row(function(a) { return [a.year, a.total_pred]; })
+			d3.csv("static/data_test/annuals/" + filename1)
+				.row(function(a) { return [a.year, a.avg_pred]; })
 				.get(function(error, rows) {
 					var sum = 0;
 					for (let i = 0; i < rows.length; i++) {
@@ -101,7 +101,7 @@
 						sum += parseInt(row[1]);
 					}
 					sum = Math.round(sum / rows.length);
-					console.log(sum);
+					//console.log(sum);
 					var annual_avg = document.querySelector('#statistics-info1 #total-annual-visits');
 					annual_avg.innerText = "Average Annual Visits: " + sum;
 				});
@@ -127,7 +127,7 @@
 				actual1.push(+d.actual);
 			});
 
-			console.log(date);
+			//console.log(date);
 
 			predicted1.unshift(traildata1[0].Trail_name + ' - modeled');
 			actual1.unshift(traildata1[0].Trail_name + ' - on-site');
@@ -147,8 +147,8 @@
 				var name2 = traildata2[0].Trail_name;
 				document.querySelector("#statistics-info2 #trail-name").innerText = name2;
 
-				d3.csv("static/data/annuals/" + filename2)
-					.row(function(a) { return [a.year, a.total_pred]; })
+				d3.csv("static/data_test/annuals/" + filename2)
+					.row(function(a) { return [a.year, a.avg_pred]; })
 					.get(function(error, rows) {
 						var sum = 0;
 						for (let i = 0; i < rows.length; i++) {
@@ -156,7 +156,7 @@
 							sum += parseInt(row[1]);
 						}
 						sum = Math.round(sum / rows.length);
-						console.log(sum);
+						//console.log(sum);
 						var annual_avg = document.querySelector('#statistics-info2 #total-annual-visits');
 						annual_avg.innerText = "Average Annual Visits: " + sum;
 					});
@@ -174,29 +174,72 @@
 
 				plot_data.push(date, predicted1, actual1, predicted2, actual2);
 
-				fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+				fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name, false);
 
 			} else {
+				var flickr = [],
+					twitter = [],
+					instagram = [],
+					wta = [];
+
+				traildata1.map(function(d) {
+					flickr.push(+d.flickr);
+					twitter.push(+d.twitter);
+					instagram.push(+d.instag);
+					wta.push(+d.wta);
+				});
+
+				flickr.unshift(traildata1[0].Trail_name + ' - Flickr');
+				twitter.unshift(traildata1[0].Trail_name + ' - Twitter');
+				instagram.unshift(traildata1[0].Trail_name + ' - Instagram');
+				wta.unshift(traildata1[0].Trail_name + ' - WTA');
+
 				document.querySelector("#statistics-info2 #trail-name").innerText = "";
 				document.querySelector("#statistics-info2 #total-annual-visits").innerText = "";
 				document.querySelector("#statistics-info2 #total-summer-visits").innerText = "";
-				plot_data.push(date, predicted1, actual1);
-				fillMonthly(filename1, traildata1[0].Trail_name, null, null);
+				plot_data.push(date, predicted1, actual1, flickr, twitter, instagram, wta);
+				if (document.getElementById('radioplotsocial1').checked) {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, false);
+				} else {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, true);
+				}
 			}
+
+			document.getElementById('radioplotsocial1').onclick = function() {
+				if (document.getElementById('radioplot1').checked) {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, false);
+				} else {
+					fillAnnual(filename1, traildata1[0].Trail_name, null, null, false);
+				}
+			}
+
+			document.getElementById('radioplotsocial2').onclick = function() {
+				if (document.getElementById('radioplot1').checked) {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, true);
+				} else {
+					fillAnnual(filename1, traildata1[0].Trail_name, null, null, true);
+				}
+			}
+
+			var social = document.querySelector('.social-select').style;
 
 			document.getElementById('radioplot1').onclick = function() {
 				if (d2 != null) {
-					fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+					fillMonthly(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name, false);
+				} else if(document.getElementById('radioplotsocial1').checked) {
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, false);
 				} else {
-					fillMonthly(filename1, traildata1[0].Trail_name, null, null);
+					fillMonthly(filename1, traildata1[0].Trail_name, null, null, true);
 				}
 			};
 
 			document.getElementById('radioplot2').onclick = function() {
 				if (d2 != null) {
-					fillAnnual(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name);
+					fillAnnual(filename1, traildata1[0].Trail_name, filename2, traildata2[0].Trail_name, false);
+				} else if (document.getElementById('radioplotsocial1').checked) {
+					fillAnnual(filename1, traildata1[0].Trail_name, null, null, false);
 				} else {
-					fillAnnual(filename1, traildata1[0].Trail_name, null, null);
+					fillAnnual(filename1, traildata1[0].Trail_name, null, null, true);
 				}
 			};
 
@@ -209,6 +252,9 @@
 		        xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
 		        columns: plot_data
 		    },
+				color: {
+					pattern: ['#ff595e', '#ffca3a', '#1982c4', '#8ac926', '#6a4c93', '#02c9c2']
+				},
 		    axis: {
 		        x: {
 		            type: 'timeseries',
@@ -263,17 +309,30 @@
 }
 
 
-	function fillMonthly(filename1, name1, filename2, name2) {
+	function fillMonthly(filename1, name1, filename2, name2, social) {
 	  var bar_data = [];
 		var data1, data2;
-	  d3.csv("static/data/monthlies/" + filename1)
+	  d3.csv("static/data_test/monthlies/" + filename1)
 	    .row(function(a) {
-	      return [a.avg_pred]; })
+	      return [a.avg_pred, a.avg_flickr, a.avg_twitter, a.avg_instag, a.avg_wta]; })
 	    .get(function(error, rows) {
-	      rows.unshift([name1 + " - Average Modeled"]);
+	      rows.unshift([name1 + " - Average Modeled", "Flickr", "Twitter", "Instagram", "WTA"]);
 				bar_data[0] = [];
+				if(social) {
+					bar_data[1] = [];
+					bar_data[2] = [];
+					bar_data[3] = [];
+				}
+				console.log(rows);
 				for (var i = 0; i < rows.length; i++) {
-					bar_data[0].push(rows[i][0]);
+					if(social) {
+						bar_data[0].push(rows[i][1]);
+						bar_data[1].push(rows[i][2]);
+						bar_data[2].push(rows[i][3]);
+						bar_data[3].push(rows[i][4]);
+					} else {
+						bar_data[0].push(rows[i][0]);
+					}
 				}
 
 				var sum1 = parseInt(rows[6]) + parseInt(rows[7]) + parseInt(rows[8]);
@@ -281,9 +340,10 @@
 				summer1.innerText = "Average Summer Visits: " + sum1;
 
 				if (filename2 == null) {
+					console.log(bar_data);
 					createMonthly(bar_data);
 				} else {
-					d3.csv("static/data/monthlies/" + filename2)
+					d3.csv("static/data_test/monthlies/" + filename2)
 						.row(function(a) { return [a.avg_pred]; })
 						.get(function(error, rows) {
 							rows.unshift([name2 + " - Average Modeled"]);
@@ -309,6 +369,9 @@
 				columns: bar_data,
 				type: 'bar'
 			},
+			color: {
+				pattern: ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2']
+			},
 			axis: {
 				x: {
 					type: 'category',
@@ -333,24 +396,37 @@
 			});
 	}
 
-	function fillAnnual(filename1, name1, filename2, name2) {
+	function fillAnnual(filename1, name1, filename2, name2, social) {
 		var bar_data = [];
 
-	  d3.csv("static/data/annuals/" + filename1)
-	    .row(function(a) {return [a.year, a.total_pred]; })
+	  d3.csv("static/data_test/annuals/" + filename1)
+	    .row(function(a) {return [a.year, a.avg_pred, a.avg_flickr, a.avg_twitter, a.avg_instag, a.avg_wta]; })
 	    .get(function(error, rows) {
-	      rows.unshift(["Year", name1 + " - Total Annual"]);
+				console.log(rows);
+	      rows.unshift(["Year", name1 + " - Total Annual", "Flickr", "Twitter", "Instagram", "WTA"]);
 	      bar_data[0] = [];
 	      bar_data[1] = [];
+				if (social) {
+					bar_data[2] = [];
+					bar_data[3] = [];
+					bar_data[4] = [];
+				}
 	      for (var i = 0; i < rows.length; i++) {
 	        bar_data[0].push(rows[i][0]);
-	        bar_data[1].push(rows[i][1]);
+					if (social) {
+						bar_data[1].push(rows[i][2]);
+						bar_data[2].push(rows[i][3]);
+						bar_data[3].push(rows[i][4]);
+						bar_data[4].push(rows[i][5]);
+					} else {
+						bar_data[1].push(rows[i][1]);
+					}
 	      }
 	      if(filename2 == null) {
 	        createAnnual(bar_data);
 	      } else {
-					d3.csv("static/data/annuals/" + filename2)
-			      .row(function(a) {return [a.total_pred]; })
+					d3.csv("static/data_test/annuals/" + filename2)
+			      .row(function(a) {return [a.avg_pred]; })
 			      .get(function(error, rows) {
 			        rows.unshift([name2 + " - Total Annual"]);
 			        bar_data[2] = [];
@@ -370,6 +446,9 @@
 					columns: bar_data,
 					x: 'Year',
 					type: 'bar'
+				},
+				color: {
+					pattern: ['#ff595e', '#1982c4', '#ffca3a', '#8ac926', '#6a4c93', '#02c9c2']
 				},
 				axis: {
 					x: {
@@ -392,6 +471,7 @@
 		});
 	}
 
+	// Sorts the dropdown select menu to be alphabetized
 	function sortDropDown() {
 		var dropdown, i, switching, b, shouldSwitch;
 		dropdown = document.querySelector('div ul');
