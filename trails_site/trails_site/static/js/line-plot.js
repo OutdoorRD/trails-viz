@@ -34,7 +34,7 @@
 				fillAnnual(trail_id);
 			};
 
-			var traildata = hikers_timeseries.filter(function(d) { return d.AllTRLs_ID == trail_id })
+			var traildata = hikers_timeseries.filter(function(d) { return d.siteid == trail_id })
 
 			var date = [],
 				predicted = [],
@@ -83,11 +83,13 @@
 		}
 
     select.selectAll("option")
-      .data(d3.map(hikers_timeseries, function(d){return d.Trail_name;}).values())
+      .data(d3.map(hikers_timeseries, function(d){
+				console.log(d);
+				return d.Trail_name;}).values())
       // .data(hikers_timeseries)
       .enter()
         .append("option")
-        .attr("value", function (d) { return d.AllTRLs_ID; })
+        .attr("value", function (d) { return d.siteid; })
         .text(function (d) { return d.Trail_name; });
 
 		// Trigger a change event to display data as soon as the page is loaded
@@ -112,6 +114,7 @@
 			.then(checkStatus)
 			.then(JSON.parse)
 			.then(function(response) {
+				console.log(response);
 				generateAnnual(response);
 			})
 			.catch(alert);

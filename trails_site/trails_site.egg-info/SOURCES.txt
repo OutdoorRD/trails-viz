@@ -7,7 +7,6 @@ trails_site.egg-info/dependency_links.txt
 trails_site.egg-info/requires.txt
 trails_site.egg-info/top_level.txt
 trails_site/static/.DS_Store
-trails_site/static/index.html
 trails_site/static/css/style.css
 trails_site/static/data/hikers_monthly.csv
 trails_site/static/data/hikers_weekly.csv
@@ -64,6 +63,11 @@ trails_site/static/data/monthlies/96.csv
 trails_site/static/data/monthlies/97.csv
 trails_site/static/data/monthlies/98.csv
 trails_site/static/data/monthlies/99.csv
+trails_site/static/img/C3.png
+trails_site/static/img/ForestServiceLogoOfficial.png
+trails_site/static/img/TNC.png
+trails_site/static/img/US-NationalParkService.png
+trails_site/static/img/natcap.jpg
 trails_site/static/js/line-plot.js
 trails_site/static/js/trail-map.js
 trails_site/static/lib/c3-0.4.21.zip
@@ -305,3 +309,4 @@ trails_site/static/lib/c3-0.4.21/src/scss/select_drag.scss
 trails_site/static/lib/c3-0.4.21/src/scss/text.scss
 trails_site/static/lib/c3-0.4.21/src/scss/title.scss
 trails_site/static/lib/c3-0.4.21/src/scss/tooltip.scss
+trails_site/templates/index.html
