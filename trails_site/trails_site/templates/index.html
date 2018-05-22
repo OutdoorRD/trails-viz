@@ -12,22 +12,49 @@
       <p id="title">SocialTrails</p>
       <p id="subtitle">monitoring recreation with social media</p>
       <div id='trail-select'>
-        <p>Select Trail:</p>
+
+        <div id='list1' class='dropdown-check-list'>
+          <span class='anchor'>Select Trails <i class='arrow down'></i></span>
+          <ul class='items'>
+
+          </ul>
+        </div>
       </div>
     </div>
   </header>
-	<div id='trail-viz'>
+  <div id='trail-viz'>
     <div id="header-space"></div>
-		<div id='trail-map'>
-			<div id='title'>Trail Map</div>
-		</div>
-    <div id='histplot-monthlies-annuals'>
-      <div id='title'>Average Monthly/Annual Trail visits</div>
-    </div>
-    <div id='select-buttons'>
-      <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly</input>
-      <div></div>
-      <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual</input>
+    <div id='first-panel'>
+  		<div id='trail-map'>
+  			<div id='title'>Trail Map</div>
+  		</div>
+      <div id='averages'>
+        <div id="statistics-info1">
+          <h3 id="trail-name"></h3>
+          <p id="total-annual-visits"></p>
+          <p id="total-summer-visits"></p>
+        </div>
+        <div id="statistics-info2">
+          <h3 id="trail-name"></h3>
+          <p id="total-annual-visits"></p>
+          <p id="total-summer-visits"></p>
+        </div>
+      </div>
+      <div id='bar-selects'>
+        <div id='select-buttons'>
+          <input id='radioplot1' type='radio' name='histplot' value='monthlies', checked='checked'>Monthly</input>
+          <div></div>
+          <input id='radioplot2' type='radio' name='histplot' value='annuals'>Annual</input>
+        </div>
+        <div id='select-buttons' class='social-select'>
+          <input id='radioplotsocial1' type='radio' name='selectsocial' value='modeled' checked='checked'>Show Modeled</input>
+          <div></div>
+          <input id='radioplotsocial2' type='radio' name='selectsocial' value='social'>Show Social Media</input>
+        </div>
+      </div>
+      <div id='histplot-monthlies-annuals'>
+        <div id='title'>Average Monthly/Annual Trail visits</div>
+      </div>
     </div>
     <div id='line-plot'>
 			<div id='title'>Monthly Trail visits</div>
@@ -56,5 +83,6 @@
 
 	<script src="{{ url_for('static', filename='js/trail-map.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/line-plot.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/mapbox-token.js')}}"></script>
 
 </body>

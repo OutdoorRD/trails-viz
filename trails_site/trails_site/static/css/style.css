@@ -16,10 +16,6 @@ header {
 	z-index: 9999;
 }
 
-/*#header-space {
-	height: 50px;
-}*/
-
 #header-info {
 	display: flex;
 	height: inherit;
@@ -43,17 +39,11 @@ header {
 }
 
 #trail-select {
+	min-width: 220px;
 	padding-right: 5%;
 	padding-top: 1%; /*wanting bottom of title and subtitle aligned*/
 	display: flex;
-	align-items: center;
-}
-
-#trail-select p {
-	font-size: 12pt;
-	padding-right: 4px;
-	width: 50%;
-	font-family: "Montserrat";
+	flex-wrap: nowrap;
 }
 
 #trail-viz {
@@ -65,16 +55,57 @@ header {
 	justify-content: space-evenly;
 }
 
+#first-panel {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	width: 100%;
+	height: 700px;
+	justify-content: space-between;
+}
+
 #trail-map {
-	height: 500px;
+	height: 700px;
 	margin-top: 100px;
 	width: 60%;
 }
 
+#averages {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 38%;
+	justify-content: space-between;
+}
+
+#bar-selects {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 38%;
+}
+
+#statistics-info1, #statistics-info2 {
+	padding-left: 3%;
+	width: 50%;
+	height: 100px;
+	margin-top: 90px;
+}
+
+#trail-name {
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+#total-annual-visits, #total-summer-visits {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 #histplot-monthlies-annuals {
-	width: 25%;
-	height: 500px;
-	margin-top: 100px;
+	width: 38%;
+	height: 400px;
+	margin-top: 20px;
 	padding-left: 1%;
 }
 
@@ -83,8 +114,9 @@ text.c3-axis-y-label {
 }
 
 #select-buttons {
-	width: 10%;
-	margin-top: 100px;
+	padding-left: 1%;
+	width: 50%;
+	position: relative;
 }
 
 #select-buttons div {
@@ -127,66 +159,70 @@ footer {
 	padding-bottom: 1%;
 }
 
-/*
-#trail-viz {
-	position: absolute;
-	top: 10px;
+.dropdown-check-list .anchor {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  /* padding: 5px 50px 5px 10px; */
+	padding: 2% 10% 2% 2%;
+	font-family: Montserrat;
+	margin-right: 10px;
+}
+
+#dropdown-symbol {
+  /* position: relative; */
+  /* content: ""; */
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 4px;
+  /* right: 0px; */
+  /* top: 20%; */
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+	/* margin-left: 60px; */
+}
+
+.arrow {
+	border: solid black;
+	border-width: 0 2px 2px 0;
+	display: inline-block;
+	padding: 3px;
+	margin-left: 20px;
+}
+
+.down {
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+}
+
+.dropdown-check-list .anchor:active:after {
+  right: 8px;
+  top: 21%;
+}
+
+.dropdown-check-list ul.items {
+  padding: 2px;
+  display: none;
+  margin: 0;
+  border-top: none;
+	background-color: white;
+}
+
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
+
+.dropdown-check-list.visible .items {
+  display: block;
+}
+
+.dropdown-check-list.visible {
+	background-color: white;
+}
+
+.dropdown-check-list {
 	width: 100%;
 }
-
-#fig-holder {
-	width: 100%;
-	height: 750px;
-	position: relative;
-}
-
-#trail-select, #trail-map, #line-plot, #text-box, #select-buttons {
-	position: absolute;
-}
-
-header {
-	padding-bottom: 40px;
-}
-
-#trail-map {
-	top: 20px;
-	width: 70%;
-	height: 500px;
-}
-
-#line-plot {
-	top: 520px;
-	width: 800px;
-	height: 300px;
-	padding-top: 10px;
-}
-
-#histplot-monthlies-annuals {
-	top: 520px;
-	padding-top: 10px;
-	width: 800px;
-}
-
-#trail-select, #select-buttons {
-	top: 520px;
-	width: 150px;
-	left: 820px;
-	height: 200px;
-	padding-top: 10px;
-}
-
-#text-box {
-	top: 550px;
-	width: 150px;
-	left: 820px;
-	height: 200px;
-	padding-top: 10px;
-}
-
-#select-buttons {
-	top: 830px;
-	width: 150px;
-	left: 820px;
-	height: 200px;
-	padding-top: 10px;
-} */
