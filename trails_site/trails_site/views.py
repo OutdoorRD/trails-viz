@@ -65,7 +65,7 @@ def create_monthlies():
     # monthly.rename(columns={'siteid':'AllTRLs_ID', 'estimate':'predicted', 'onsite':'actual'}, inplace=True)
     # monthly.to_csv('static/data/hikers_monthly.csv', index=False, na_rep='NA')
 
-    monthly = monthly[['siteid', 'date', 'estimate', 'onsite', 'Trail_name', 'year', 'month']]
+    monthly = monthly[['siteid', 'date', 'estimate', 'onsite', 'Trail_name', 'year', 'month', 'flickr', 'twitter', 'instag', 'wta']]
     return monthly.to_json(orient='records') # maybe play with orient option if this format isn't perfect for javascript
 
 monthlies = create_monthlies()
@@ -127,7 +127,12 @@ def get_annuals(int):
 
     month = pd.read_json(monthlies)
     site = month.loc[month['siteid'] == int]
+    print(site.groupby('year'))
     annual_totals = site.groupby('year')['estimate'].sum().round(0)
+    annual_flickr = site.groupby('year')['flickr'].sum().round(0)
+    annual_twitter = site.groupby('year')['twitter'].sum().round(0)
+    annual_instag = site.groupby('year')['instag'].sum().round(0)
+    annual_wta = site.groupby('year')['wta'].sum().round(0)
     total_years = site['year'].unique()
     print(total_years)
     print(annual_totals)
@@ -135,7 +140,11 @@ def get_annuals(int):
     for i in range(len(total_years)):
         dictionary = {
             'year': total_years[i],
-            'avg_pred': annual_totals[total_years[i]]
+            'avg_pred': annual_totals[total_years[i]],
+            'flickr': annual_flickr[total_years[i]],
+            'twitter': annual_twitter[total_years[i]],
+            'instag': annual_instag[total_years[i]],
+            'wta': annual_wta[total_years[i]]
         }
         annual_table.append(dictionary)
     print(annual_table)
@@ -153,12 +162,22 @@ def get_monthlies(int):
 
     month = pd.read_json(monthlies)
     site = month.loc[month['siteid'] == int]
+    print(site)
     monthly_means = site.groupby('month')['estimate'].mean().round(0)
+    monthly_flickr = site.groupby('month')['flickr'].mean().round(0)
+    monthly_instag = site.groupby('month')['instag'].mean().round(0)
+    monthly_twitter = site.groupby('month')['twitter'].mean().round(0)
+    monthly_wta = site.groupby('month')['wta'].mean().round(0)
+
     monthly_table = []
     print(monthly_means)
     for i in range(11):
         dictionary = {
-            'avg_pred': monthly_means[i + 1]
+            'avg_pred': monthly_means[i + 1],
+            'flickr': monthly_flickr[i + 1],
+            'twitter': monthly_twitter[i + 1],
+            'instag': monthly_instag[i + 1],
+            'wta': monthly_wta[i + 1]
         }
         monthly_table.append(dictionary)
     print(monthly_table)
