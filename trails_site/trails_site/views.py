@@ -84,7 +84,6 @@ def get_geojson():
     alllines['siteid'] = pd.to_numeric(alllines['siteid'])
     alllines.drop(axis=1, labels='Notes', inplace=True)
 
-    print(type(alllines))
 
     # select only project sites
     project_lines = alllines.loc[alllines['siteid'].isin(project_sites['siteid'])]
@@ -92,7 +91,6 @@ def get_geojson():
     # get 2017 annual totals, so we have some data to join
     # note we're re-using the monthly dataframe created above...
     month = pd.read_json(monthlies)
-    print(type(month))
     months2017 = month.loc[month['year'] == 2017]
     annual = months2017[['siteid', 'estimate']].groupby('siteid').sum()
 
@@ -107,35 +105,19 @@ def get_geojson():
 
 @app.route('/api/hikers_monthly')
 def get_hikersmonthly():
-    # d = open(os.getcwd() + '/static/data/hikers_monthly.csv')
-    # fieldnames = ("AllTRLs_ID","date","predicted","actual","Trail_name")
-    # reader = csv.DictReader(d, fieldnames)
-    # next(reader)
-    # out = jsonify([row for row in reader])
-    # return out
     return monthlies
 
 @app.route('/api/annuals/<int:int>')
 def get_annuals(int):
-    # filename = str(int) + '.csv'
-    # d = open(os.getcwd() + '/static/data/annuals/' + filename)
-    # fieldnames = ("AllTRLs_ID","year","avg_pred")
-    # reader = csv.DictReader(d, fieldnames)
-    # next(reader)
-    # out = jsonify([row for row in reader])
-    # return out
 
     month = pd.read_json(monthlies)
     site = month.loc[month['siteid'] == int]
-    print(site.groupby('year'))
     annual_totals = site.groupby('year')['estimate'].sum().round(0)
     annual_flickr = site.groupby('year')['flickr'].sum().round(0)
     annual_twitter = site.groupby('year')['twitter'].sum().round(0)
     annual_instag = site.groupby('year')['instag'].sum().round(0)
     annual_wta = site.groupby('year')['wta'].sum().round(0)
     total_years = site['year'].unique()
-    print(total_years)
-    print(annual_totals)
     annual_table = []
     for i in range(len(total_years)):
         dictionary = {
@@ -147,22 +129,13 @@ def get_annuals(int):
             'wta': annual_wta[total_years[i]]
         }
         annual_table.append(dictionary)
-    print(annual_table)
 
     return json.dumps(annual_table)
 
 @app.route('/api/monthlies/<int:int>')
 def get_monthlies(int):
-    # filename = str(int) + '.csv'
-    # d = open(os.getcwd() + '/static/data/monthlies/' + filename)
-    # fieldnames = ("AllTRLs_ID","month","avg_pred")
-    # reader = csv.DictReader(d, fieldnames)
-    # next(reader)
-    # out = jsonify([row for row in reader])
-
     month = pd.read_json(monthlies)
     site = month.loc[month['siteid'] == int]
-    print(site)
     monthly_means = site.groupby('month')['estimate'].mean().round(0)
     monthly_flickr = site.groupby('month')['flickr'].mean().round(0)
     monthly_instag = site.groupby('month')['instag'].mean().round(0)
@@ -170,8 +143,7 @@ def get_monthlies(int):
     monthly_wta = site.groupby('month')['wta'].mean().round(0)
 
     monthly_table = []
-    print(monthly_means)
-    for i in range(11):
+    for i in range(12):
         dictionary = {
             'avg_pred': monthly_means[i + 1],
             'flickr': monthly_flickr[i + 1],
@@ -180,6 +152,5 @@ def get_monthlies(int):
             'wta': monthly_wta[i + 1]
         }
         monthly_table.append(dictionary)
-    print(monthly_table)
 
     return json.dumps(monthly_table)
