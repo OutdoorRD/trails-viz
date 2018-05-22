@@ -8,29 +8,82 @@
 
 	function ready(error, geojsontrails){
 
-		console.log(window.location.href);
+		var TRAIL_COLOR = '#ff5a3d';
+		var SELECTED_COLOR = '#a13dff';
+		var TRAIL_OPACITY = 0.75;
+		var POLYGON_COLOR = '#FF967F';
+		var POLYGON_HIGHLIGHT = '#578fff';
+		var POLYGON_SELECTED = '#CC8AFF';
 
-		// creates the streets/roads map layer
-		var streets = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>' +
-									' contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-			maxZoom: 18,
-			id: 'osm',
-		});
+		var selected = 1;
 
-		// creates the terrain map layer
-		var terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
-			attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
-			 							' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
-										' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		var outdoors = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
+						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
 			maxZoom: 18,
 			ext: 'png'
-		})
+		});
+
+		var satellite = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
+			attribution:'© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
+						'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+						'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
+			maxZoom: 18,
+			ext: 'png'
+		});
 
 		var baseMaps = {
-		    "terrain": terrain,
-				"streets": streets
+			"outdoors": outdoors,
+			"satellite": satellite,
 		};
+
+		// var getPolygonStyle = function(feature) {   ///////////////     POLYGON CODE    ////////////////////
+		// 	return {
+		// 		color: POLYGON_COLOR,
+		// 		weight: 2,
+		// 		opacity: 0.75
+		// 	}
+		// }
+		//
+		// var highlightPolygon = function(e) {
+		// 	var polygon;
+		// 	if(e.target) {
+		// 		polygon = e.target;
+		// 	} else {
+		// 		polygon = e;
+		// 	}
+		// 	polygon.setStyle({
+		// 		color: POLYGON_HIGHLIGHT,
+		// 		weight: 3,
+		// 		opacity: 0.75
+		// 	});
+		// }
+		//
+		// var resetPolygonHighlight = function(e) {
+		// 	trailPolygon.resetStyle(e.target);
+		// }
+		//
+		// var onEachPolygon = function(feature, polylayer) {
+		// 	polylayer._leaflet_id = (feature.properties.AllTRLs_ID) + 200;
+		// 	polylayer.on({
+		// 		mouseover: function(e, feature, polylayer) {
+		// 			console.log(polylayer);
+		// 			if(e.target.options.color == POLYGON_COLOR) {
+		// 				highlightPolygon(e);
+		// 				highlightFeature(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+		// 				console.log(e);
+		// 			}
+		// 		},
+		// 		mouseout: function(e, feature, polylayer) {
+		// 			if(e.target.options.color != POLYGON_SELECTED) {
+		// 				resetPolygonHighlight(e);
+		// 				resetHighlight(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
+		// 			}
+		// 		},
+		// 		click: changeSelect
+		// 	})
+		// }   														///////////		END OF POLYGON CODE    /////////////
 
 		// sets the initial style for the trails
 		var getStyle = function(feature){
@@ -40,8 +93,8 @@
 			weight = (feature.properties.annual*0.17)**4
 
 			return {
-			color: '#ff7800',
-			opacity: 1.0,
+			color: TRAIL_COLOR,
+			opacity: TRAIL_OPACITY,
 			weight: weight
 			}
 		};
@@ -49,6 +102,14 @@
 		// highlights a trail that is being hovered over by the user in blue
 		var highlightFeature = function(e) {
 		    var line = e.target;
+
+				// if polygon is being used:
+				// var line;
+				// if (e.target) {
+				// 	line = e.target;
+				// } else {
+				// 	line = e;
+				// }
 
 		    line.setStyle({
 		        weight: 5,
@@ -64,6 +125,9 @@
 		// resets the style of a highlighted trail
 		var resetHighlight = function(e) {
 		    layer.resetStyle(e.target);
+
+				// if polygon being used:
+				// if(e.target) {} else { if(e.options.color != SELECTED_COLOR) {layer.resetStyle(e); } }
 		};
 
 
@@ -72,15 +136,18 @@
 			//if (feature.properties){
 		       // layer.bindPopup(String(feature.properties.annual));
 	    //}
+			layer.bindTooltip(feature.properties.Trail_name);
 			layer._leaflet_id = feature.properties.siteid;
 	    layer.on({
 	    	mouseover: function(e) {
-					if(e.target.options.color == "#ff7800") {
+					if(e.target.options.color == TRAIL_COLOR) {
 						highlightFeature(e);
+						// if polygon used:
+						// highlightPolygon(trailPolygon.getLayer(e.target.feature.properties.siteid + 200));
 					}
 				},
 	    	mouseout: function(e) {
-					if (e.target.options.color != "#00ff00") {
+					if (e.target.options.color != SELECTED_COLOR) {
 						resetHighlight(e)
 					}
 				},
@@ -94,54 +161,129 @@
 			style: getStyle
 		});
 
+		// IF POLYGON BEING USED:
+		// var trailPolygon = L.geoJSON(geojsonpolygons, {
+		// 	onEachFeature: onEachPolygon,
+		// 	style: getPolygonStyle
+		// });
+
 		// create the map variable to be displayed on the website with the default layers
-		// shown as the terrain layer and the trail layer
+		// shown as the outdoor layer and the trail layer
 		var map = L.map('trail-map', {
 			center: [45, -105],
 			zoom: 9,
-			layers: [terrain, layer]
-		})
+			layers: [outdoors, layer]  // add trailPolygon if Polygons being used
+		});
 
 		// add map layers, including geoJSON data, to the leaflet map
 		L.control.layers(baseMaps).addTo(map);
-		layer.addTo(map);
 		map.fitBounds(layer.getBounds());
 
 		// changeSelect changes the select box value when a user clicks on a trail
 		// on the map and triggers a change event to occur
 		function changeSelect() {
-			var trail_select = document.querySelector("#trail-select select");
-			trail_select.value = this._leaflet_id;
-			var event = new Event("change");
-			trail_select.dispatchEvent(event);
+			var thisid = this._leaflet_id;
+
+			// used for polygons
+			if(thisid >= 200) {
+				thisid -= 200;
+			}
+
+			var isSelected = false;
+			var input;
+			var selectedInputs = [];
+			for (var i = 0; i < trail_inputs.length; i++) {
+				if (trail_inputs[i].value == thisid && trail_inputs[i].checked) {
+					input = trail_inputs[i];
+					isSelected = !isSelected;
+				} else if (trail_inputs[i].value == thisid) {
+					input = trail_inputs[i];
+				} else if (trail_inputs[i].checked) {
+					selectedInputs.push(trail_inputs[i]);
+				}
+			}
+			if(isSelected) {
+				selected--;
+				input.checked = !input.checked;
+				var event = new Event("change");
+				input.dispatchEvent(event);
+			} else {
+				if (selected == 0 || selected == 1) {
+					input.checked = !input.checked;
+					selected++;
+					var event = new Event("change");
+					input.dispatchEvent(event);
+				} else {
+					var event = new Event("change");
+					selected--;
+					selectedInputs[0].checked = !selectedInputs[0].checked;
+					selectedInputs[0].dispatchEvent(event);
+					selectedInputs[1].checked = !selectedInputs[1].checked;
+					selectedInputs[1].dispatchEvent(event);
+					input.checked = !input.checked;
+					input.dispatchEvent(event);
+				}
+			}
+			if (selected == 1 || selected == 0) {
+				toggleVisibility(true);
+			} else {
+				toggleVisibility(false);
+			}
 		}
 
-		// the DOM select box to choose a trail
-		//var trail_select = document.querySelector("#trail-select select");
+		var trail_inputs;
 
-		// set the initial trail highlighted in green
-		var initial_layer = layer.getLayer("5");
-		initial_layer.removeFrom(map);
-		initial_layer.setStyle({
-			weight: 5,
-			color: '#00ff00',
-			opacity: 1.0
-		});
-		initial_layer.addTo(map);
-
-		// keep track of the current and previous chosen trails
-		var id;
-		var previd = 5; // set to the id of the initial layer (Dingford Creek)
-
-		// triggers the map to change when a different trail is selected
 		var checkForSelect = setInterval(function() {
-			if(document.querySelector("#trail-select select").length) {
-				document.querySelector("#trail-select select").onchange = function() {
-					updateMap();
-				};
+			if(document.querySelectorAll('#trail-select ul li').length) {
+				trail_inputs = document.querySelectorAll('ul.items li input');
+				for (var i = 0; i < trail_inputs.length; i++) {
+					trail_inputs[i].onchange = function() { updateMap(); };
+				}
+				var selectedFirst;
+				for (var i = 0; i < trail_inputs.length; i++) {
+					if (trail_inputs[i].value == 5) {
+						selectedFirst = trail_inputs[i];
+						break;
+					}
+				}
+				selectedFirst.dispatchEvent(new Event("change"));
 				clearInterval(checkForSelect);
 			}
 		}, 100);
+
+
+
+		// set initial trail
+		var initial_layer = layer.getLayer("5");
+		// var initial_polygon = trailPolygon.getLayer("205");    ///// polygon ///////
+		initial_layer.removeFrom(map);
+		// initial_polygon.removeFrom(map);				 ///// polygon ///////
+		initial_layer.setStyle({
+			weight: 5,
+			color: SELECTED_COLOR,
+			opacity: 1.0
+		});
+		// initial_polygon.setStyle({						 ///// polygon ///////
+		// 	weight: 2,
+		// 	color: POLYGON_SELECTED,
+		// 	opacity: 0.75
+		// });
+		// initial_polygon.addTo(map);
+		initial_layer.addTo(map);
+
+		// keeps track of the IDs of the selected trails
+		var currIds = [5];
+
+
+		// triggers the map to change when a different trail is selected
+		// var checkForSelect = setInterval(function() {
+		// 	if(document.querySelector("#trail-select ul").length) {
+		// 		document.querySelector("#trail-select ul").onchange = function() {
+		// 			updateMap();
+		// 		};
+		// 		clearInterval(checkForSelect);
+		// 	}
+		// }, 100);
 
 		// updateMap highlights the user-selected trail in green on the map and un-highlights the
 		// previous trail chosen by the user. If the user re-selects the same trail, nothing
@@ -150,26 +292,73 @@
 		// arguments:
 		// 		- select: the DOM select box to choose which trail is shown
 		function updateMap() {
-			id = document.querySelector("#trail-select select").value;
-			console.log(id);
-			var newlayer = layer.getLayer(id);
-			newlayer.removeFrom(map);
-			newlayer.setStyle({
-					weight: 5,
-					color: '#00ff00',
-					opacity: 1.0
-			});
-			newlayer.addTo(map)
-			var prevlayer = layer.getLayer(previd);
-			if (previd !== id) {
-				prevlayer.setStyle({
-					color: '#ff7800',
-					opacity: 1.0,
-					weight: (prevlayer.feature.properties.annual*0.17)**4
-				});
-				prevlayer.addTo(map);
-				previd = id;
+			// gets all the IDs of all checked trails
+			var checkedIds = [];
+			for (var i = 0; i < trail_inputs.length; i++) {
+				if (trail_inputs[i].checked) {
+					checkedIds.push(trail_inputs[i].value);
+				}
 			}
+			// combines and sorts the checked IDs with the previously current IDs
+			var combinedIds = checkedIds.concat(currIds);
+			combinedIds = combinedIds.sort();
+			var newIds = [];
+			// adds duplicate IDs to a variable newIds
+			for (var i = 0; i < combinedIds.length - 1; i++) {
+				if (combinedIds[i] == combinedIds[i + 1]) {
+					newIds.push(combinedIds[i]);
+				}
+			}
+			// removes newIds from currIds to identify which trails need to be
+			// unselected
+			for (var i = 0; i < newIds.length; i++) {
+				for (var j = 0; j < currIds.length; j++) {
+					if (newIds[i] == currIds[j]) {
+						currIds.splice(j, 1);
+						break;
+					}
+				}
+			}
+			// unselects trails that aren't selected anymore by using the
+			// filtered currIds, which now contains trails that need to be
+			// unselected
+			for (var i = 0; i < currIds.length; i++) {
+				var resetLayer = layer.getLayer(currIds[i]);
+				// var resetPolygon = trailPolygon.getLayer(parseInt(currIds[i]) + 200);
+				resetLayer.removeFrom(map);
+				resetLayer.setStyle({
+					color: TRAIL_COLOR,
+					opacity: TRAIL_OPACITY,
+					weight: (resetLayer.feature.properties.annual*0.17)**4
+				});
+				// resetPolygon.setStyle({
+				// 	color: POLYGON_COLOR,
+				// 	opacity: 0.75,
+				// 	weight: 2
+				// })
+				resetLayer.addTo(map);
+			}
+			// selects trails that are checked by matching them with
+			// the IDs in checkedIds
+			for (var i = 0; i < checkedIds.length; i++) {
+				var addLayer = layer.getLayer(checkedIds[i]);
+				// var addPolygon = trailPolygon.getLayer(parseInt(checkedIds[i]) + 200);
+				addLayer.setStyle({
+					weight: 5,
+					color: SELECTED_COLOR,
+					opacity: 1.0
+				});
+				// addPolygon.setStyle({
+				// 	weight: 2,
+				// 	color: POLYGON_SELECTED,
+				// 	opacity: 0.75
+				// })
+				// addPolygon.addTo(map);
+				addLayer.addTo(map);
+			}
+			// resets currIds to reflect the now-selected trails
+			currIds = checkedIds;
+
 		}
 
 	}
@@ -180,6 +369,18 @@
     } else {
         return Promise.reject(new Error(response.status + ": " + response.statusText));
     }
+	}
+
+	// Takes a boolean value 'visible' representing whether
+	// the social select box should be visible (when one trail is selected)
+	// and changes it accordingly
+	function toggleVisibility(visible) {
+		var social = document.querySelector('.social-select');
+		if (visible) {
+			social.style.visibility = 'visible';
+		} else {
+			social.style.visibility = 'hidden';
+		}
 	}
 
 })();
