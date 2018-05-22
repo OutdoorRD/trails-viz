@@ -144,12 +144,12 @@ def get_annuals(int):
 
 @app.route('/api/monthlies/<int:int>')
 def get_monthlies(int):
-    filename = str(int) + '.csv'
-    d = open(os.getcwd() + '/static/data/monthlies/' + filename)
-    fieldnames = ("AllTRLs_ID","month","avg_pred")
-    reader = csv.DictReader(d, fieldnames)
-    next(reader)
-    out = jsonify([row for row in reader])
+    # filename = str(int) + '.csv'
+    # d = open(os.getcwd() + '/static/data/monthlies/' + filename)
+    # fieldnames = ("AllTRLs_ID","month","avg_pred")
+    # reader = csv.DictReader(d, fieldnames)
+    # next(reader)
+    # out = jsonify([row for row in reader])
 
     month = pd.read_json(monthlies)
     site = month.loc[month['siteid'] == int]

@@ -66,13 +66,13 @@
 		    layer.resetStyle(e.target);
 		};
 
+
 		// defines the behavior of the geoJSON trails on the map
 		var onEachFeature = function(feature, layer){
-			if (feature.properties && feature.properties.Trail_name){
-		        layer.bindTooltip(feature.properties.Trail_name);
-		        layer.bindPopup(String(feature.properties.annual));
-	    }
-			layer._leaflet_id = feature.properties.AllTRLs_ID;
+			//if (feature.properties){
+		       // layer.bindPopup(String(feature.properties.annual));
+	    //}
+			layer._leaflet_id = feature.properties.siteid;
 	    layer.on({
 	    	mouseover: function(e) {
 					if(e.target.options.color == "#ff7800") {

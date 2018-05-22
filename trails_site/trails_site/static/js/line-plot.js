@@ -42,8 +42,8 @@
 
 			traildata.map(function(d) {
 				date.push(d.date);
-				predicted.push(+d.predicted);
-				actual.push(+d.actual);
+				predicted.push(+d.estimate);
+				actual.push(+d.onsite);
 			})
 
 			date.unshift('date')
