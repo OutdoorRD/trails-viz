@@ -7,6 +7,7 @@ import geopandas as gpd
 import numpy as np
 from trails_site import app
 
+# homepage
 @app.route('/')
 def get_page():
     return render_template('index.html')
@@ -70,7 +71,7 @@ def create_monthlies():
 
 monthlies = create_monthlies()
 
-
+# geojson API endpoint
 @app.route('/api/geojson')
 def get_geojson():
     # with open(os.getcwd() + '/static/data/trails.geojson') as f:
@@ -103,10 +104,12 @@ def get_geojson():
     return project_lines.to_json() # not sure if this gets you exactly the proper format you need
 
 
+# monthly hiker data API endpoint
 @app.route('/api/hikers_monthly')
 def get_hikersmonthly():
     return monthlies
 
+# annual average data API endpoint (requires an int representing the siteid)
 @app.route('/api/annuals/<int:int>')
 def get_annuals(int):
 
@@ -132,6 +135,7 @@ def get_annuals(int):
 
     return json.dumps(annual_table)
 
+# monthly averages data API endpoint (requires an int representing the siteid)
 @app.route('/api/monthlies/<int:int>')
 def get_monthlies(int):
     month = pd.read_json(monthlies)
