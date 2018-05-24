@@ -133,9 +133,6 @@
 
 		// defines the behavior of the geoJSON trails on the map
 		var onEachFeature = function(feature, layer){
-			//if (feature.properties){
-		       // layer.bindPopup(String(feature.properties.annual));
-	    //}
 			layer.bindTooltip(feature.properties.Trail_name);
 			layer._leaflet_id = feature.properties.siteid;
 	    layer.on({
@@ -182,6 +179,7 @@
 		// changeSelect changes the select box value when a user clicks on a trail
 		// on the map and triggers a change event to occur
 		function changeSelect() {
+			// when a select box is selected, the trail id of that trail is saved in this variable
 			var thisid = this._leaflet_id;
 
 			// used for polygons
@@ -189,6 +187,7 @@
 				thisid -= 200;
 			}
 
+			// adds selected trails to selectedInputs and indicates that the selected trail is checked
 			var isSelected = false;
 			var input;
 			var selectedInputs = [];
@@ -202,28 +201,41 @@
 					selectedInputs.push(trail_inputs[i]);
 				}
 			}
+			// unchecks the selected trail if it is checked (because we are managing a change event, so the
+			// trail is supposed to become unchecked)
+			// decreases the number of trails selected if the trail isSelected
 			if(isSelected) {
 				selected--;
 				input.checked = !input.checked;
 				var event = new Event("change");
 				input.dispatchEvent(event);
+			// changes the selected value (checks the box)
+			// increases the number of selected trails
+			// triggers a change event
 			} else {
 				if (selected == 0 || selected == 1) {
 					input.checked = !input.checked;
 					selected++;
 					var event = new Event("change");
 					input.dispatchEvent(event);
+
+				// in this case, two trails have already been selected and we now need to
+				// reset it to have one trail selected (because the user is trying to select a third trail)
 				} else {
 					var event = new Event("change");
 					selected--;
+					// unchecks the first two trails that are already selected and dispatches a change event
 					selectedInputs[0].checked = !selectedInputs[0].checked;
 					selectedInputs[0].dispatchEvent(event);
 					selectedInputs[1].checked = !selectedInputs[1].checked;
 					selectedInputs[1].dispatchEvent(event);
 					input.checked = !input.checked;
+					// dispatches a change event for the new trail being selected
 					input.dispatchEvent(event);
 				}
 			}
+			// toggles the visibility of the social media select boxes so that the user cannot switch
+			// them when two trails are selected
 			if (selected == 1 || selected == 0) {
 				toggleVisibility(true);
 			} else {
@@ -233,6 +245,11 @@
 
 		var trail_inputs;
 
+		// this interval is run when the page loads so that behavior is not assigned before the dropdown
+		// menu has been filled in with trail names
+		// once the dropdown is filled, the first trail's data is selected and loaded (i.e. a change event
+		// is triggered for Dingford Creek so that data appears when the page loads)
+		// the interval is cleared afterwards, so that it doesn't keep running in the background
 		var checkForSelect = setInterval(function() {
 			if(document.querySelectorAll('#trail-select ul li').length) {
 				trail_inputs = document.querySelectorAll('ul.items li input');
@@ -272,25 +289,14 @@
 		initial_layer.addTo(map);
 
 		// keeps track of the IDs of the selected trails
+		// value starts at 5 by default since Dingford Creek is the first trail to be shown
 		var currIds = [5];
 
 
-		// triggers the map to change when a different trail is selected
-		// var checkForSelect = setInterval(function() {
-		// 	if(document.querySelector("#trail-select ul").length) {
-		// 		document.querySelector("#trail-select ul").onchange = function() {
-		// 			updateMap();
-		// 		};
-		// 		clearInterval(checkForSelect);
-		// 	}
-		// }, 100);
 
-		// updateMap highlights the user-selected trail in green on the map and un-highlights the
-		// previous trail chosen by the user. If the user re-selects the same trail, nothing
-		// happens
-		//
-		// arguments:
-		// 		- select: the DOM select box to choose which trail is shown
+
+		// updateMap highlights the user-selected trail in purple on the map and unselects trails that
+		// aren't selected anymore by checking trail_inputs
 		function updateMap() {
 			// gets all the IDs of all checked trails
 			var checkedIds = [];
@@ -363,6 +369,8 @@
 
 	}
 
+	// checks the status of the API fetch and returns a 200 status if okay along with the response
+	// text and returns a rejected Promise with an error message if the AJAX call fails
 	function checkStatus(response) {
 		if (response.status >= 200 && response.status < 300) {
         return response.text();
@@ -372,7 +380,7 @@
 	}
 
 	// Takes a boolean value 'visible' representing whether
-	// the social select box should be visible (when one trail is selected)
+	// the social media  select box should be visible (when one trail is selected)
 	// and changes it accordingly
 	function toggleVisibility(visible) {
 		var social = document.querySelector('.social-select');
