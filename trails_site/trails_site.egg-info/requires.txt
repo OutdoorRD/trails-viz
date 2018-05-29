@@ -1,0 +1,4 @@
+flask
+pandas==0.23.3
+geopandas
+numpy
