@@ -234,13 +234,7 @@
 					input.dispatchEvent(event);
 				}
 			}
-			// toggles the visibility of the social media select boxes so that the user cannot switch
-			// them when two trails are selected
-			if (selected == 1 || selected == 0) {
-				toggleVisibility(true);
-			} else {
-				toggleVisibility(false);
-			}
+
 		}
 
 		var trail_inputs;
@@ -364,6 +358,15 @@
 			}
 			// resets currIds to reflect the now-selected trails
 			currIds = checkedIds;
+
+			// toggles the visibility of the social media select boxes so that the user cannot switch
+			// them when two trails are selected
+			selected = currIds.length;
+			if (selected == 1 || selected == 0) {
+				toggleVisibility(true);
+			} else {
+				toggleVisibility(false);
+			}
 
 		}
 
