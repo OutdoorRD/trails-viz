@@ -1,4 +1,4 @@
-flask
-pandas==0.23.3
+flask==0.12.2
+pandas
 geopandas
 numpy

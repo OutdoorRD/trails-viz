@@ -69,6 +69,7 @@ trails_site/static/img/TNC.png
 trails_site/static/img/US-NationalParkService.png
 trails_site/static/img/natcap.jpg
 trails_site/static/js/line-plot.js
+trails_site/static/js/mapbox-token.js
 trails_site/static/js/trail-map.js
 trails_site/static/lib/c3-0.4.21.zip
 trails_site/static/lib/c3-0.4.21/.bmp.yml
