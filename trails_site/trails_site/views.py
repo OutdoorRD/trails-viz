@@ -24,7 +24,7 @@ project_data = {
 
 ## get project site metadata (names and siteids)
 allsites = gpd.read_file(project_data['polygon_uri'])
-project_sites = allsites.loc[allsites['Prjct_code'].isin(project_data['project_codes']),
+PROJECT_SITES = allsites.loc[allsites['Prjct_code'].isin(project_data['project_codes']),
                              ['Trail_name', 'siteid']]
 
 def create_monthlies():
@@ -49,8 +49,8 @@ def create_monthlies():
     monthly.drop(labels='d2p', axis=1, inplace=True)
 
     ## select only project sites
-    monthly = monthly.loc[monthly['trail'].isin(project_sites['siteid'])]
-    monthly = pd.merge(monthly, project_sites, left_on='trail', right_on='siteid', how='left')
+    monthly = monthly.loc[monthly['trail'].isin(PROJECT_SITES['siteid'])]
+    monthly = pd.merge(monthly, PROJECT_SITES, left_on='trail', right_on='siteid', how='left')
 
     ## rename and drop some columns:
     monthly.drop(labels='trail', axis=1, inplace=True)
@@ -87,10 +87,11 @@ def get_geojson():
 
 
     # select only project sites
-    project_lines = alllines.loc[alllines['siteid'].isin(project_sites['siteid'])]
+    project_lines = alllines.loc[alllines['siteid'].isin(PROJECT_SITES['siteid'])]
+    project_lines = pd.merge(project_lines, PROJECT_SITES, on='siteid', how='left')
 
     # get 2017 annual totals, so we have some data to join
-    # note we're re-using the monthly dataframe created above...
+    # note we're using the monthly data returned by create_monthlies()
     month = pd.read_json(monthlies)
     months2017 = month.loc[month['year'] == 2017]
     annual = months2017[['siteid', 'estimate']].groupby('siteid').sum()

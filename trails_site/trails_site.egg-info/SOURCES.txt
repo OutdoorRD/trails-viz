@@ -6,7 +6,6 @@ trails_site.egg-info/SOURCES.txt
 trails_site.egg-info/dependency_links.txt
 trails_site.egg-info/requires.txt
 trails_site.egg-info/top_level.txt
-trails_site/static/.DS_Store
 trails_site/static/css/style.css
 trails_site/static/data/hikers_monthly.csv
 trails_site/static/data/hikers_weekly.csv
