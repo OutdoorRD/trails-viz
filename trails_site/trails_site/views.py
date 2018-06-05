@@ -67,7 +67,9 @@ def create_monthlies():
     # monthly.to_csv('static/data/hikers_monthly.csv', index=False, na_rep='NA')
 
     monthly = monthly[['siteid', 'date', 'estimate', 'onsite', 'Trail_name', 'year', 'month', 'flickr', 'twitter', 'instag', 'wta']]
-    return monthly.to_json(orient='records') # maybe play with orient option if this format isn't perfect for javascript
+    jsonstring = monthly.to_json(orient='records') # to_json converts NaNs and Nones to null
+    jsonstring = jsonstring.replace('null', '"NaN"') # but bad idea to pass null to js, since null converted to numeric == 0
+    return jsonstring
 
 monthlies = create_monthlies()
 
