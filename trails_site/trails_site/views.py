@@ -13,14 +13,13 @@ def get_page():
     return render_template('index.html')
 
 project_data = {
-    "polygon_uri": "../../../mbs-trails/gis/allsites.shp",
-    "geojson_lines_uri": "../../../mbs-trails/gis/allsites_lines.geojson",
+    "polygon_uri": "/home/woodsp/mbs-trails/gis/allsites.shp",
+    "geojson_lines_uri": "/home/woodsp/mbs-trails/gis/allsites_lines.geojson",
     "project_codes": ['MBS_PIL, MBS_SARL', 'MBS_SARL'],
-    "monthly_estimates": "../../../mbs-trails/3_analyze/viz_model_mmm.csv",
-    "monthly_onsite": "../../../mbs-trails/3_analyze/viz_model_mmmir.csv",
-    "weekly_estimates": "../../../mbs-trails/3_analyze/viz_model_www.csv",
-    "weekly_onsite": "../../../mbs-trails/3_analyze/viz_model_wwwir.csv"
-}
+    "monthly_estimates": "/home/woodsp/mbs-trails/3_analyze/viz_model_mmm.csv",
+    "monthly_onsite": "/home/woodsp/mbs-trails/3_analyze/viz_model_mmmir.csv",
+    "weekly_estimates": "/home/woodsp/mbs-trails/3_analyze/viz_model_www.csv",
+    "weekly_onsite": "/home/woodsp/mbs-trails/3_analyze/viz_model_wwwir.csv"}
 
 ## get project site metadata (names and siteids)
 allsites = gpd.read_file(project_data['polygon_uri'])
