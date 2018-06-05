@@ -1,2 +1,4 @@
+.gitignore
+trails_site/trails_site/static/js/mapbox-token.js
 trails_site/venv
 *.pyc
