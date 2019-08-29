@@ -46,13 +46,9 @@ link <- read.dbf("/home/dmf/mbsnf/mbs-trails/gis/AllTRLs_v4.dbf")
 out_mon2 <- left_join(out_mon, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
 out_week2 <- left_join(out_week, link[,c("AllTRLs_ID", "Trail_name")], by="AllTRLs_ID")
 
-### DIVIDE by 2 - since we never did that for IR counts
-### MOVE THIS UPSTREAM, BEFORE MODELING
-## also limit precision in predicted vals
-out_mon2$predicted <- round(out_mon2$predicted/2, 2)
-out_mon2$actual <- out_mon2$actual/2
-out_week2$predicted <- round(out_week2$predicted/2, 2)
-out_week2$actual <- out_week2$actual/2
+## limit precision in predicted vals
+out_mon2$predicted <- round(out_mon2$predicted, 2)
+out_week2$predicted <- round(out_week2$predicted, 2)
 
 write.csv(out_mon2[, c(out_fieldnames, "Trail_name")], 'static/data/hikers_monthly.csv', row.names = F)
 write.csv(out_week2, 'static/data/hikers_weekly.csv', row.names = F)
