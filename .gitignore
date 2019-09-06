@@ -1,7 +1,10 @@
-.gitignore
+.idea/
 trails_site/trails_site.egg-info/SOURCES.txt
 trails_site/trails_site/__init__.pyc
 trails_site/trails_site/static/js/mapbox-token.js
 trails_site/venv
 *.pyc
 scratch/
+.Rhistory
+trails_site_files/
+*.egg-info/
