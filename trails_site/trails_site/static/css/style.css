@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background: #fefefe;
+	width: 100%;
+	margin-top: 0;
+	margin-left: 0;
+}
+
+header {
+	background-color: #9ACD32;
+	width: 100%;
+	height: 70px;
+	position: fixed;
+	z-index: 9999;
+}
+
+#header-info {
+	display: flex;
+	height: inherit;
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+#title {
+	padding-left: 5%;
+	font-size: 30px;
+	margin: auto 0 auto 0;
+	font-family: "Montserrat";
+}
+
+#subtitle {
+	padding-right: 25%;
+	padding-top: 0.7%; /*wanting bottom of title and subtitle aligned*/
+	font-size: 19px;
+	margin: auto 0 auto 0;
+	font-family: "Montserrat";
+}
+
+#trail-select {
+	min-width: 220px;
+	padding-right: 5%;
+	padding-top: 1%; /*wanting bottom of title and subtitle aligned*/
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+#trail-viz {
+	width: 94%;
+	margin: 0 auto;
+	margin-top: 0;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+}
+
+#first-panel {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	width: 100%;
+	height: 700px;
+	justify-content: space-between;
+}
+
+#trail-map {
+	height: 700px;
+	margin-top: 100px;
+	width: 60%;
+}
+
+#averages {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 38%;
+	justify-content: space-between;
+}
+
+#bar-selects {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 38%;
+}
+
+#statistics-info1, #statistics-info2 {
+	padding-left: 3%;
+	width: 50%;
+	height: 100px;
+	margin-top: 90px;
+}
+
+#trail-name {
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+#total-annual-visits, #total-summer-visits {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#histplot-monthlies-annuals {
+	width: 38%;
+	height: 400px;
+	margin-top: 20px;
+	padding-left: 1%;
+}
+
+text.c3-axis-y-label {
+	font-size: 14px;
+}
+
+#select-buttons {
+	padding-left: 1%;
+	width: 50%;
+	position: relative;
+}
+
+#select-buttons div {
+	width: 100%;
+}
+
+#line-plot {
+	width: 95%;
+	margin-top: 50px;
+}
+
+#line-plot .c3-line {
+    stroke-width: 2px;
+}
+
+#text-box {
+	/*width: 90%;*/
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: 9pt;
+}
+
+footer {
+	position: absolute;
+	width: 100%;
+	/*background-color: #909090;*/
+	background-color: lightgray;
+	color: white;
+	text-align: center;
+}
+
+#footer-info {
+	display: flex;
+	height: inherit;
+	align-items: baseline;
+	justify-content: space-between;
+	padding-right: 5%;
+	padding-left: 5%;
+	padding-top: 1%;
+	padding-bottom: 1%;
+}
+
+.dropdown-check-list .anchor {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  /* padding: 5px 50px 5px 10px; */
+	padding: 2% 10% 2% 2%;
+	font-family: Montserrat;
+	margin-right: 10px;
+}
+
+#dropdown-symbol {
+  /* position: relative; */
+  /* content: ""; */
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 4px;
+  /* right: 0px; */
+  /* top: 20%; */
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+	/* margin-left: 60px; */
+}
+
+.arrow {
+	border: solid black;
+	border-width: 0 2px 2px 0;
+	display: inline-block;
+	padding: 3px;
+	margin-left: 20px;
+}
+
+.down {
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+}
+
+.dropdown-check-list .anchor:active:after {
+  right: 8px;
+  top: 21%;
+}
+
+.dropdown-check-list ul.items {
+  padding: 2px;
+  display: none;
+  margin: 0;
+  border-top: none;
+	background-color: white;
+}
+
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
+
+.dropdown-check-list.visible .items {
+  display: block;
+}
+
+.dropdown-check-list.visible {
+	background-color: white;
+}
+
+.dropdown-check-list {
+	width: 100%;
+}
