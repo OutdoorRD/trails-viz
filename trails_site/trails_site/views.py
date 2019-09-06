@@ -15,7 +15,7 @@ def get_page():
 project_data = {
     "polygon_uri": "/home/woodsp/mbs-trails/gis/allsites.shp",
     "geojson_lines_uri": "/home/woodsp/mbs-trails/gis/allsites_lines.geojson",
-    "project_codes": ['MBS_PIL, MBS_SARL', 'MBS_SARL'],
+    "project_codes": ['MBS_PIL', 'MBS_SARL', 'MBS_PIL, MBS_SARL'],
     "monthly_estimates": "/home/woodsp/mbs-trails/3_analyze/viz_model_mmm.csv",
     "monthly_onsite": "/home/woodsp/mbs-trails/3_analyze/viz_model_mmmir.csv",
     "weekly_estimates": "/home/woodsp/mbs-trails/3_analyze/viz_model_www.csv",
@@ -94,10 +94,10 @@ def get_geojson():
     # get 2017 annual totals, so we have some data to join
     # note we're using the monthly data returned by create_monthlies()
     month = pd.read_json(monthlies)
-    months2017 = month.loc[month['year'] == 2017]
-    annual = months2017[['siteid', 'estimate']].groupby('siteid').sum()
+    months2018 = month.loc[month['year'] == 2018]
+    annual = months2018[['siteid', 'estimate']].groupby('siteid').sum()
 
-    annual['annual'] = np.log(annual['estimate'])
+    annual['annual'] = np.log(annual['estimate']+1)
     annual.drop(axis=1, labels='estimate', inplace=True)
     annual.reset_index(inplace=True)
 
