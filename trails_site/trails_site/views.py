@@ -24,7 +24,9 @@ project_data = {
 ## get project site metadata (names and siteids)
 allsites = gpd.read_file(project_data['polygon_uri'])
 PROJECT_SITES = allsites.loc[allsites['Prjct_code'].isin(project_data['project_codes']),
-                             ['Trail_name', 'siteid']]
+                             ['Trail_name', 'siteid', 'geometry']]
+
+PROJECT_SITES.columns = ['Trail_name', 'siteid', 'poly_geometry']
 
 def create_monthlies():
     #load monthly
@@ -103,8 +105,20 @@ def get_geojson():
 
     project_lines = pd.merge(project_lines, annual, how='left', on='siteid')
 
-    return project_lines.to_json() # not sure if this gets you exactly the proper format you need
+    project_lines_json = project_lines.drop('poly_geometry', axis=1).to_json()
 
+    project_polygons = project_lines.drop('geometry', axis=1)
+    project_polygons = project_polygons.rename(columns={'poly_geometry': 'geometry'})
+
+    project_polygons_json = project_polygons.to_json()
+
+    return json.dumps({'lines': project_lines_json, 'polygons': project_polygons_json})
+
+
+def _convert(o):
+    if isinstance(o, np.int64):
+        return int(o)
+    raise TypeError
 
 # monthly hiker data API endpoint
 @app.route('/api/hikers_monthly')
@@ -112,11 +126,11 @@ def get_hikersmonthly():
     return monthlies
 
 # annual average data API endpoint (requires an int representing the siteid)
-@app.route('/api/annuals/<int:int>')
-def get_annuals(int):
+@app.route('/api/annuals/<int:siteid>')
+def get_annuals(siteid):
 
     month = pd.read_json(monthlies)
-    site = month.loc[month['siteid'] == int]
+    site = month.loc[month['siteid'] == siteid]
     annual_totals = site.groupby('year')['estimate'].sum().round(0)
     annual_flickr = site.groupby('year')['flickr'].sum().round(0)
     annual_twitter = site.groupby('year')['twitter'].sum().round(0)
@@ -135,7 +149,7 @@ def get_annuals(int):
         }
         annual_table.append(dictionary)
 
-    return json.dumps(annual_table)
+    return json.dumps(annual_table, default=_convert)
 
 # monthly averages data API endpoint (requires an int representing the siteid)
 @app.route('/api/monthlies/<int:int>')
@@ -159,4 +173,4 @@ def get_monthlies(int):
         }
         monthly_table.append(dictionary)
 
-    return json.dumps(monthly_table)
+    return json.dumps(monthly_table, default=_convert)
