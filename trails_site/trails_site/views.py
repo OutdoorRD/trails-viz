@@ -59,8 +59,8 @@ def create_monthlies():
 
     ### DIVIDE by 2 - since we never did that for IR counts
     ## also limit precision in predicted vals
-    monthly['estimate'] = (monthly['estimate']/2).round(2)
-    monthly['onsite'] = (monthly['onsite']/2).round(2)
+    monthly['estimate'] = monthly['estimate'].round(2)
+    monthly['onsite'] = monthly['onsite'].round(2)
 
     # temp selecting and renaming of cols to test against existing app
     # monthly = monthly[['siteid', 'date', 'estimate', 'onsite', 'Trail_name', 'year', 'month']]
