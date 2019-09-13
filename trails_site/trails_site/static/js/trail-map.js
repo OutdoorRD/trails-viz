@@ -6,7 +6,10 @@
 		.defer(d3.json, window.location.href + 'api/geojson')
 		.await(ready);
 
-	function ready(error, geojsontrails){
+	function ready(error, response){
+
+		var geojsontrails = JSON.parse(response.lines)
+		var geojsonpolygons = JSON.parse(response.polygons)
 
 		var TRAIL_COLOR = '#ff5a3d';
 		var SELECTED_COLOR = '#a13dff';
@@ -38,52 +41,54 @@
 			"satellite": satellite,
 		};
 
-		// var getPolygonStyle = function(feature) {   ///////////////     POLYGON CODE    ////////////////////
-		// 	return {
-		// 		color: POLYGON_COLOR,
-		// 		weight: 2,
-		// 		opacity: 0.75
-		// 	}
-		// }
-		//
-		// var highlightPolygon = function(e) {
-		// 	var polygon;
-		// 	if(e.target) {
-		// 		polygon = e.target;
-		// 	} else {
-		// 		polygon = e;
-		// 	}
-		// 	polygon.setStyle({
-		// 		color: POLYGON_HIGHLIGHT,
-		// 		weight: 3,
-		// 		opacity: 0.75
-		// 	});
-		// }
-		//
-		// var resetPolygonHighlight = function(e) {
-		// 	trailPolygon.resetStyle(e.target);
-		// }
-		//
-		// var onEachPolygon = function(feature, polylayer) {
-		// 	polylayer._leaflet_id = (feature.properties.AllTRLs_ID) + 200;
-		// 	polylayer.on({
-		// 		mouseover: function(e, feature, polylayer) {
-		// 			console.log(polylayer);
-		// 			if(e.target.options.color == POLYGON_COLOR) {
-		// 				highlightPolygon(e);
-		// 				highlightFeature(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
-		// 				console.log(e);
-		// 			}
-		// 		},
-		// 		mouseout: function(e, feature, polylayer) {
-		// 			if(e.target.options.color != POLYGON_SELECTED) {
-		// 				resetPolygonHighlight(e);
-		// 				resetHighlight(layer.getLayer(e.target.feature.properties.AllTRLs_ID));
-		// 			}
-		// 		},
-		// 		click: changeSelect
-		// 	})
-		// }   														///////////		END OF POLYGON CODE    /////////////
+		var getPolygonStyle = function(feature) {   ///////////////     POLYGON CODE    ////////////////////
+			return {
+				color: POLYGON_COLOR,
+				weight: 2,
+				opacity: 0.75
+			}
+		}
+
+		var highlightPolygon = function(e) {
+			var polygon;
+			if(e.target) {
+				polygon = e.target;
+			} else {
+				polygon = e;
+			}
+			polygon.setStyle({
+				color: POLYGON_HIGHLIGHT,
+				weight: 3,
+				opacity: 0.75
+			});
+		}
+
+		var resetPolygonHighlight = function(e) {
+		    if (e.target) {
+		        trailPolygon.resetStyle(e.target);
+            } else {
+		        trailPolygon.resetStyle(e);
+            }
+		}
+
+		var onEachPolygon = function(feature, polylayer) {
+			polylayer._leaflet_id = (feature.properties.siteid) + 200;
+			polylayer.on({
+				mouseover: function(e, feature, polylayer) {
+					if(e.target.options.color == POLYGON_COLOR) {
+						highlightPolygon(e);
+						highlightFeature(trailLinelayer.getLayer(e.target.feature.properties.siteid));
+					}
+				},
+				mouseout: function(e, feature, polylayer) {
+					if(e.target.options.color != POLYGON_SELECTED) {
+						resetPolygonHighlight(e);
+						resetHighlight(trailLinelayer.getLayer(e.target.feature.properties.siteid));
+					}
+				},
+				click: changeSelect
+			})
+		}   														///////////		END OF POLYGON CODE    /////////////
 
 		// sets the initial style for the trails
 		var getStyle = function(feature){
@@ -93,9 +98,9 @@
 			weight = (feature.properties.annual*0.17)**4
 
 			return {
-			color: TRAIL_COLOR,
-			opacity: TRAIL_OPACITY,
-			weight: weight
+			    color: TRAIL_COLOR,
+			    opacity: TRAIL_OPACITY,
+			    weight: weight
 			}
 		};
 
@@ -103,13 +108,13 @@
 		var highlightFeature = function(e) {
 		    var line = e.target;
 
-				// if polygon is being used:
-				// var line;
-				// if (e.target) {
-				// 	line = e.target;
-				// } else {
-				// 	line = e;
-				// }
+				 //if polygon is being used:
+				var line;
+				if (e.target) {
+					line = e.target;
+				} else {
+					line = e;
+				}
 
 		    line.setStyle({
 		        weight: 5,
@@ -124,57 +129,59 @@
 
 		// resets the style of a highlighted trail
 		var resetHighlight = function(e) {
-		    layer.resetStyle(e.target);
-
-				// if polygon being used:
-				// if(e.target) {} else { if(e.options.color != SELECTED_COLOR) {layer.resetStyle(e); } }
+		    if (e.target && e.target.options.color != SELECTED_COLOR) {
+                trailLinelayer.resetStyle(e.target);
+            } else {
+		        // if polygon being used:
+		        trailLinelayer.resetStyle(e);
+            }
 		};
-
 
 		// defines the behavior of the geoJSON trails on the map
-		var onEachFeature = function(feature, layer){
-			layer.bindTooltip(feature.properties.Trail_name);
-			layer._leaflet_id = feature.properties.siteid;
-	    layer.on({
-	    	mouseover: function(e) {
-					if(e.target.options.color == TRAIL_COLOR) {
-						highlightFeature(e);
-						// if polygon used:
-						// highlightPolygon(trailPolygon.getLayer(e.target.feature.properties.siteid + 200));
-					}
-				},
-	    	mouseout: function(e) {
-					if (e.target.options.color != SELECTED_COLOR) {
-						resetHighlight(e)
-					}
-				},
-				click: changeSelect
-	    })
-		};
+        var onEachFeature = function (feature, layer) {
+            layer.bindTooltip(feature.properties.Trail_name);
+            layer._leaflet_id = feature.properties.siteid;
+            layer.on({
+                mouseover: function (e) {
+                    if (e.target.options.color == TRAIL_COLOR) {
+                        highlightFeature(e);
+                        // if polygon used:
+                        highlightPolygon(trailPolygon.getLayer(e.target.feature.properties.siteid + 200));
+                    }
+                },
+                mouseout: function (e) {
+                    if (e.target.options.color != SELECTED_COLOR) {
+                        resetHighlight(e);
+                        resetPolygonHighlight(trailPolygon.getLayer(e.target.feature.properties.siteid + 200));
+                    }
+                },
+                click: changeSelect
+            })
+        };
 
 		// create geoJSON layer with trail data and defined functionality
-		var layer = L.geoJSON(geojsontrails, {
+		var trailLinelayer = L.geoJSON(geojsontrails, {
 			onEachFeature: onEachFeature,
 			style: getStyle
 		});
 
 		// IF POLYGON BEING USED:
-		// var trailPolygon = L.geoJSON(geojsonpolygons, {
-		// 	onEachFeature: onEachPolygon,
-		// 	style: getPolygonStyle
-		// });
+		var trailPolygon = L.geoJSON(geojsonpolygons, {
+			onEachFeature: onEachPolygon,
+			style: getPolygonStyle
+		});
 
 		// create the map variable to be displayed on the website with the default layers
 		// shown as the outdoor layer and the trail layer
 		var map = L.map('trail-map', {
 			center: [45, -105],
 			zoom: 9,
-			layers: [outdoors, layer]  // add trailPolygon if Polygons being used
+			layers: [outdoors, trailLinelayer, trailPolygon]  // add trailPolygon if Polygons being used
 		});
 
 		// add map layers, including geoJSON data, to the leaflet map
 		L.control.layers(baseMaps).addTo(map);
-		map.fitBounds(layer.getBounds());
+		map.fitBounds(trailLinelayer.getBounds());
 
 		// changeSelect changes the select box value when a user clicks on a trail
 		// on the map and triggers a change event to occur
@@ -265,21 +272,21 @@
 
 
 		// set initial trail
-		var initial_layer = layer.getLayer("5");
-		// var initial_polygon = trailPolygon.getLayer("205");    ///// polygon ///////
+		var initial_layer = trailLinelayer.getLayer("5");
+		var initial_polygon = trailPolygon.getLayer("205");    ///// polygon ///////
 		initial_layer.removeFrom(map);
-		// initial_polygon.removeFrom(map);				 ///// polygon ///////
+		initial_polygon.removeFrom(map);				 ///// polygon ///////
 		initial_layer.setStyle({
 			weight: 5,
 			color: SELECTED_COLOR,
 			opacity: 1.0
 		});
-		// initial_polygon.setStyle({						 ///// polygon ///////
-		// 	weight: 2,
-		// 	color: POLYGON_SELECTED,
-		// 	opacity: 0.75
-		// });
-		// initial_polygon.addTo(map);
+		initial_polygon.setStyle({						 ///// polygon ///////
+			weight: 2,
+			color: POLYGON_SELECTED,
+			opacity: 0.75
+		});
+		initial_polygon.addTo(map);
 		initial_layer.addTo(map);
 
 		// keeps track of the IDs of the selected trails
@@ -323,37 +330,37 @@
 			// filtered currIds, which now contains trails that need to be
 			// unselected
 			for (var i = 0; i < currIds.length; i++) {
-				var resetLayer = layer.getLayer(currIds[i]);
-				// var resetPolygon = trailPolygon.getLayer(parseInt(currIds[i]) + 200);
+				var resetLayer = trailLinelayer.getLayer(currIds[i]);
+				var resetPolygon = trailPolygon.getLayer(parseInt(currIds[i]) + 200);
 				resetLayer.removeFrom(map);
 				resetLayer.setStyle({
 					color: TRAIL_COLOR,
 					opacity: TRAIL_OPACITY,
 					weight: (resetLayer.feature.properties.annual*0.17)**4
 				});
-				// resetPolygon.setStyle({
-				// 	color: POLYGON_COLOR,
-				// 	opacity: 0.75,
-				// 	weight: 2
-				// })
+				resetPolygon.setStyle({
+					color: POLYGON_COLOR,
+					opacity: 0.75,
+					weight: 2
+				})
 				resetLayer.addTo(map);
 			}
 			// selects trails that are checked by matching them with
 			// the IDs in checkedIds
 			for (var i = 0; i < checkedIds.length; i++) {
-				var addLayer = layer.getLayer(checkedIds[i]);
-				// var addPolygon = trailPolygon.getLayer(parseInt(checkedIds[i]) + 200);
+				var addLayer = trailLinelayer.getLayer(checkedIds[i]);
+				var addPolygon = trailPolygon.getLayer(parseInt(checkedIds[i]) + 200);
 				addLayer.setStyle({
 					weight: 5,
 					color: SELECTED_COLOR,
 					opacity: 1.0
 				});
-				// addPolygon.setStyle({
-				// 	weight: 2,
-				// 	color: POLYGON_SELECTED,
-				// 	opacity: 0.75
-				// })
-				// addPolygon.addTo(map);
+				addPolygon.setStyle({
+					weight: 2,
+					color: POLYGON_SELECTED,
+					opacity: 0.75
+				})
+				addPolygon.addTo(map);
 				addLayer.addTo(map);
 			}
 			// resets currIds to reflect the now-selected trails
