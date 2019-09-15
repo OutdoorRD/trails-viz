@@ -26,18 +26,25 @@ def _prepare_geo_dfs():
     lines['siteid'] = pd.to_numeric(lines['siteid'])
     access_points['siteid'] = pd.to_numeric(access_points['siteid'])
 
+    # drop columns if required fields are null
+    polygons.dropna(subset=['siteid', 'Prjct_code', 'geometry'], inplace=True)
+    lines.dropna(inplace=True)
+    access_points.dropna(inplace=True)
+
     # trail name and project code is not present in the lines and access point files
     # since, there will be always be a polygon for a site, this info can be extracted
     # from the polygon data frame by doing a merge
-    poly_line_merge = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
-                               lines['siteid'], on='siteid', how='left')
-    poly_access_merge = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
-                                 access_points['siteid'], on='siteid', how='left')
+    lines = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
+                     lines, on='siteid', how='right')
+    access_points = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
+                             access_points, on='siteid', how='right')
 
-    lines[['Trail_name', 'Prjct_code']] = poly_line_merge[['Trail_name', 'Prjct_code']]
-    access_points[['Trail_name', 'Prjct_code']] = poly_access_merge[['Trail_name', 'Prjct_code']]
+    lines.dropna(inplace=True)
+    access_points.dropna(inplace=True)
 
-    return polygons.append(lines, sort=False).append(access_points, sort=False)
+    allsites = polygons.append(lines, sort=False).append(access_points, sort=False)
+    print(allsites)
+    return allsites
 
 
 _ALLSITES_DF = _prepare_geo_dfs()
