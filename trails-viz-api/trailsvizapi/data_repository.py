@@ -43,7 +43,6 @@ def _prepare_geo_dfs():
     access_points.dropna(inplace=True)
 
     allsites = polygons.append(lines, sort=False).append(access_points, sort=False)
-    print(allsites)
     return allsites
 
 

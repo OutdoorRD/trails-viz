@@ -108,3 +108,4 @@ venv.bak/
 *.sqlite
 
 data-files/
+scratch*
