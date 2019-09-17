@@ -75,7 +75,7 @@
 
         const siteGroupsGeoJson = {};
         axios
-          .get(self.$apiEndpoint + "/geojson?projectGroup=" + selectedProject)
+          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + selectedProject)
           .then(response => {
             const allSitesGeoJson = response.data;
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
