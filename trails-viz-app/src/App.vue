@@ -1,15 +1,18 @@
 <template>
-  <div id="app">
+  <b-container fluid id="app">
+    <top-bar></top-bar>
     <map-div></map-div>
-  </div>
+  </b-container>
 </template>
 
 <script>
 import MapDiv from "@/components/MapDiv";
+import TopBar from "@/components/TopBar";
 
 export default {
   name: 'app',
   components: {
+    TopBar,
     MapDiv
   }
 }
@@ -20,8 +23,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  padding: 0;
 }
 </style>
