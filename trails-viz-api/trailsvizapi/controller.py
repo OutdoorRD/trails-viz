@@ -1,6 +1,11 @@
-from flask import request, Response
+from flask import request, Response, jsonify
 
-from trailsvizapi import app, data_repository
+from trailsvizapi import app, data_repository, app_config
+
+
+@app.route('/api/projects')
+def get_all_projects():
+    return jsonify(app_config.PROJECT_GROUPS)
 
 
 @app.route('/api/geojson')
