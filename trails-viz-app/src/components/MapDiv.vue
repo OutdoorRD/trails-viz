@@ -26,13 +26,21 @@
 
   export default {
     name: "MapDiv",
+    props: ["selectedSites"],
     mounted() {
       const mapDiv = L.map(this.$refs["mapDiv"], {
-        center: [47, -122],
-        zoom: 9
+        center: [40.53, -99.1],
+        zoom: 5
       });
 
       const outdoorLayer = L.tileLayer(MAPBOX_TILES_API, {
+        attribution: MAPBOX_ATTRIBUTION,
+        maxZoom: 18,
+        id: "mapbox.outdoors",
+        accessToken: MAPBOX_TOKEN
+      });
+
+      const streetsLayer = L.tileLayer(MAPBOX_TILES_API, {
         attribution: MAPBOX_ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.streets",
@@ -46,39 +54,60 @@
         accessToken: MAPBOX_TOKEN
       });
 
-      L.control.layers({"outdoor": outdoorLayer, "satellite": satelliteLayer}).addTo(mapDiv);
+      L.control.layers({"outdoor": outdoorLayer, "streets": streetsLayer, "satellite": satelliteLayer}).addTo(mapDiv);
       outdoorLayer.addTo(mapDiv);
 
-      const defaultStyle = {
-        color: "#ff0000",
-        weight: 0.8
-      };
+      this.mapDiv = mapDiv
+    },
+    methods: {
+      renderProjectSites: function (selectedProject) {
+        let self = this;
 
-      const siteGroupsGeoJson = {};
-      axios
-        .get("http://localhost:5000/api/geojson?projectGroup=MBS")
-        .then(response => {
-          const allSitesGeoJson = response.data;
-          mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
+        const defaultStyle = {
+          color: "#ff0000",
+          weight: 0.5
+        };
 
-          for (let feature of allSitesGeoJson["features"]) {
-            const siteid = feature["properties"]["siteid"];
-            const trailName = feature["properties"]["Trail_name"];
+        const selectedStyle = {
+          color: "#0000ff",
+          weight: 0.8
+        };
 
-            if (!(siteid in siteGroupsGeoJson)) {
-              siteGroupsGeoJson[siteid] = {"type": "FeatureCollection", "name": trailName};
-              siteGroupsGeoJson[siteid]["features"] = [];
+        const siteGroupsGeoJson = {};
+        axios
+          .get(self.$apiEndpoint + "/geojson?projectGroup=" + selectedProject)
+          .then(response => {
+            const allSitesGeoJson = response.data;
+            this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
+
+            for (let feature of allSitesGeoJson["features"]) {
+              const siteid = feature["properties"]["siteid"];
+              const trailName = feature["properties"]["Trail_name"];
+
+              if (!(siteid in siteGroupsGeoJson)) {
+                siteGroupsGeoJson[siteid] = {"type": "FeatureCollection", "name": trailName};
+                siteGroupsGeoJson[siteid]["features"] = [];
+              }
+              siteGroupsGeoJson[siteid]["features"].push(feature);
             }
-            siteGroupsGeoJson[siteid]["features"].push(feature);
-          }
 
-          Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-            L.geoJSON(site, {style: defaultStyle})
-              .bindTooltip(site["name"])
-              .addTo(mapDiv);
-            }
-          )
-        })
+            Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+              L.geoJSON(site, {style: defaultStyle})
+                .bindTooltip(site["name"])
+                .on('mouseover', function (event) {
+                  event.target.setStyle(selectedStyle);
+                })
+                .on('mouseout', function (event) {
+                  event.target.setStyle(defaultStyle);
+                })
+                .on('click', function (event) {
+                  event.target.setStyle(selectedStyle);
+                })
+                .addTo(this.mapDiv);
+              }
+            )
+          })
+      }
     }
   }
 </script>

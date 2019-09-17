@@ -1,7 +1,7 @@
 <template>
   <b-container fluid id="app">
-    <top-bar></top-bar>
-    <map-div></map-div>
+    <top-bar v-on:project-selected="sendEventToMap"></top-bar>
+    <map-div ref="map-div"></map-div>
   </b-container>
 </template>
 
@@ -14,6 +14,11 @@ export default {
   components: {
     TopBar,
     MapDiv
+  },
+  methods: {
+    sendEventToMap: function (selectedProject) {
+      this.$refs['map-div'].renderProjectSites(selectedProject)
+    }
   }
 }
 </script>
