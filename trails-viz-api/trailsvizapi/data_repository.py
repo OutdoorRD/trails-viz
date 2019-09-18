@@ -75,3 +75,12 @@ def get_monthly_estimates(siteid):
                                      'onsite', 'log_onsite', 'data_days']]
     mean_site_data.reset_index(inplace=True)
     return mean_site_data
+
+
+def get_annual_estimates(siteid):
+    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
+    annual_site_data = site_data.groupby(by=['year']).sum()
+    annual_site_data = annual_site_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
+                                         'onsite', 'log_onsite', 'data_days']]
+    annual_site_data.reset_index(inplace=True)
+    return annual_site_data

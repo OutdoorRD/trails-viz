@@ -28,4 +28,5 @@ def get_monthly_estimates(siteid):
 
 @app.route('/api/sites/<int:siteid>/annualEstimates')
 def get_annual_estimates(siteid):
-    pass
+    data = data_repository.get_annual_estimates(siteid)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
