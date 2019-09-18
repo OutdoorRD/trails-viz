@@ -27,6 +27,11 @@
   export default {
     name: "MapDiv",
     props: ["selectedSites"],
+    data: function() {
+      return {
+        visibleLayers : []
+      }
+    },
     mounted() {
       const mapDiv = L.map(this.$refs["mapDiv"], {
         center: [40.53, -99.1],
@@ -73,6 +78,9 @@
           weight: 0.8
         };
 
+        // remove the existing visible sites of the project
+        self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
+
         const siteGroupsGeoJson = {};
         axios
           .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + selectedProject)
@@ -92,7 +100,7 @@
             }
 
             Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-              L.geoJSON(site, {style: defaultStyle})
+              let siteLayer = L.geoJSON(site, {style: defaultStyle})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
                   event.target.setStyle(selectedStyle);
@@ -102,11 +110,12 @@
                 })
                 .on('click', function (event) {
                   event.target.setStyle(selectedStyle);
-                })
-                .addTo(this.mapDiv);
-              }
-            )
-          })
+                });
+
+              self.visibleLayers.push(siteLayer);
+              siteLayer.addTo(this.mapDiv);
+            })
+        })
       }
     }
   }
@@ -115,7 +124,7 @@
 <style scoped>
   @import "~leaflet/dist/leaflet.css";
   .map-div {
-    height: 800px;
+    height: 640px;
     width: 1000px;
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <b-container fluid id="app">
     <top-bar v-on:project-selected="sendEventToMap"></top-bar>
-    <map-div ref="map-div"></map-div>
+    <map-div ref="map-div" id="mapDiv"></map-div>
   </b-container>
 </template>
 
@@ -24,10 +24,13 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  padding: 0;
-}
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 0;
+  }
+  #mapDiv {
+    padding: 10px;
+  }
 </style>
