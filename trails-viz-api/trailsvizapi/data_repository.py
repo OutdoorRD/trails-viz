@@ -46,9 +46,32 @@ def _prepare_geo_dfs():
     return allsites
 
 
+def _prepare_monthly_df():
+    monthly_estimate = pd.read_csv(_MONTHLY_ESTIMATES_FILE)
+    monthly_onsite = pd.read_csv(_MONTHLY_ONSITE_FILE)
+    monthly_estimate.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
+    monthly_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
+
+    monthly_estimate.drop(columns='d2p', inplace=True)
+    monthly_onsite.drop(columns='d2p', inplace=True)
+
+    id_cols = ['trail', 'month', 'year']
+    return pd.merge(monthly_estimate, monthly_onsite, on=id_cols, how='outer')
+
+
 _ALLSITES_DF = _prepare_geo_dfs()
+_MONTHLY_VISITATION_DF = _prepare_monthly_df()
 
 
 def get_project_sites(project_group):
     project_sites = _ALLSITES_DF[_ALLSITES_DF['Prjct_code'].str.contains(project_group)]
     return project_sites
+
+
+def get_monthly_estimates(siteid):
+    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
+    mean_site_data = site_data.groupby(by=['month']).mean()
+    mean_site_data = mean_site_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
+                                     'onsite', 'log_onsite', 'data_days']]
+    mean_site_data.reset_index(inplace=True)
+    return mean_site_data
