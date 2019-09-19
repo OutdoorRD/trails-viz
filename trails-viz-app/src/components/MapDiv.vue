@@ -29,7 +29,8 @@
     props: ["selectedSites"],
     data: function() {
       return {
-        visibleLayers : []
+        visibleLayers : [],
+        selectedSite: null
       }
     },
     mounted() {
@@ -73,6 +74,11 @@
           weight: 0.5
         };
 
+        const hoverStyle = {
+          color: "#ffb801",
+          weight: 0.8
+        };
+
         const selectedStyle = {
           color: "#0000ff",
           weight: 0.8
@@ -81,19 +87,19 @@
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
-        const siteGroupsGeoJson = {};
         axios
           .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + selectedProject)
           .then(response => {
-            const allSitesGeoJson = response.data;
+            let siteGroupsGeoJson = {};
+            let allSitesGeoJson = response.data;
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
 
             for (let feature of allSitesGeoJson["features"]) {
-              const siteid = feature["properties"]["siteid"];
-              const trailName = feature["properties"]["Trail_name"];
+              let siteid = feature["properties"]["siteid"];
+              let trailName = feature["properties"]["Trail_name"];
 
               if (!(siteid in siteGroupsGeoJson)) {
-                siteGroupsGeoJson[siteid] = {"type": "FeatureCollection", "name": trailName};
+                siteGroupsGeoJson[siteid] = {"type": "FeatureCollection", "name": trailName, "siteid": siteid};
                 siteGroupsGeoJson[siteid]["features"] = [];
               }
               siteGroupsGeoJson[siteid]["features"].push(feature);
@@ -103,17 +109,25 @@
               let siteLayer = L.geoJSON(site, {style: defaultStyle})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
-                  event.target.setStyle(selectedStyle);
+                  event.target.setStyle(hoverStyle);
                 })
                 .on('mouseout', function (event) {
-                  event.target.setStyle(defaultStyle);
+                  if (event.target !== self.selectedSite) {
+                    event.target.setStyle(defaultStyle);
+                  }
                 })
                 .on('click', function (event) {
+                  if (self.selectedSite) {
+                    self.selectedSite.setStyle(defaultStyle);
+                  }
                   event.target.setStyle(selectedStyle);
+                  self.selectedSite = event.target;
+                  self.$emit('site-selected', self.selectedSite["siteid"]);
                 });
 
               self.visibleLayers.push(siteLayer);
               siteLayer.addTo(this.mapDiv);
+              siteLayer.siteid = site["siteid"]; // custom properties can be added to JS objects
             })
         })
       }
