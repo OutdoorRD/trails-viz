@@ -18,6 +18,12 @@
     },
     mounted() {
       let self = this;
+    },
+    methods: {
+      renderBarGraph: function (selectedSite) {
+        this.trailName = selectedSite['trailName']
+      }
+
     }
   }
 </script>

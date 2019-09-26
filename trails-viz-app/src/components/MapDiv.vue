@@ -120,12 +120,18 @@
                   }
                   event.target.setStyle(selectedStyle);
                   self.selectedSite = event.target;
-                  self.$emit('site-selected', self.selectedSite["siteid"]);
+                  self.$emit('site-selected', {
+                    "siteid": self.selectedSite["siteid"],
+                    "trailName": self.selectedSite["trailName"]
+                  });
                 });
 
               self.visibleLayers.push(siteLayer);
               siteLayer.addTo(this.mapDiv);
-              siteLayer.siteid = site["siteid"]; // custom properties can be added to JS objects
+
+              // custom properties can be added to JS objects
+              siteLayer.siteid = site["siteid"];
+              siteLayer.trailName = site["name"];
             })
         })
       }
