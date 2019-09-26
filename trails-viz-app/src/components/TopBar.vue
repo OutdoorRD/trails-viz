@@ -1,18 +1,15 @@
 <template>
-  <div>
-    <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand>SocialTrails</b-navbar-brand>
+  <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar-brand>SocialTrails</b-navbar-brand>
 
-      <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
+    <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
 
-      <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto">
-        <b-form-input size="sm" list="project-list" placeholder="Type Project Name" v-model="searchText" v-on:keyup="autoComplete" v-on:change="emitEvent"></b-form-input>
-        <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
-      </b-navbar-nav>
-
-    </b-navbar>
-  </div>
+    <!-- Right aligned nav items -->
+    <b-navbar-nav class="ml-auto">
+      <b-form-input size="sm" list="project-list" placeholder="Type Project Name" v-model="searchText" v-on:keyup="autoComplete" v-on:change="emitEvent"></b-form-input>
+      <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
+    </b-navbar-nav>
+  </b-navbar>
 </template>
 
 <script>

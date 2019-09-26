@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <div class="map-div" ref="mapDiv"></div>
-  </div>
+  <div class="map-div" ref="mapDiv"></div>
 </template>
 
 <script>
@@ -139,6 +137,5 @@
   @import "~leaflet/dist/leaflet.css";
   .map-div {
     height: 640px;
-    width: 1000px;
   }
 </style>
