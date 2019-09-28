@@ -5,6 +5,7 @@
 <script>
   import L from "leaflet";
   import axios from "axios";
+  import {store} from "../store";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -22,13 +23,26 @@
     '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
     '<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>';
 
+  const defaultStyle = {
+    color: "#ff0000",
+    weight: 0.5
+  };
+
+  const hoverStyle = {
+    color: "#ffb801",
+    weight: 0.8
+  };
+
+  const selectedStyle = {
+    color: "#0000ff",
+    weight: 0.8
+  };
+
   export default {
     name: "MapDiv",
-    props: ["selectedSites"],
     data: function() {
       return {
-        visibleLayers : [],
-        selectedSite: null
+        visibleLayers : []
       }
     },
     mounted() {
@@ -64,29 +78,14 @@
       this.mapDiv = mapDiv
     },
     methods: {
-      renderProjectSites: function (selectedProject) {
+      renderProjectSites: function () {
         let self = this;
-
-        const defaultStyle = {
-          color: "#ff0000",
-          weight: 0.5
-        };
-
-        const hoverStyle = {
-          color: "#ffb801",
-          weight: 0.8
-        };
-
-        const selectedStyle = {
-          color: "#0000ff",
-          weight: 0.8
-        };
 
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
         axios
-          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + selectedProject)
+          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + store.selectedProject)
           .then(response => {
             let siteGroupsGeoJson = {};
             let allSitesGeoJson = response.data;
@@ -107,23 +106,17 @@
               let siteLayer = L.geoJSON(site, {style: defaultStyle})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
-                  event.target.setStyle(hoverStyle);
+                  if (event.target !== store.selectedSite) {
+                    event.target.setStyle(hoverStyle);
+                  }
                 })
                 .on('mouseout', function (event) {
-                  if (event.target !== self.selectedSite) {
+                  if (event.target !== store.selectedSite) {
                     event.target.setStyle(defaultStyle);
                   }
                 })
                 .on('click', function (event) {
-                  if (self.selectedSite) {
-                    self.selectedSite.setStyle(defaultStyle);
-                  }
-                  event.target.setStyle(selectedStyle);
-                  self.selectedSite = event.target;
-                  self.$emit('site-selected', {
-                    "siteid": self.selectedSite["siteid"],
-                    "trailName": self.selectedSite["trailName"]
-                  });
+                  self.selectSite(event.target)
                 });
 
               self.visibleLayers.push(siteLayer);
@@ -134,6 +127,14 @@
               siteLayer.trailName = site["name"];
             })
         })
+      },
+      selectSite: function (selectedLayer) {
+        if (store.selectedSite) {
+          store.selectedSite.setStyle(defaultStyle);
+        }
+        selectedLayer.setStyle(selectedStyle);
+        store.setSelectedSite(selectedLayer);
+        this.$emit('site-selected');
       }
     }
   }

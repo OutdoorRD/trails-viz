@@ -6,45 +6,51 @@
 
     <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
-      <b-form-input size="sm" list="project-list" placeholder="Type Project Name" v-model="searchText" v-on:keyup="autoComplete" v-on:change="emitEvent"></b-form-input>
-      <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
+      <b-nav-form v-on:submit="doNothing">
+        <b-form-input size="sm" list="project-list" placeholder="Search Project" v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
+        <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
+      </b-nav-form>
     </b-navbar-nav>
   </b-navbar>
 </template>
 
 <script>
-  import axios from 'axios';
+
+  import {store} from '../store'
 
   export default {
     name: "TopBar",
     mounted: function() {
-      let self = this;
-      axios.get(self.$apiEndpoint + "/projects")
-        .then(response => self.allProjects = response.data)
+      store.fetchAllProjects()
     },
     data: function () {
       return {
-        allProjects: [],
+        projectSearchText: '',
         filteredProjects: [],
-        searchText: ''
+        siteSearchText: '',
+        filteredSites: []
       };
     },
     methods: {
-      autoComplete: function () {
-        if (this.allProjects.includes(this.searchText.toUpperCase())) {
+      autoCompleteProject: function () {
+        if (store.allProjects.includes(this.projectSearchText.toUpperCase())) {
           // don't show suggestions when a valid project is selected
           return
         }
-        if (this.searchText.length >= 1) {
-          this.filteredProjects = this.allProjects.filter(name => name.toUpperCase().includes(this.searchText.toUpperCase()));
+        if (this.projectSearchText.length >= 1) {
+          this.filteredProjects = store.allProjects.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
         } else {
           this.filteredProjects = []
         }
       },
-      emitEvent: function () {
-        if (this.filteredProjects.includes(this.searchText.toUpperCase())) {
-          this.$emit('project-selected', this.searchText.toUpperCase())
+      emitProjectNameEvent: function () {
+        if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
+          store.setSelectedProject(this.projectSearchText.toUpperCase());
+          this.$emit('project-selected');
         }
+      },
+      doNothing: function(event) {
+        event.preventDefault()
       }
     }
   }
