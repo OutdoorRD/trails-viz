@@ -2,15 +2,23 @@
   <b-navbar toggleable="lg" type="dark" variant="info">
     <b-navbar-brand>SocialTrails</b-navbar-brand>
 
-    <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
-    <!-- Right aligned nav items -->
-    <b-navbar-nav class="ml-auto">
-      <b-nav-form v-on:submit="doNothing">
-        <b-form-input size="sm" list="project-list" placeholder="Search Project" v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
-        <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
-      </b-nav-form>
-    </b-navbar-nav>
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav>
+        <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto">
+        <b-nav-form v-on:submit="doNothing">
+          <b-form-input class="form-input" size="sm" list="project-list" placeholder="Search Project" v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
+          <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
+
+          <b-form-input class="form-input" size="sm" list="project-sites-list" placeholder="Search Trail" v-model="siteSearchText" v-on:keyup="autoCompleteSite" v-on:change="emitSiteNameEvent"></b-form-input>
+          <b-form-datalist id="project-sites-list" :options="filteredSites"></b-form-datalist>
+        </b-nav-form>
+      </b-navbar-nav>
+    </b-collapse>
+
   </b-navbar>
 </template>
 
@@ -49,6 +57,21 @@
           this.$emit('project-selected');
         }
       },
+      autoCompleteSite:  function() {
+        let trailNames = Object.keys(store.projectSites);
+
+        if (trailNames.includes(this.siteSearchText)) {
+          return
+        }
+        if (this.siteSearchText.length >= 2) {
+          this.filteredSites = trailNames.filter(name => name.toUpperCase().includes(this.siteSearchText.toUpperCase()));
+        } else {
+          this.filteredSites = []
+        }
+      },
+      emitSiteNameEvent: function() {
+        this.$emit('site-selected', this.siteSearchText);
+      },
       doNothing: function(event) {
         event.preventDefault()
       }
@@ -57,5 +80,7 @@
 </script>
 
 <style scoped>
-
+  .form-input {
+    margin: 0 10px 0 10px;
+  }
 </style>

@@ -4,7 +4,7 @@ import axios from 'axios'
 export const store = {
   allProjects: [],
   selectedProject: '',
-  projectSites: [],
+  projectSites: {},
   selectedSite: '',
   fetchAllProjects() {
     axios.get(Vue.prototype.$apiEndpoint + '/projects')

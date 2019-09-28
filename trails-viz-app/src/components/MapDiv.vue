@@ -80,6 +80,7 @@
     methods: {
       renderProjectSites: function () {
         let self = this;
+        let projectSites = {};
 
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
@@ -116,25 +117,29 @@
                   }
                 })
                 .on('click', function (event) {
-                  self.selectSite(event.target)
+                  self.selectSite(event.target["trailName"])
                 });
-
-              self.visibleLayers.push(siteLayer);
-              siteLayer.addTo(this.mapDiv);
 
               // custom properties can be added to JS objects
               siteLayer.siteid = site["siteid"];
               siteLayer.trailName = site["name"];
-            })
+
+              self.visibleLayers.push(siteLayer);
+              projectSites[siteLayer.trailName] = siteLayer;
+              siteLayer.addTo(this.mapDiv);
+            });
+            store.setProjectSites(projectSites);
         })
       },
-      selectSite: function (selectedLayer) {
+      selectSite: function (trailName) {
         if (store.selectedSite) {
           store.selectedSite.setStyle(defaultStyle);
         }
-        selectedLayer.setStyle(selectedStyle);
-        store.setSelectedSite(selectedLayer);
+        let site = store.projectSites[trailName];
+        site.setStyle(selectedStyle);
+        store.setSelectedSite(site);
         this.$emit('site-selected');
+        this.mapDiv.fitBounds(site.getBounds());
       }
     }
   }
