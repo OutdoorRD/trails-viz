@@ -23,7 +23,6 @@
 </template>
 
 <script>
-  import axios from 'axios'
   import {store} from '../store'
   import c3 from 'c3'
 
@@ -54,9 +53,6 @@
         dataSource: ''
       }
     },
-    mounted() {
-
-    },
     methods: {
       renderDefaultGraph: function () {
         let self = this;
@@ -64,25 +60,20 @@
         this.trailName = store.selectedSite['trailName'];
         this.siteid = store.selectedSite['siteid'];
 
-        axios.all([
-          axios.get(this.$apiEndpoint + '/sites/' + this.siteid + '/annualEstimates'),
-          axios.get(this.$apiEndpoint + '/sites/' + this.siteid + '/monthlyEstimates')
-        ]).then(axios.spread((annualResponse, monthlyResponse) => {
-          self.annualEstimates = annualResponse.data;
-          self.monthlyEstimates = monthlyResponse.data;
+        self.annualEstimates = store.annualEstimates;
+        self.monthlyEstimates = store.monthlyEstimates;
 
-          self.averageAnnualVisits = self.annualEstimates.map(x => x.estimate).reduce((a, b) => a + b) / self.annualEstimates.length;
-          self.averageAnnualVisits = Math.round(self.averageAnnualVisits);
+        self.averageAnnualVisits = self.annualEstimates.map(x => x.estimate).reduce((a, b) => a + b) / self.annualEstimates.length;
+        self.averageAnnualVisits = Math.round(self.averageAnnualVisits);
 
-          // on load, render the default graph which is monthly modelled
-          if (!self.timePeriod) {
-            self.timePeriod = 'monthly';
-          }
-          if (!self.dataSource) {
-            self.dataSource = 'socialMedia';
-          }
-          self.renderSelectedGraph();
-        }));
+        // on load, render the default graph which is monthly modelled
+        if (!self.timePeriod) {
+          self.timePeriod = 'monthly';
+        }
+        if (!self.dataSource) {
+          self.dataSource = 'socialMedia';
+        }
+        self.renderSelectedGraph();
       },
       _addLabelToArray: function(arr, label) {
         arr.unshift(label);

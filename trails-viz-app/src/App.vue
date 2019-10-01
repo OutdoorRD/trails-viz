@@ -3,7 +3,7 @@
     <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap"></top-bar>
     <b-row no-gutters>
       <b-col sm="7" class="map-col">
-        <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendSiteSelectedToBarGraph"></map-div>
+        <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents"></map-div>
       </b-col>
       <b-col sm="5" class="graph-col">
         <bar-graph ref="bar-graph"></bar-graph>
@@ -16,6 +16,8 @@
 import MapDiv from "@/components/MapDiv";
 import TopBar from "@/components/TopBar";
 import BarGraph from "@/components/BarGraph";
+import {store} from "./store";
+import axios from "axios";
 
 export default {
   name: 'app',
@@ -31,8 +33,17 @@ export default {
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
     },
-    sendSiteSelectedToBarGraph: function () {
-      this.$refs['bar-graph'].renderDefaultGraph();
+    sendRenderPlotEvents: function () {
+      // populate the estimates in global store to be used in bar graph and time series
+      let siteid = store.selectedSite['siteid'];
+      axios.all([
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates')
+      ]).then(axios.spread((annualResponse, monthlyResponse) => {
+        store.setAnnualEstimates(annualResponse.data);
+        store.setMonthlyEstimates(monthlyResponse.data);
+        this.$refs['bar-graph'].renderDefaultGraph();
+      }))
     }
   }
 }
