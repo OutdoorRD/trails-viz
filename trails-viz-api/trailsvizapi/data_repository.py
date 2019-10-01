@@ -68,6 +68,11 @@ def get_project_sites(project_group):
     return project_sites
 
 
+def get_monthly_visitation(siteid):
+    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
+    return site_data
+
+
 def get_monthly_estimates(siteid):
     site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
     mean_site_data = site_data.groupby(by=['month']).mean()

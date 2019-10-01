@@ -15,11 +15,6 @@ def get_geojson_data():
     return Response(data.to_json(), mimetype='application/json')
 
 
-@app.route('/api/sites/<int:siteid>/weeklyEstimates')
-def get_weekly_estimates(siteid):
-    pass
-
-
 @app.route('/api/sites/<int:siteid>/monthlyEstimates')
 def get_monthly_estimates(siteid):
     data = data_repository.get_monthly_estimates(siteid)
@@ -29,4 +24,10 @@ def get_monthly_estimates(siteid):
 @app.route('/api/sites/<int:siteid>/annualEstimates')
 def get_annual_estimates(siteid):
     data = data_repository.get_annual_estimates(siteid)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
+
+
+@app.route('/api/sites/<int:siteid>/monthlyVisitation')
+def get_monthly_visitation(siteid):
+    data = data_repository.get_monthly_visitation(siteid)
     return Response(data.to_json(orient='records'), mimetype='application/json')
