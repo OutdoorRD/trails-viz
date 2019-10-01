@@ -9,7 +9,9 @@ export const store = {
 
   annualEstimates: [],
   monthlyEstimates: [],
-  weeklyEstimates: [],
+
+  monthlyVisitation: [],
+  weeklyVisitation: [],
 
   fetchAllProjects() {
     axios.get(Vue.prototype.$apiEndpoint + '/projects')
@@ -30,7 +32,10 @@ export const store = {
   setMonthlyEstimates(monthlyEstimates) {
     this.monthlyEstimates = monthlyEstimates;
   },
-  setWeeklyEstimates(weeklyEstimates) {
-    this.weeklyEstimates = weeklyEstimates;
+  setMonthlyVisitation(monthlyVisitation) {
+    this.monthlyVisitation = monthlyVisitation;
+  },
+  setWeeklyVisitation(weeklyVisitation) {
+    this.weeklyVisitation = weeklyVisitation;
   }
 };

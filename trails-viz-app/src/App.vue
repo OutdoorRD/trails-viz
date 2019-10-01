@@ -9,6 +9,11 @@
         <bar-graph ref="bar-graph"></bar-graph>
       </b-col>
     </b-row>
+    <b-row no-gutters>
+      <b-col sm="12" class="time-series">
+        <time-series ref="time-series"></time-series>
+      </b-col>
+    </b-row>
   </b-container>
 </template>
 
@@ -18,10 +23,12 @@ import TopBar from "@/components/TopBar";
 import BarGraph from "@/components/BarGraph";
 import {store} from "./store";
 import axios from "axios";
+import TimeSeries from "@/components/TimeSeries";
 
 export default {
   name: 'app',
   components: {
+    TimeSeries,
     BarGraph,
     TopBar,
     MapDiv
@@ -38,11 +45,16 @@ export default {
       let siteid = store.selectedSite['siteid'];
       axios.all([
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates')
-      ]).then(axios.spread((annualResponse, monthlyResponse) => {
-        store.setAnnualEstimates(annualResponse.data);
-        store.setMonthlyEstimates(monthlyResponse.data);
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes) => {
+        store.setAnnualEstimates(annualEstimateRes.data);
+        store.setMonthlyEstimates(monthlyEstimateRes.data);
+        store.setMonthlyVisitation(monthlyVisitationRes.data);
+        store.setWeeklyVisitation(weeklyVisitationRes.data);
         this.$refs['bar-graph'].renderDefaultGraph();
+        this.$refs['time-series'].renderTimeSeries();
       }))
     }
   }
@@ -62,5 +74,8 @@ export default {
   }
   .graph-col {
     padding: 4px 4px 4px 2px !important;
+  }
+  .time-series {
+    padding: 4px !important;
   }
 </style>
