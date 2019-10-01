@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="selectedSite">
     <b-row no-gutters>
       <b-col>
         <h3>{{trailName}}</h3>
@@ -36,6 +36,7 @@
       return {
         siteid: null,
         trailName: null,
+        selectedSite: null,
         weeklyEstimates: null,
         monthlyEstimates: null,
         annualEstimates: null,
@@ -59,6 +60,7 @@
     methods: {
       renderDefaultGraph: function () {
         let self = this;
+        this.selectedSite = store.selectedSite;
         this.trailName = store.selectedSite['trailName'];
         this.siteid = store.selectedSite['siteid'];
 
