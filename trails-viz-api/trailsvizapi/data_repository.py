@@ -59,8 +59,23 @@ def _prepare_monthly_df():
     return pd.merge(monthly_estimate, monthly_onsite, on=id_cols, how='outer')
 
 
+def _prepare_weekly_df():
+    weekly_estimate = pd.read_csv(_WEEKLY_ESTIMATES_FILE)
+    weekly_onsite = pd.read_csv(_WEEKLY_ONSITE_FILE)
+
+    weekly_estimate.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
+    weekly_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
+
+    weekly_estimate.drop(columns='d2p', inplace=True)
+    weekly_onsite.drop(columns='d2p', inplace=True)
+
+    id_cols = ['trail', 'week', 'month', 'year']
+    return pd.merge(weekly_estimate, weekly_onsite, on=id_cols, how='outer')
+
+
 _ALLSITES_DF = _prepare_geo_dfs()
 _MONTHLY_VISITATION_DF = _prepare_monthly_df()
+_WEEKLY_VISITATION_DF = _prepare_weekly_df()
 
 
 def get_project_sites(project_group):
@@ -70,6 +85,11 @@ def get_project_sites(project_group):
 
 def get_monthly_visitation(siteid):
     site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
+    return site_data
+
+
+def get_weekly_visitation(siteid):
+    site_data = _WEEKLY_VISITATION_DF[_WEEKLY_VISITATION_DF['trail'] == siteid]
     return site_data
 
 
