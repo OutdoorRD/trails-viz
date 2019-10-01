@@ -1,5 +1,14 @@
 <template>
-  <div id="time-series"></div>
+  <div v-show="selectedSite">
+    <div id="time-series"></div>
+    <div class="text-center disclaimer">
+      <p>
+        <strong>"Modeled"</strong> values here are in draft form and will change, sometimes dramatically, as our methods and data improve.
+        <br>
+        <strong>"On-site"</strong> values are estimates from infrared counters and parking lot counts, where available.
+      </p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -75,5 +84,7 @@
 </script>
 
 <style scoped>
-
+  .disclaimer {
+    font-size: 12px;
+  }
 </style>
