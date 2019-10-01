@@ -73,8 +73,13 @@
           self.averageAnnualVisits = Math.round(self.averageAnnualVisits);
 
           // on load, render the default graph which is monthly modelled
-          self.timePeriod = 'monthly';
-          self.dataSource = 'modelled';
+          if (!self.timePeriod) {
+            self.timePeriod = 'monthly';
+          }
+          if (!self.dataSource) {
+            self.dataSource = 'socialMedia';
+          }
+          self.renderSelectedGraph();
         }));
       },
       _addLabelToArray: function(arr, label) {

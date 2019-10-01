@@ -139,7 +139,7 @@
         site.setStyle(selectedStyle);
         store.setSelectedSite(site);
         this.$emit('site-selected');
-        this.mapDiv.fitBounds(site.getBounds());
+        this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
       }
     }
   }
