@@ -2,10 +2,10 @@
   <b-container fluid id="app">
     <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap"></top-bar>
     <b-row no-gutters>
-      <b-col sm="8" class="map-col">
+      <b-col sm="7" class="map-col">
         <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendSiteSelectedToBarGraph"></map-div>
       </b-col>
-      <b-col sm="4" class="graph-col">
+      <b-col sm="5" class="graph-col">
         <bar-graph ref="bar-graph"></bar-graph>
       </b-col>
     </b-row>
@@ -32,7 +32,7 @@ export default {
       this.$refs['map-div'].selectSite(trailName)
     },
     sendSiteSelectedToBarGraph: function () {
-      this.$refs['bar-graph'].renderBarGraph();
+      this.$refs['bar-graph'].renderDefaultGraph();
     }
   }
 }
