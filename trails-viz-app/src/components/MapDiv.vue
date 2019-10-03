@@ -1,5 +1,10 @@
 <template>
-  <div class="map-div" ref="mapDiv"></div>
+  <div>
+    <b-alert :show="dismissCountDown" dismissible fade variant="warning" @dismiss-count-down="countDownChanged">
+      Only two sites can be compared at a time!
+    </b-alert>
+    <div class="map-div" ref="mapDiv"></div>
+  </div>
 </template>
 
 <script>
@@ -38,10 +43,17 @@
     weight: 0.8
   };
 
+  const compareStyle = {
+    color: "#fa00ff",
+    weight: 0.8
+  };
+
   export default {
     name: "MapDiv",
     data: function() {
       return {
+        dismissSecs: 5,
+        dismissCountDown: 0,
         visibleLayers : []
       }
     },
@@ -107,17 +119,33 @@
               let siteLayer = L.geoJSON(site, {style: defaultStyle})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
-                  if (event.target !== store.selectedSite) {
+                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                    // do nothing
+                  } else {
                     event.target.setStyle(hoverStyle);
                   }
                 })
                 .on('mouseout', function (event) {
-                  if (event.target !== store.selectedSite) {
+                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                    // don't change the style
+                  } else {
                     event.target.setStyle(defaultStyle);
                   }
                 })
                 .on('click', function (event) {
-                  self.selectSite(event.target["trailName"])
+                  if (event.originalEvent.ctrlKey) {
+                    if (store.comparingSite && store.selectedSite) {
+                      self.showAlert();
+                    }
+                    else if(store.selectedSite) {
+                      store.setComparingSite(event.target);
+                      store.selectedSite.setStyle(compareStyle);
+                      store.comparingSite.setStyle(compareStyle);
+                      self.$emit('compare-activated');
+                    }
+                  } else {
+                    self.selectSite(event.target["trailName"])
+                  }
                 });
 
               // custom properties can be added to JS objects
@@ -132,6 +160,10 @@
         })
       },
       selectSite: function (trailName) {
+        if (store.comparingSite) {
+          store.comparingSite.setStyle(defaultStyle);
+          store.setComparingSite('');
+        }
         if (store.selectedSite) {
           store.selectedSite.setStyle(defaultStyle);
         }
@@ -140,6 +172,12 @@
         store.setSelectedSite(site);
         this.$emit('site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
+      },
+      countDownChanged(dismissCountDown) {
+        this.dismissCountDown = dismissCountDown
+      },
+      showAlert() {
+        this.dismissCountDown = this.dismissSecs
       }
     }
   }

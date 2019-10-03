@@ -10,6 +10,10 @@ export const store = {
   monthlyVisitation: [],
   weeklyVisitation: [],
 
+  comparingSite: '',
+  comparingSiteAnnualEstimates: [],
+  comparingSiteMonthlyEstimates: [],
+
   setAllProjects(allProjects) {
     this.allProjects = allProjects;
   },
@@ -33,6 +37,15 @@ export const store = {
   },
   setWeeklyVisitation(weeklyVisitation) {
     this.weeklyVisitation = weeklyVisitation;
+  },
+  setComparingSite(comparingSite) {
+    this.comparingSite = comparingSite;
+  },
+  setComparingSiteAnnualEstimates(comparingSiteAnnualEstimates) {
+    this.comparingSiteAnnualEstimates = comparingSiteAnnualEstimates;
+  },
+  setComparingSiteMonthlyEstimates(comparingSiteMonthlyEstimates) {
+    this.comparingSiteMonthlyEstimates = comparingSiteMonthlyEstimates;
   },
   clearSelectedProjectData() {
     this.selectedProject = '';

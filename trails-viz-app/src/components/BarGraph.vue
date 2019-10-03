@@ -111,64 +111,97 @@
           }
         })
       },
+      _prepareMonthlyModelledData: function(trailName, monthlyEstimates) {
+        let estimates = [trailName + ' - Monthly Average Modelled'];
+        monthlyEstimates.forEach(x => {
+          estimates.push(Math.round(x.estimate));
+        });
+        return [estimates];
+      },
+      _prepareAnnualModelledData: function(trailName, annualEstimates) {
+        let estimates = [trailName + ' - Annual Modelled'];
+        annualEstimates.forEach(x => {
+          estimates.push(Math.round(x.estimate));
+        });
+        return [estimates];
+      },
+      _prepareMonthlySocialMediaData: function(trailName, monthlyEstimates) {
+        let flickr = [trailName + ' - Flickr'];
+        let instag = [trailName + ' - Instagram'];
+        let twitter = [trailName + ' - Twitter'];
+        let wta = [trailName + ' - WTA'];
+
+        monthlyEstimates.forEach(x => {
+          flickr.push(Math.round(x.flickr));
+          instag.push(Math.round(x.instag));
+          twitter.push(Math.round(x.twitter));
+          wta.push(Math.round(x.wta));
+        });
+        return [flickr, instag, twitter, wta];
+      },
+      _prepareAnnualSocialMediaData: function(trailName, annualEstimates) {
+        let flickr = [trailName + ' - Flickr'];
+        let instag = [trailName + ' - Instagram'];
+        let twitter = [trailName + ' - Twitter'];
+        let wta = [trailName + ' - WTA'];
+
+        annualEstimates.forEach(x => {
+          flickr.push(Math.round(x.flickr));
+          instag.push(Math.round(x.instag));
+          twitter.push(Math.round(x.twitter));
+          wta.push(Math.round(x.wta));
+        });
+        return [flickr, instag, twitter, wta];
+      },
       renderMonthlyModelled: function() {
         let self = this;
-        let estimates = ['Monthly Average Modelled'];
         let categories = [];
-
         self.monthlyEstimates.forEach(x => {
-          estimates.push(Math.round(x.estimate));
           categories.push(MONTH_DICT[x.month])
         });
-        let data = [estimates];
+        let data = self._prepareMonthlyModelledData(self.trailName, self.monthlyEstimates);
+        if (store.comparingSite) {
+          data = data.concat(self._prepareMonthlyModelledData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+        }
         self._renderBarGraph(data, categories);
       },
       renderMonthlySocialMedia: function () {
         let self = this;
-        let flickr = ['Flickr'];
-        let instag = ['Instagram'];
-        let twitter = ['Twitter'];
-        let wta = ['WTA'];
         let categories = [];
 
         self.monthlyEstimates.forEach(x => {
-          flickr.push(Math.round(x.flickr));
-          instag.push(Math.round(x.instag));
-          twitter.push(Math.round(x.twitter));
-          wta.push(Math.round(x.wta));
           categories.push(MONTH_DICT[x.month])
         });
-        let data = [flickr, instag, twitter, wta];
+        let data = self._prepareMonthlySocialMediaData(self.trailName, self.monthlyEstimates);
+        if (store.comparingSite) {
+          data = data.concat(self._prepareMonthlySocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+        }
         self._renderBarGraph(data, categories, true);
       },
       renderAnnualModelled: function () {
         let self = this;
-        let estimates = ['Annual Modelled'];
         let categories = [];
 
         self.annualEstimates.forEach(x => {
-          estimates.push(Math.round(x.estimate));
           categories.push(x.year)
         });
-        let data = [estimates];
+        let data = self._prepareAnnualModelledData(self.trailName, self.annualEstimates);
+        if (store.comparingSite) {
+          data = data.concat(self._prepareAnnualModelledData(store.comparingSite['trailName'], store.comparingSiteAnnualEstimates));
+        }
         self._renderBarGraph(data, categories);
       },
       renderAnnualSocialMedia: function () {
         let self = this;
-        let flickr = ['Flickr'];
-        let instag = ['Instagram'];
-        let twitter = ['Twitter'];
-        let wta = ['WTA'];
         let categories = [];
 
         self.annualEstimates.forEach(x => {
-          flickr.push(Math.round(x.flickr));
-          instag.push(Math.round(x.instag));
-          twitter.push(Math.round(x.twitter));
-          wta.push(Math.round(x.wta));
           categories.push(x.year)
         });
-        let data = [flickr, instag, twitter, wta];
+        let data = self._prepareAnnualSocialMediaData(self.trailName, self.annualEstimates);
+        if (store.comparingSite) {
+          data = data.concat(self._prepareAnnualSocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+        }
         self._renderBarGraph(data, categories, true);
       },
       renderSelectedGraph: function () {

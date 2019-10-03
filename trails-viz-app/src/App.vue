@@ -3,7 +3,7 @@
     <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap"></top-bar>
     <b-row no-gutters>
       <b-col sm="7" class="map-col">
-        <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents"></map-div>
+        <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents" v-on:compare-activated="sendCompareSites"></map-div>
       </b-col>
       <b-col sm="5" class="graph-col">
         <bar-graph ref="bar-graph"></bar-graph>
@@ -70,6 +70,17 @@ export default {
         store.setWeeklyVisitation(weeklyVisitationRes.data);
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
+      }))
+    },
+    sendCompareSites: function () {
+      let siteid = store.comparingSite['siteid'];
+      axios.all([
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates')
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes) => {
+        store.setComparingSiteAnnualEstimates(annualEstimateRes.data);
+        store.setComparingSiteMonthlyEstimates(monthlyEstimateRes.data);
+        this.$refs['bar-graph'].renderSelectedGraph();
       }))
     }
   }
