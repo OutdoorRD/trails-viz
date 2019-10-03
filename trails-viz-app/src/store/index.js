@@ -1,6 +1,3 @@
-import Vue from 'vue'
-import axios from 'axios'
-
 export const store = {
   allProjects: [],
   selectedProject: '',
@@ -13,9 +10,8 @@ export const store = {
   monthlyVisitation: [],
   weeklyVisitation: [],
 
-  fetchAllProjects() {
-    axios.get(Vue.prototype.$apiEndpoint + '/projects')
-      .then(response => this.allProjects = response.data);
+  setAllProjects(allProjects) {
+    this.allProjects = allProjects;
   },
   setSelectedProject(project) {
     this.selectedProject = project
@@ -37,5 +33,16 @@ export const store = {
   },
   setWeeklyVisitation(weeklyVisitation) {
     this.weeklyVisitation = weeklyVisitation;
+  },
+  clearSelectedProjectData() {
+    this.selectedProject = '';
+    this.projectSites = {};
+    this.selectedSite = '';
+
+    this.annualEstimates = [];
+    this.monthlyEstimates = [];
+
+    this.monthlyVisitation = [];
+    this.weeklyVisitation = [];
   }
 };

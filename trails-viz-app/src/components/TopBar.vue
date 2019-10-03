@@ -28,9 +28,6 @@
 
   export default {
     name: "TopBar",
-    mounted: function() {
-      store.fetchAllProjects()
-    },
     data: function () {
       return {
         projectSearchText: '',
@@ -53,6 +50,7 @@
       },
       emitProjectNameEvent: function () {
         if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
+          store.clearSelectedProjectData();
           store.setSelectedProject(this.projectSearchText.toUpperCase());
           this.$emit('project-selected');
         }

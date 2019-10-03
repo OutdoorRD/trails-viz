@@ -133,6 +133,13 @@
             }
           }
         });
+      },
+      clearTimeSeries: function () {
+        this.siteid = null;
+        this.trailName = null;
+        this.selectedSite = null;
+        this.monthlyVisitation = null;
+        this.dataRange = '';
       }
     }
   }

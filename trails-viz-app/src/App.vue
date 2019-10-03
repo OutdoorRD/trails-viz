@@ -41,9 +41,16 @@ export default {
     TopBar,
     MapDiv
   },
+  mounted() {
+    axios.get(this.$apiEndpoint + '/projects')
+      .then(response => store.setAllProjects(response.data));
+  },
   methods: {
     sendProjectSelectedEventToMap: function () {
-      this.$refs['map-div'].renderProjectSites()
+      this.$refs['map-div'].renderProjectSites();
+      this.$refs['bar-graph'].clearBarGraph();
+      this.$refs['time-series'].clearTimeSeries();
+      store.clearSelectedProjectData();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)

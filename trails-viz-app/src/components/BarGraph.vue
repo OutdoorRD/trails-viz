@@ -71,7 +71,7 @@
           self.timePeriod = 'monthly';
         }
         if (!self.dataSource) {
-          self.dataSource = 'socialMedia';
+          self.dataSource = 'modelled';
         }
         self.renderSelectedGraph();
       },
@@ -181,6 +181,17 @@
         } else if (this.timePeriod === 'annual' && this.dataSource === 'socialMedia') {
           this.renderAnnualSocialMedia()
         }
+      },
+      clearBarGraph: function () {
+        this.siteid = null;
+        this.trailName = null;
+        this.selectedSite = null;
+        this.weeklyEstimates = null;
+        this.monthlyEstimates = null;
+        this.annualEstimates = null;
+        this.averageAnnualVisits = '';
+        this.timePeriod = '';
+        this.dataSource = '';
       }
     }
   }
