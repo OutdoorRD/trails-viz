@@ -1,5 +1,12 @@
 <template>
   <div v-show="selectedSite">
+    <b-row no-gutters>
+      <b-col class="text-right">
+        <b-form-group>
+          <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
+        </b-form-group>
+      </b-col>
+    </b-row>
     <div id="time-series"></div>
     <div class="text-center disclaimer">
       <p>
@@ -23,7 +30,13 @@
         trailName: null,
         selectedSite: null,
         monthlyVisitation: null,
-        dataRange: ''
+        dataRange: '',
+        chart: null,
+        domain: null,
+        dateRangeOptions: [
+          {text: 'Monthly', value: 'monthly'},
+          {text: 'Weekly', value: 'weekly'}
+        ]
       }
     },
     methods: {
@@ -64,7 +77,7 @@
           monthlyTwitter.push(x.twitter);
           monthlyWta.push(x.wta);
         });
-        let timeseriesMonthlyData = [monthlyDates, monthlyModelled, monthlyOnsite, monthlyFlickr, monthlyInstag, monthlyTwitter, monthlyWta];
+        self.timeseriesMonthlyData = [monthlyDates, monthlyModelled, monthlyOnsite, monthlyFlickr, monthlyInstag, monthlyTwitter, monthlyWta];
 
         let weeklyDates = ['date'];
         let weeklyModelled = ['Modelled'];
@@ -84,15 +97,23 @@
           weeklyTwitter.push(x.twitter);
           weeklyWta.push(x.wta);
         });
-        let timeseriesWeeklyData = [weeklyDates, weeklyModelled, weeklyOnsite, weeklyFlickr, weeklyInstag, weeklyTwitter, weeklyWta];
+        self.timeseriesWeeklyData = [weeklyDates, weeklyModelled, weeklyOnsite, weeklyFlickr, weeklyInstag, weeklyTwitter, weeklyWta];
 
-        self.dataRange = 'monthly';
-        let chart = c3.generate({
+        let data;
+        if (self.dataRange === "weekly") {
+          data = self.timeseriesWeeklyData
+        } else if (self.dataRange === "monthly") {
+          data = self.timeseriesMonthlyData
+        } else {
+          self.dataRange = "monthly";
+          data = self.timeseriesMonthlyData
+        }
+        self.chart = c3.generate({
           bindto: '#time-series',
           data: {
             x: 'date',
             xFormat: '%Y-%m-%d', // 'xFormat' can be used as custom format of 'x'
-            columns: timeseriesMonthlyData
+            columns: data
           },
           axis: {
             x: {
@@ -113,26 +134,23 @@
             enabled: true,
             rescale: true,
             onzoom: function (domain) {
-              let startDate = domain[0];
-              let endDate = domain[1];
-              let diffTime = Math.abs(endDate - startDate);
-              let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-              if (self.dataRange === 'monthly' && diffDays <= 500) {
-                self.dataRange = 'weekly';
-                chart.load({
-                  columns: timeseriesWeeklyData
-                });
-                chart.zoom(domain);
-              } else if (self.dataRange === 'weekly' && diffDays > 500) {
-                self.dataRange = 'monthly';
-                chart.load({
-                  columns: timeseriesMonthlyData
-                });
-                chart.zoom(domain);
-              }
+              self.domain = domain;
             }
           }
         });
+      },
+      switchDateRange: function() {
+        let self = this;
+        if (self.dataRange === "monthly") {
+          self.chart.load({
+            columns: self.timeseriesMonthlyData
+          });
+        } else if (self.dataRange === "weekly") {
+          self.chart.load({
+            columns: self.timeseriesWeeklyData
+          });
+        }
+        self.chart.zoom(self.domain);
       },
       clearTimeSeries: function () {
         this.siteid = null;
