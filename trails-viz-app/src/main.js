@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
-Vue.prototype.$apiEndpoint= 'http://localhost:5000/api'
+Vue.prototype.$apiEndpoint = process.env.VUE_APP_API_ENDPOINT
 Vue.use(BootstrapVue)
 
 new Vue({
