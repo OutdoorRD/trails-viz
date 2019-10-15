@@ -22,6 +22,12 @@
   import {store} from '../store'
   import c3 from 'c3'
 
+  Number.prototype.pad = function (size) {
+    let s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+  };
+
   export default {
     name: "TimeSeries",
     data: function() {
@@ -148,7 +154,14 @@
             x: {
               type: 'timeseries',
               tick: {
-                format: '%Y-%m',
+                format: function (date) {
+                  let x = date.getFullYear() + '-' + (date.getMonth() + 1).pad(2);
+                  if (self.dataRange === "monthly") {
+                    return x
+                  } else if (self.dataRange === "weekly") {
+                    return x + '-' + date.getDate().pad(2);
+                  }
+                },
                 fit: false
               }
             },
