@@ -64,7 +64,7 @@
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
           monthlyModelled.push(Math.round(x.estimate, 2));
-          monthlyOnsite.push(Math.round(x.onsite, 2));
+          monthlyOnsite.push(x.onsite);
           monthlyFlickr.push(x.flickr);
           monthlyInstag.push(x.instag);
           monthlyTwitter.push(x.twitter);
@@ -90,7 +90,7 @@
           let sunday = self._getNthSunday(x.year, x.week);
           weeklyDates.push(x.year + '-' + x.month + '-' + sunday);
           weeklyModelled.push(Math.round(x.estimate, 2));
-          weeklyOnsite.push(Math.round(x.onsite, 2));
+          weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
           weeklyInstag.push(x.instag);
           weeklyTwitter.push(x.twitter);
