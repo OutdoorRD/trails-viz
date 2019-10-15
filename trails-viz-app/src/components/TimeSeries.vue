@@ -52,23 +52,16 @@
         date.setDate(dayOfYear);
         return date.getDate();
       },
-      renderTimeSeries: function () {
-        let self = this;
-        this.selectedSite = store.selectedSite;
-        this.trailName = store.selectedSite['trailName'];
-        this.siteid = store.selectedSite['siteid'];
-        this.monthlyVisitation = store.monthlyVisitation;
-        this.weeklyVisitation = store.weeklyVisitation;
-
+      _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
         let monthlyDates = ['date'];
-        let monthlyModelled = ['Modelled'];
-        let monthlyOnsite = ['On Site'];
-        let monthlyFlickr = ['Flickr'];
-        let monthlyInstag = ['Instagram'];
-        let monthlyTwitter = ['Twitter'];
-        let monthlyWta = ['WTA'];
+        let monthlyModelled = [trailName + 'Modelled'];
+        let monthlyOnsite = [trailName + 'On Site'];
+        let monthlyFlickr = [trailName + 'Flickr'];
+        let monthlyInstag = [trailName + 'Instagram'];
+        let monthlyTwitter = [trailName + 'Twitter'];
+        let monthlyWta = [trailName + 'WTA'];
 
-        self.monthlyVisitation.forEach(x => {
+        monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
           monthlyModelled.push(Math.round(x.estimate, 2));
           monthlyOnsite.push(Math.round(x.onsite, 2));
@@ -77,17 +70,23 @@
           monthlyTwitter.push(x.twitter);
           monthlyWta.push(x.wta);
         });
-        self.timeseriesMonthlyData = [monthlyDates, monthlyModelled, monthlyOnsite, monthlyFlickr, monthlyInstag, monthlyTwitter, monthlyWta];
-
+        let timeseriesMonthlyData = [monthlyDates, monthlyModelled, monthlyOnsite, monthlyFlickr, monthlyInstag, monthlyTwitter, monthlyWta];
+        if (skipDate) {
+          timeseriesMonthlyData.splice(0, 1)
+        }
+        return timeseriesMonthlyData
+      },
+      _prepareWeeklyData(trailName, weeklyVisitation, skipDate=false) {
+        let self = this;
         let weeklyDates = ['date'];
-        let weeklyModelled = ['Modelled'];
-        let weeklyOnsite = ['On Site'];
-        let weeklyFlickr = ['Flickr'];
-        let weeklyInstag = ['Instagram'];
-        let weeklyTwitter = ['Twitter'];
-        let weeklyWta = ['WTA'];
+        let weeklyModelled = [trailName + 'Modelled'];
+        let weeklyOnsite = [trailName + 'On Site'];
+        let weeklyFlickr = [trailName + 'Flickr'];
+        let weeklyInstag = [trailName + 'Instagram'];
+        let weeklyTwitter = [trailName + 'Twitter'];
+        let weeklyWta = [trailName + 'WTA'];
 
-        self.weeklyVisitation.forEach(x => {
+        weeklyVisitation.forEach(x => {
           let sunday = self._getNthSunday(x.year, x.week);
           weeklyDates.push(x.year + '-' + x.month + '-' + sunday);
           weeklyModelled.push(Math.round(x.estimate, 2));
@@ -97,7 +96,37 @@
           weeklyTwitter.push(x.twitter);
           weeklyWta.push(x.wta);
         });
-        self.timeseriesWeeklyData = [weeklyDates, weeklyModelled, weeklyOnsite, weeklyFlickr, weeklyInstag, weeklyTwitter, weeklyWta];
+        let timeseriesWeeklyData = [weeklyDates, weeklyModelled, weeklyOnsite, weeklyFlickr, weeklyInstag, weeklyTwitter, weeklyWta];
+        if (skipDate) {
+          timeseriesWeeklyData.splice(0, 1)
+        }
+        return timeseriesWeeklyData;
+      },
+      renderTimeSeries: function () {
+        let self = this;
+        this.selectedSite = store.selectedSite;
+        this.trailName = store.selectedSite['trailName'];
+        this.siteid = store.selectedSite['siteid'];
+        this.monthlyVisitation = store.monthlyVisitation;
+        this.weeklyVisitation = store.weeklyVisitation;
+
+        self.timeseriesMonthlyData = self._prepareMonthlyData(this.trailName, this.monthlyVisitation);
+        self.timeseriesWeeklyData = self._prepareWeeklyData(this.trailName, this.weeklyVisitation);
+
+        if (store.comparingSite) {
+          let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(store.comparingSite['trailName'], store.comparingSiteMonthlyVisitation, true));
+          let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(store.comparingSite['trailName'], store.comparingSiteWeeklyVisitation, true));
+
+          // filter out social media data to remove the clutter
+          joinedMonthlyData.splice(3, 4);
+          joinedMonthlyData.splice(5, 4);
+
+          joinedWeeklyData.splice(3, 4);
+          joinedWeeklyData.splice(5, 4);
+
+          self.timeseriesMonthlyData = joinedMonthlyData;
+          self.timeseriesWeeklyData = joinedWeeklyData;
+        }
 
         let data;
         if (self.dataRange === "weekly") {

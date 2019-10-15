@@ -76,11 +76,16 @@ export default {
       let siteid = store.comparingSite['siteid'];
       axios.all([
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates')
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes) => {
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes) => {
         store.setComparingSiteAnnualEstimates(annualEstimateRes.data);
         store.setComparingSiteMonthlyEstimates(monthlyEstimateRes.data);
+        store.setComparingSiteMonthlyVisitation(monthlyVisitationRes.data);
+        store.setComparingSiteWeeklyVisitation(weeklyVisitationRes.data);
         this.$refs['bar-graph'].renderSelectedGraph();
+        this.$refs['time-series'].renderTimeSeries();
       }))
     }
   }
