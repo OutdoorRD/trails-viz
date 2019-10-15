@@ -54,12 +54,12 @@
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
         let monthlyDates = ['date'];
-        let monthlyModelled = [trailName + 'Modelled'];
-        let monthlyOnsite = [trailName + 'On Site'];
-        let monthlyFlickr = [trailName + 'Flickr'];
-        let monthlyInstag = [trailName + 'Instagram'];
-        let monthlyTwitter = [trailName + 'Twitter'];
-        let monthlyWta = [trailName + 'WTA'];
+        let monthlyModelled = [trailName + ' Modelled'];
+        let monthlyOnsite = [trailName + ' On Site'];
+        let monthlyFlickr = [trailName + ' Flickr'];
+        let monthlyInstag = [trailName + ' Instagram'];
+        let monthlyTwitter = [trailName + ' Twitter'];
+        let monthlyWta = [trailName + ' WTA'];
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
@@ -79,12 +79,12 @@
       _prepareWeeklyData(trailName, weeklyVisitation, skipDate=false) {
         let self = this;
         let weeklyDates = ['date'];
-        let weeklyModelled = [trailName + 'Modelled'];
-        let weeklyOnsite = [trailName + 'On Site'];
-        let weeklyFlickr = [trailName + 'Flickr'];
-        let weeklyInstag = [trailName + 'Instagram'];
-        let weeklyTwitter = [trailName + 'Twitter'];
-        let weeklyWta = [trailName + 'WTA'];
+        let weeklyModelled = [trailName + ' Modelled'];
+        let weeklyOnsite = [trailName + ' On Site'];
+        let weeklyFlickr = [trailName + ' Flickr'];
+        let weeklyInstag = [trailName + ' Instagram'];
+        let weeklyTwitter = [trailName + ' Twitter'];
+        let weeklyWta = [trailName + ' WTA'];
 
         weeklyVisitation.forEach(x => {
           let sunday = self._getNthSunday(x.year, x.week);
