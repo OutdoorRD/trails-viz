@@ -22,7 +22,7 @@ the IDE would be able to recognize the former as a JavaScript project and the la
 Install the dependencies globally or inside a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) 
 (recommended). Navigate to the root of `trails-viz-api`, setup flask environment variables and start the 
 development server. One app specific environment variable `DATA_FILES_ROOT` is required to set the location where
-all the csv and shp files are. 
+all the csv and shp files are:
 
 ```shell script
 $ cd trails-viz-api
@@ -39,17 +39,18 @@ Navigate to root of `trails-viz-app`, install dependencies and start development
 ```shell script
 $ cd trails-viz-app
 $ npm install
-$ npm run build
+$ npm run serve
 ```
 This will start the server on port 8080. Navigate to http://localhost:8080.
 
 ## Build
-Front and back end has must be build separately.Run the following commands form the root of the project - `trails-viz`
+Front end and back end has must be built separately.Run the following commands form the root of the project - `trails-viz`
 ```shell script
 # build front end
 $ cd trails-viz-app
 $ npm run build
 $ cd ..
+# build back end
 $ cd trails-viz-api
 $ python setup.py bdist_wheel
 ```
@@ -63,8 +64,8 @@ $ docker build -t trails-viz:latest .
 ``` 
 
 ## Running on Production
-The docker image can be started, which will start both the app and web on the container. During docker run, two 
-arguments are required to run the app. The directory on the host which contains the csv and shape files must be 
+A conainer can be started from the docker image, which will run both the app and web inside it. To start the container, two 
+arguments are required to run the app - the directory on the host which contains the csv and shape files must be 
 mounted onto the container and environment variable `DATA_FILES_ROOT` must be set. Also host port must be mapped
 if not using default.
 ```shell script
