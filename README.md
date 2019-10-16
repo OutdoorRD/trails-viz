@@ -69,10 +69,18 @@ arguments are required to run the app - the directory on the host which contains
 mounted onto the container and environment variable `DATA_FILES_ROOT` must be set. Also host port must be mapped
 if not using default.
 ```shell script
-$ docker run -v <host-path-to-shape-files>:/app/data-files \
--p 8080:80 \ 
--e DATA_FILES_ROOT=/app/data-files \
-trails-viz:latest
+docker run -v <host-path-to-data>:/app/data-files \
+-p 9000:80 \
+-e DATA_FILES_ROOT=/app/data-files/ 
+vivekkr12/trails-viz:latest
 ``` 
-This will start the app on port 8080 on the host machine. If running behind a web server such as apache,
-the virtualhost can be configured to forward to the port 8080.
+This will start the app on port 9000 on the host machine. If running behind a web server such as apache, the virtualhost 
+can be configured to forward to the port.  This may require proxies for both the gui and the api.  On our production 
+machine, we do this with:
+
+```
+ProxyPass /trails_site/ http://localhost:9000/
+ProxyPassReverse /trails_site/ http://localhost:9000/
+ProxyPass /api/ http://localhost:9000/api/
+ProxyPassReverse /api/ http://localhost:9000/api/
+```
