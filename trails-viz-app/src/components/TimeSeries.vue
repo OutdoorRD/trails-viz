@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import {store} from '../store'
+  import {store, constants} from '../store'
   import c3 from 'c3'
 
   Number.prototype.pad = function (size) {
@@ -58,14 +58,24 @@
         date.setDate(dayOfYear);
         return date.getDate();
       },
+      _getColors: function(trailName, comparing=false) {
+        let colors = {};
+        colors[trailName + ' - Modelled'] = comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
+        colors[trailName + ' - On Site'] = comparing ? constants.COLORS.COMPARE_ON_SITE : constants.COLORS.ON_SITE;
+        colors[trailName + ' - Flickr'] =  comparing ? constants.COLORS.COMPARE_FLICKR : constants.COLORS.FLICKR;
+        colors[trailName + ' - Instagram'] =  comparing ? constants.COLORS.COMPARE_INSTA : constants.COLORS.INSTA;
+        colors[trailName + ' - Twitter'] =  comparing ? constants.COLORS.COMPARE_TWITTER : constants.COLORS.TWITTER;
+        colors[trailName + ' - WTA'] =  comparing ? constants.COLORS.COMPARE_WTA : constants.COLORS.WTA;
+        return colors
+      },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
         let monthlyDates = ['date'];
-        let monthlyModelled = [trailName + ' Modelled'];
-        let monthlyOnsite = [trailName + ' On Site'];
-        let monthlyFlickr = [trailName + ' Flickr'];
-        let monthlyInstag = [trailName + ' Instagram'];
-        let monthlyTwitter = [trailName + ' Twitter'];
-        let monthlyWta = [trailName + ' WTA'];
+        let monthlyModelled = [trailName + ' - Modelled'];
+        let monthlyOnsite = [trailName + ' - On Site'];
+        let monthlyFlickr = [trailName + ' - Flickr'];
+        let monthlyInstag = [trailName + ' - Instagram'];
+        let monthlyTwitter = [trailName + ' - Twitter'];
+        let monthlyWta = [trailName + ' - WTA'];
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
@@ -85,12 +95,12 @@
       _prepareWeeklyData(trailName, weeklyVisitation, skipDate=false) {
         let self = this;
         let weeklyDates = ['date'];
-        let weeklyModelled = [trailName + ' Modelled'];
-        let weeklyOnsite = [trailName + ' On Site'];
-        let weeklyFlickr = [trailName + ' Flickr'];
-        let weeklyInstag = [trailName + ' Instagram'];
-        let weeklyTwitter = [trailName + ' Twitter'];
-        let weeklyWta = [trailName + ' WTA'];
+        let weeklyModelled = [trailName + ' - Modelled'];
+        let weeklyOnsite = [trailName + ' - On Site'];
+        let weeklyFlickr = [trailName + ' - Flickr'];
+        let weeklyInstag = [trailName + ' - Instagram'];
+        let weeklyTwitter = [trailName + ' - Twitter'];
+        let weeklyWta = [trailName + ' - WTA'];
 
         weeklyVisitation.forEach(x => {
           let sunday = self._getNthSunday(x.year, x.week);
@@ -119,6 +129,8 @@
         self.timeseriesMonthlyData = self._prepareMonthlyData(this.trailName, this.monthlyVisitation);
         self.timeseriesWeeklyData = self._prepareWeeklyData(this.trailName, this.weeklyVisitation);
 
+        let colors = self._getColors(self.trailName);
+
         if (store.comparingSite) {
           let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(store.comparingSite['trailName'], store.comparingSiteMonthlyVisitation, true));
           let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(store.comparingSite['trailName'], store.comparingSiteWeeklyVisitation, true));
@@ -132,6 +144,9 @@
 
           self.timeseriesMonthlyData = joinedMonthlyData;
           self.timeseriesWeeklyData = joinedWeeklyData;
+
+          let compareColors = self._getColors(store.comparingSite['trailName'], true);
+          Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
 
         let data;
@@ -148,7 +163,8 @@
           data: {
             x: 'date',
             xFormat: '%Y-%m-%d', // 'xFormat' can be used as custom format of 'x'
-            columns: data
+            columns: data,
+            colors: Object.assign({}, colors)
           },
           axis: {
             x: {

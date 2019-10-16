@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import {store} from '../store'
+  import {store, constants} from '../store'
   import c3 from 'c3'
 
   const MONTH_DICT = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
@@ -79,7 +79,7 @@
         arr.unshift(label);
         return arr;
       },
-      _renderBarGraph: function (data, categories, showLegend=false) {
+      _renderBarGraph: function (data, categories, colors, showLegend=false) {
         c3.generate({
           bindto: '#chart-area',
           size: {
@@ -107,25 +107,39 @@
           },
           data: {
             columns: data,
-            type: 'bar'
+            type: 'bar',
+            colors: Object.assign({}, colors) // clone the object to avoid side effects as c3 updates this object on it's own
           }
         })
       },
-      _prepareMonthlyModelledData: function(trailName, monthlyEstimates) {
+      _getSocialMediaColors:  function(trailName, comparing) {
+        let colors = {};
+        colors[trailName + ' - Flickr'] =  comparing ? constants.COLORS.COMPARE_FLICKR : constants.COLORS.FLICKR;
+        colors[trailName + ' - Instagram'] =  comparing ? constants.COLORS.COMPARE_INSTA : constants.COLORS.INSTA;
+        colors[trailName + ' - Twitter'] =  comparing ? constants.COLORS.COMPARE_TWITTER : constants.COLORS.TWITTER;
+        colors[trailName + ' - WTA'] =  comparing ? constants.COLORS.COMPARE_WTA : constants.COLORS.WTA;
+        return colors;
+      },
+      _prepareMonthlyModelledData: function(trailName, monthlyEstimates, comparing=false) {
         let estimates = [trailName + ' - Monthly Average Modelled'];
+        let colors = {};
         monthlyEstimates.forEach(x => {
           estimates.push(Math.round(x.estimate));
         });
-        return [estimates];
+        colors[trailName + ' - Monthly Average Modelled'] =  comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
+        return [[estimates], colors];
       },
-      _prepareAnnualModelledData: function(trailName, annualEstimates) {
+      _prepareAnnualModelledData: function(trailName, annualEstimates, comparing=false) {
         let estimates = [trailName + ' - Annual Modelled'];
+        let colors = {};
         annualEstimates.forEach(x => {
           estimates.push(Math.round(x.estimate));
         });
-        return [estimates];
+        colors[trailName + ' - Annual Modelled'] =  comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
+        return [[estimates], colors];
       },
-      _prepareMonthlySocialMediaData: function(trailName, monthlyEstimates) {
+      _prepareMonthlySocialMediaData: function(trailName, monthlyEstimates, comparing=false) {
+        let self = this;
         let flickr = [trailName + ' - Flickr'];
         let instag = [trailName + ' - Instagram'];
         let twitter = [trailName + ' - Twitter'];
@@ -137,9 +151,11 @@
           twitter.push(Math.round(x.twitter));
           wta.push(Math.round(x.wta));
         });
-        return [flickr, instag, twitter, wta];
+
+        return [[flickr, instag, twitter, wta], self._getSocialMediaColors(trailName, comparing)];
       },
-      _prepareAnnualSocialMediaData: function(trailName, annualEstimates) {
+      _prepareAnnualSocialMediaData: function(trailName, annualEstimates, comparing=false) {
+        let self = this;
         let flickr = [trailName + ' - Flickr'];
         let instag = [trailName + ' - Instagram'];
         let twitter = [trailName + ' - Twitter'];
@@ -151,7 +167,7 @@
           twitter.push(Math.round(x.twitter));
           wta.push(Math.round(x.wta));
         });
-        return [flickr, instag, twitter, wta];
+        return [[flickr, instag, twitter, wta], self._getSocialMediaColors(trailName, comparing)];
       },
       renderMonthlyModelled: function() {
         let self = this;
@@ -159,11 +175,16 @@
         self.monthlyEstimates.forEach(x => {
           categories.push(MONTH_DICT[x.month])
         });
-        let data = self._prepareMonthlyModelledData(self.trailName, self.monthlyEstimates);
+        let [data, colors] = self._prepareMonthlyModelledData(self.trailName, self.monthlyEstimates);
         if (store.comparingSite) {
-          data = data.concat(self._prepareMonthlyModelledData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+          let [compareData, compareColors] = self._prepareMonthlyModelledData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+          data = data.concat(compareData);
+          Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
+          self._renderBarGraph(data, categories, colors, true);
+        } else {
+          self._renderBarGraph(data, categories, colors);
         }
-        self._renderBarGraph(data, categories);
+
       },
       renderMonthlySocialMedia: function () {
         let self = this;
@@ -172,11 +193,13 @@
         self.monthlyEstimates.forEach(x => {
           categories.push(MONTH_DICT[x.month])
         });
-        let data = self._prepareMonthlySocialMediaData(self.trailName, self.monthlyEstimates);
+        let [data, colors] = self._prepareMonthlySocialMediaData(self.trailName, self.monthlyEstimates);
         if (store.comparingSite) {
-          data = data.concat(self._prepareMonthlySocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+          let [compareData, compareColors] = self._prepareMonthlySocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+          data = data.concat(compareData);
+          Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
-        self._renderBarGraph(data, categories, true);
+        self._renderBarGraph(data, categories, colors, true);
       },
       renderAnnualModelled: function () {
         let self = this;
@@ -185,11 +208,15 @@
         self.annualEstimates.forEach(x => {
           categories.push(x.year)
         });
-        let data = self._prepareAnnualModelledData(self.trailName, self.annualEstimates);
+        let [data, colors] = self._prepareAnnualModelledData(self.trailName, self.annualEstimates);
         if (store.comparingSite) {
-          data = data.concat(self._prepareAnnualModelledData(store.comparingSite['trailName'], store.comparingSiteAnnualEstimates));
+          let [compareData, compareColors] = self._prepareAnnualModelledData(store.comparingSite['trailName'], store.comparingSiteAnnualEstimates, true);
+          data = data.concat(compareData);
+          Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
+          self._renderBarGraph(data, categories, colors, true);
+        } else {
+          self._renderBarGraph(data, categories, colors);
         }
-        self._renderBarGraph(data, categories);
       },
       renderAnnualSocialMedia: function () {
         let self = this;
@@ -198,11 +225,13 @@
         self.annualEstimates.forEach(x => {
           categories.push(x.year)
         });
-        let data = self._prepareAnnualSocialMediaData(self.trailName, self.annualEstimates);
+        let [data, colors] = self._prepareAnnualSocialMediaData(self.trailName, self.annualEstimates);
         if (store.comparingSite) {
-          data = data.concat(self._prepareAnnualSocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates));
+          let [compareData, compareColors] = self._prepareAnnualSocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+          data = data.concat(compareData);
+          Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
-        self._renderBarGraph(data, categories, true);
+        self._renderBarGraph(data, categories, colors, true);
       },
       renderSelectedGraph: function () {
         if (this.timePeriod === 'monthly' && this.dataSource === 'modelled') {
