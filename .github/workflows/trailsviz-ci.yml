@@ -35,11 +35,12 @@ jobs:
         npm run lint
         npm run build
         cd ..
-    - name: Backend Lint and Build
+    - name: Backend Lint and Build using Python ${{ matrix.python-version }}
       run: |
         cd trails-viz-api
         python -m pip install --upgrade pip
         pip install flake8
+        pip install wheel
         pip install -r requirements.txt
         flake8 . --count --max-line-length=119 --exclude trailsvizapi/__init__.py --show-source --statistics
         python setup.py bdist_wheel
