@@ -1,4 +1,4 @@
-name: Trails Viz CI
+name: Trails Viz Build
 
 on:
   push:
@@ -45,3 +45,6 @@ jobs:
         flake8 . --count --max-line-length=119 --exclude trailsvizapi/__init__.py --show-source --statistics
         python setup.py bdist_wheel
         cd ..
+    - name: Build Docker image
+      run: |
+        docker build -t trails-viz:latest .
