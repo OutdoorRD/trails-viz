@@ -11,6 +11,8 @@ _MONTHLY_ONSITE_FILE = config.DATA_FILES_ROOT + 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = config.DATA_FILES_ROOT + 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = config.DATA_FILES_ROOT + 'viz_model_wwwir.csv'
 
+DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
+
 
 def _prepare_geo_dfs():
     polygons = gpd.read_file(_ALLSITES_POLYGONS_FILE)
@@ -73,39 +75,50 @@ def _prepare_weekly_df():
     return pd.merge(weekly_estimate, weekly_onsite, on=id_cols, how='outer')
 
 
-_ALLSITES_DF = _prepare_geo_dfs()
-_MONTHLY_VISITATION_DF = _prepare_monthly_df()
-_WEEKLY_VISITATION_DF = _prepare_weekly_df()
+def _get_from_data_source(key):
+    if key not in DATA_SOURCE:
+        DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
+        DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
+        DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
+
+    return DATA_SOURCE[key]
 
 
 def get_project_sites(project_group):
-    project_sites = _ALLSITES_DF[_ALLSITES_DF['Prjct_code'].str.contains(project_group)]
+    allsites = _get_from_data_source('ALLSITES_DF')
+    project_sites = allsites[allsites['Prjct_code'].str.contains(project_group)]
     return project_sites
 
 
 def get_monthly_visitation(siteid):
-    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
+    monthly_df = _get_from_data_source('MONTHLY_VISITATION_DF')
+    site_data = monthly_df[monthly_df['trail'] == siteid]
     return site_data
 
 
 def get_weekly_visitation(siteid):
-    site_data = _WEEKLY_VISITATION_DF[_WEEKLY_VISITATION_DF['trail'] == siteid]
+    weekly_df = _get_from_data_source('WEEKLY_VISITATION_DF')
+    site_data = weekly_df[weekly_df['trail'] == siteid]
+    return site_data
+
+
+def _get_estimates(siteid, period):
+    monthly_df = _get_from_data_source('MONTHLY_VISITATION_DF')
+    site_data = monthly_df[monthly_df['trail'] == siteid]
+    if period == 'monthly':
+        site_data = site_data.groupby(by=['month']).mean()
+    elif period == 'annual':
+        site_data = site_data.groupby(by=['year']).sum()
+
+    site_data = site_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
+                           'onsite', 'log_onsite', 'data_days']]
+    site_data.reset_index(inplace=True)
     return site_data
 
 
 def get_monthly_estimates(siteid):
-    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
-    mean_site_data = site_data.groupby(by=['month']).mean()
-    mean_site_data = mean_site_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
-                                     'onsite', 'log_onsite', 'data_days']]
-    mean_site_data.reset_index(inplace=True)
-    return mean_site_data
+    return _get_estimates(siteid, 'monthly')
 
 
 def get_annual_estimates(siteid):
-    site_data = _MONTHLY_VISITATION_DF[_MONTHLY_VISITATION_DF['trail'] == siteid]
-    annual_site_data = site_data.groupby(by=['year']).sum()
-    annual_site_data = annual_site_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
-                                         'onsite', 'log_onsite', 'data_days']]
-    annual_site_data.reset_index(inplace=True)
-    return annual_site_data
+    return _get_estimates(siteid, 'annual')
