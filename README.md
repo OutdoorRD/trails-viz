@@ -2,6 +2,8 @@
 
 A web-app to display model predictions of trail use.
 
+![build badge](https://github.com/OutdoorRD/trails-viz/workflows/Trails%20Viz%20Build/badge.svg)
+
 ## Development
 
 The project is split into two separate apps for front end and back end:
