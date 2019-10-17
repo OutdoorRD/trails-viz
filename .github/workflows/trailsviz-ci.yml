@@ -19,6 +19,7 @@ jobs:
         python-version: [3.6, 3.7]
 
     steps:
+    - uses: actions/checkout@v1
     - name: Setup Node JS ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
