@@ -124,12 +124,9 @@ export default {
   }
 
   .map-col {
-    padding: 4px 2px 4px 4px !important;
+    padding: 4px 4px 4px 4px !important;
   }
   .charts-col {
-    padding: 4px 4px 4px 2px !important;
-  }
-  .time-series {
-    padding: 4px !important;
+    padding: 4px 4px 4px 4px !important;
   }
 </style>
