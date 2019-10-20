@@ -1,12 +1,6 @@
 <template>
   <div v-show="selectedSite">
     <b-row no-gutters>
-      <b-col>
-        <h3>{{trailName}}</h3>
-        <p>Average Annual Visits: <b>{{averageAnnualVisits}}</b></p>
-      </b-col>
-    </b-row>
-    <b-row no-gutters>
       <b-col sm="6">
         <b-form-group>
           <b-radio-group v-model="timePeriod" :options="timePeriodOptions" stacked v-on:input="renderSelectedGraph"></b-radio-group>
