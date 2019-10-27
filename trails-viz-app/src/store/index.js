@@ -5,7 +5,7 @@ export const constants = {
     INSTA: '#9620e5',
     TWITTER: '#2b7782',
     WTA: '#0ab652',
-    ON_SITE: '#ffe702',
+    ON_SITE: '#640b00',
     COMPARE_MODELLED: '#fb9205',
     COMPARE_FLICKR: '#c9c9c4',
     COMPARE_INSTA: '#f90dc3',
