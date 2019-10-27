@@ -21,7 +21,7 @@
                 <time-series ref="time-series"></time-series>
               </b-tab>
               <b-tab title="Home Locations">
-
+                <home-locations ref="home-locations"></home-locations>
               </b-tab>
             </b-tabs>
           </b-col>
@@ -45,6 +45,7 @@ import FooterBar from "@/components/FooterBar";
 
 import {store} from "./store";
 import axios from "axios";
+import HomeLocations from "@/components/HomeLocations";
 
 export default {
   name: 'app',
@@ -55,6 +56,7 @@ export default {
     }
   },
   components: {
+    HomeLocations,
     FooterBar,
     TimeSeries,
     BarGraph,
@@ -70,6 +72,7 @@ export default {
       this.$refs['map-div'].renderProjectSites();
       this.$refs['bar-graph'].clearBarGraph();
       this.$refs['time-series'].clearTimeSeries();
+      this.$refs['home-locations'].clear();
       store.clearSelectedProjectData();
     },
     sendSiteSelectedEventToMap: function(trailName) {
@@ -85,13 +88,16 @@ export default {
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes) => {
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
         store.setAnnualEstimates(annualEstimateRes.data);
         store.setMonthlyEstimates(monthlyEstimateRes.data);
         store.setMonthlyVisitation(monthlyVisitationRes.data);
         store.setWeeklyVisitation(weeklyVisitationRes.data);
+        store.setHomeLocations(homeLocationsRes.data);
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
+        this.$refs['home-locations'].renderTreeMap();
       }))
     },
     sendCompareSites: function () {
