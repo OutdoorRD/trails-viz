@@ -22,6 +22,10 @@
     shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
   });
 
+  // Make the fault marker of leaflet smaller
+  L.Icon.Default.prototype.options.iconSize = [13, 20];
+  L.Icon.Default.prototype.options.shadowSize = [20, 20];
+
   const MAPBOX_TOKEN = "pk.eyJ1Ijoid29vZHNwIiwiYSI6ImNrMjEwY3oycTFlcnEzbXFvbzR4bmNqNjgifQ.pM7-As9W2Ce9xXMv3W-NNg";
   const MAPBOX_TILES_API = "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}";
   const MAPBOX_ATTRIBUTION = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
