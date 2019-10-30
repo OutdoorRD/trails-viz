@@ -23,6 +23,7 @@
   });
 
   // Make the fault marker of leaflet smaller
+  L.Icon.Default.prototype.options.iconAnchor = [6, 20];
   L.Icon.Default.prototype.options.iconSize = [13, 20];
   L.Icon.Default.prototype.options.shadowSize = [20, 20];
 
