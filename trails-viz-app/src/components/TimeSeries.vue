@@ -178,6 +178,7 @@
                     return x + '-' + date.getDate().pad(2);
                   }
                 },
+                rotate: 60,
                 fit: false
               }
             },

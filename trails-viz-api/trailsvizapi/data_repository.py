@@ -6,6 +6,7 @@ import trailsvizapi.app_config as config
 _ALLSITES_POLYGONS_FILE = config.DATA_FILES_ROOT + 'allsites.shp'
 _ALLSITES_LINES_FILE = config.DATA_FILES_ROOT + 'allsites_lines.geojson'
 _ALLSITES_ACCESS_POINTS_FILE = config.DATA_FILES_ROOT + 'allsites_access_points.geojson'
+_ALLSITES_HOME_LOCATIONS_FILE = config.DATA_FILES_ROOT + 'allsites_homes_by_site.csv'
 _MONTHLY_ESTIMATES_FILE = config.DATA_FILES_ROOT + 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = config.DATA_FILES_ROOT + 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = config.DATA_FILES_ROOT + 'viz_model_www.csv'
@@ -75,11 +76,17 @@ def _prepare_weekly_df():
     return pd.merge(weekly_estimate, weekly_onsite, on=id_cols, how='outer')
 
 
+def _prepare_home_locations_df():
+    home_locations = pd.read_csv(_ALLSITES_HOME_LOCATIONS_FILE)
+    return home_locations
+
+
 def _get_from_data_source(key):
     if key not in DATA_SOURCE:
         DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
         DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
+        DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
 
     return DATA_SOURCE[key]
 
@@ -122,3 +129,36 @@ def get_monthly_estimates(siteid):
 
 def get_annual_estimates(siteid):
     return _get_estimates(siteid, 'annual')
+
+
+def get_home_locations(siteid):
+    home_locations = _get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    visit_days = site_home_locations['visit_days'].sum()
+    visitors_unq = site_home_locations['visitors_unq'].sum()
+    tree = dict()
+
+    # JSON doesn't recognize any numpy data types, hence must be converted to int
+    tree['siteid'] = int(site_home_locations.iloc[0, 0])
+    tree['visit_days'] = int(visit_days)
+    tree['visitors_unq'] = int(visitors_unq)
+    tree['countries'] = []
+
+    for country_idx, country_row in site_home_locations.groupby(by=['country']).sum().iterrows():
+        country_data = {'name': country_idx, 'visit_days': int(country_row['visit_days']),
+                        'visitors_unq': int(country_row['visitors_unq']),  'states': []}
+        tree['countries'].append(country_data)
+        country_df = site_home_locations[site_home_locations['country'] == country_idx]
+
+        for state_idx, state_row in country_df.groupby(by=['state']).sum().iterrows():
+            state_data = {'name': state_idx, 'visit_days': int(state_row['visit_days']),
+                          'visitors_unq': int(state_row['visitors_unq']), 'counties': []}
+            country_data['states'].append(state_data)
+            state_df = country_df[country_df['state'] == state_idx]
+
+            for county_idx, county_row in state_df.groupby(by=['county']).sum().iterrows():
+                county_data = {'name': county_idx, 'visit_days': int(county_row['visit_days']),
+                               'visitors_unq': int(county_row['visitors_unq'])}
+                state_data['counties'].append(county_data)
+
+    return tree

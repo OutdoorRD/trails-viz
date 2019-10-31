@@ -5,7 +5,7 @@ export const constants = {
     INSTA: '#9620e5',
     TWITTER: '#2b7782',
     WTA: '#0ab652',
-    ON_SITE: '#ffe702',
+    ON_SITE: '#640b00',
     COMPARE_MODELLED: '#fb9205',
     COMPARE_FLICKR: '#c9c9c4',
     COMPARE_INSTA: '#f90dc3',
@@ -32,6 +32,8 @@ export const store = {
   comparingSiteMonthlyEstimates: [],
   comparingSiteMonthlyVisitation: [],
   comparingSiteWeeklyVisitation: [],
+
+  homeLocations: [],
 
   setAllProjects(allProjects) {
     this.allProjects = allProjects;
@@ -72,6 +74,9 @@ export const store = {
   setComparingSiteWeeklyVisitation(comparingSiteWeeklyVisitation) {
     this.comparingSiteWeeklyVisitation = comparingSiteWeeklyVisitation;
   },
+  setHomeLocations(homeLocations) {
+    this.homeLocations = homeLocations;
+  },
   clearSelectedProjectData() {
     this.selectedProject = '';
     this.projectSites = {};
@@ -82,5 +87,7 @@ export const store = {
 
     this.monthlyVisitation = [];
     this.weeklyVisitation = [];
+
+    this.homeLocations = [];
   }
 };
