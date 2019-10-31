@@ -2,12 +2,12 @@ name: Trails Viz Build
 
 on:
   push:
+    paths:
+      - '.github/workflows/**'
+      - 'trails-viz-app/**'
+      - 'trails-viz-api/**'
     branches: 
       - master
-  pull_request:
-    branches: 
-      - master
-
 jobs:
   build:
 
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x]
-        python-version: [3.6, 3.7]
+        python-version: [3.6]
 
     steps:
     - uses: actions/checkout@v1
@@ -45,6 +45,3 @@ jobs:
         flake8 . --count --max-line-length=119 --exclude trailsvizapi/__init__.py --show-source --statistics
         python setup.py bdist_wheel
         cd ..
-    - name: Build Docker image
-      run: |
-        docker build -t trails-viz:latest .
