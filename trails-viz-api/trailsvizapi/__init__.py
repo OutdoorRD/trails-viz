@@ -7,4 +7,7 @@ __version__ = '0.0.1'
 app = Flask(__name__)
 CORS(app)
 
-from trailsvizapi.controller import *
+from trailsvizapi.controller.projects import *
+from trailsvizapi.controller.estimates import *
+from trailsvizapi.controller.home_locations import *
+from trailsvizapi.controller.visitation import *
