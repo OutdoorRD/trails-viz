@@ -43,14 +43,15 @@
         let parents = [];
         let values = [];
         let colors = [];
-        labels.push('World');
+        let worldLabel = 'World (' + self.homeLocations['visit_days'] + ')';
+        labels.push(worldLabel);
         values.push(data['visit_days']);
         parents.push('');
         colors.push(this._getRandomColor());
         for (let country of data['countries']) {
           labels.push(country['name']);
           values.push(country['visit_days']);
-          parents.push('World');
+          parents.push(worldLabel);
           colors.push(this._getRandomColor());
 
           for (let state of country['states']) {
