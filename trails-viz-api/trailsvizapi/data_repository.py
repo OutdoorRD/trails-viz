@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 
@@ -95,6 +96,32 @@ def get_project_sites(project_group):
     allsites = _get_from_data_source('ALLSITES_DF')
     project_sites = allsites[allsites['Prjct_code'].str.contains(project_group)]
     return project_sites
+
+
+def _get_project_visitation_data(project, period):
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    if period == 'monthly':
+        df = _get_from_data_source('MONTHLY_VISITATION_DF')
+        group_by_cols = ['year', 'month']
+    else:
+        df = _get_from_data_source('WEEKLY_VISITATION_DF')
+        group_by_cols = ['year', 'month', 'week']
+
+    project_sites_data = df[df['trail'].isin(project_site_ids)]
+    project_sites_data = project_sites_data.drop('trail', axis=1)
+    project_sites_data = project_sites_data.groupby(group_by_cols, as_index=False).sum()
+    project_sites_data['log_estimate'] = np.log(project_sites_data['estimate'] + 1)
+    return project_sites_data
+
+
+def get_project_monthly_visitation(project):
+    return _get_project_visitation_data(project, 'monthly')
+
+
+def get_project_weekly_visitation(project):
+    return _get_project_visitation_data(project, 'weekly')
 
 
 def get_monthly_visitation(siteid):

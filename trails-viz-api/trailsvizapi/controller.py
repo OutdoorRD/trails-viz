@@ -27,6 +27,18 @@ def get_annual_estimates(siteid):
     return Response(data.to_json(orient='records'), mimetype='application/json')
 
 
+@app.route('/api/projects/<string:project>/monthlyVisitation')
+def get_project_monthly_visitation(project):
+    data = data_repository.get_project_monthly_visitation(project)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
+
+
+@app.route('/api/projects/<string:project>/weeklyVisitation')
+def get_project_weekly_visitation(project):
+    data = data_repository.get_project_weekly_visitation(project)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
+
+
 @app.route('/api/sites/<int:siteid>/monthlyVisitation')
 def get_monthly_visitation(siteid):
     data = data_repository.get_monthly_visitation(siteid)
