@@ -52,6 +52,7 @@ def _prepare_geo_dfs():
 def _prepare_estimates_and_visitation_df(period):
     estimates_file = _MONTHLY_ESTIMATES_FILE if period == 'monthly' else _WEEKLY_ESTIMATES_FILE
     onsite_file = _MONTHLY_ONSITE_FILE if period == 'monthly' else _WEEKLY_ONSITE_FILE
+    id_cols = ['trail', 'month', 'year'] if period =='monthly' else ['trail', 'week', 'month', 'year']
 
     estimates_df = pd.read_csv(estimates_file)
     estimates_onsite = pd.read_csv(onsite_file)
@@ -61,7 +62,6 @@ def _prepare_estimates_and_visitation_df(period):
     estimates_df.drop(columns='d2p', inplace=True)
     estimates_onsite.drop(columns='d2p', inplace=True)
 
-    id_cols = ['trail', 'month', 'year']
     return pd.merge(estimates_df, estimates_onsite, on=id_cols, how='outer')
 
 
