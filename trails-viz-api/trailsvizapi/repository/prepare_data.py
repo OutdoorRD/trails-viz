@@ -49,31 +49,28 @@ def _prepare_geo_dfs():
     return allsites
 
 
-def _prepare_monthly_df():
-    monthly_estimate = pd.read_csv(_MONTHLY_ESTIMATES_FILE)
-    monthly_onsite = pd.read_csv(_MONTHLY_ONSITE_FILE)
-    monthly_estimate.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
-    monthly_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
+def _prepare_estimates_and_visitation_df(period):
+    estimates_file = _MONTHLY_ESTIMATES_FILE if period == 'monthly' else _WEEKLY_ESTIMATES_FILE
+    onsite_file = _MONTHLY_ONSITE_FILE if period == 'monthly' else _WEEKLY_ONSITE_FILE
 
-    monthly_estimate.drop(columns='d2p', inplace=True)
-    monthly_onsite.drop(columns='d2p', inplace=True)
+    estimates_df = pd.read_csv(estimates_file)
+    estimates_onsite = pd.read_csv(onsite_file)
+    estimates_df.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
+    estimates_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
+
+    estimates_df.drop(columns='d2p', inplace=True)
+    estimates_onsite.drop(columns='d2p', inplace=True)
 
     id_cols = ['trail', 'month', 'year']
-    return pd.merge(monthly_estimate, monthly_onsite, on=id_cols, how='outer')
+    return pd.merge(estimates_df, estimates_onsite, on=id_cols, how='outer')
+
+
+def _prepare_monthly_df():
+    return _prepare_estimates_and_visitation_df('monthly')
 
 
 def _prepare_weekly_df():
-    weekly_estimate = pd.read_csv(_WEEKLY_ESTIMATES_FILE)
-    weekly_onsite = pd.read_csv(_WEEKLY_ONSITE_FILE)
-
-    weekly_estimate.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
-    weekly_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
-
-    weekly_estimate.drop(columns='d2p', inplace=True)
-    weekly_onsite.drop(columns='d2p', inplace=True)
-
-    id_cols = ['trail', 'week', 'month', 'year']
-    return pd.merge(weekly_estimate, weekly_onsite, on=id_cols, how='outer')
+    return _prepare_estimates_and_visitation_df('weekly')
 
 
 def _prepare_home_locations_df():
