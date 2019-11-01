@@ -1,24 +1,23 @@
 from trailsvizapi.repository.prepare_data import get_from_data_source
+from trailsvizapi.repository.sites import get_project_sites
 
 
-def get_home_locations(siteid):
-    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
-    site_home_locations = home_locations[home_locations['siteid'] == siteid]
-    visit_days = site_home_locations['visit_days'].sum()
-    visitors_unq = site_home_locations['visitors_unq'].sum()
+def _treefy_home_locations(id_, home_locations):
+    visit_days = home_locations['visit_days'].sum()
+    visitors_unq = home_locations['visitors_unq'].sum()
     tree = dict()
 
     # JSON doesn't recognize any numpy data types, hence must be converted to int
-    tree['siteid'] = int(site_home_locations.iloc[0, 0])
+    tree['id'] = id_
     tree['visit_days'] = int(visit_days)
     tree['visitors_unq'] = int(visitors_unq)
     tree['countries'] = []
 
-    for country_idx, country_row in site_home_locations.groupby(by=['country']).sum().iterrows():
+    for country_idx, country_row in home_locations.groupby(by=['country']).sum().iterrows():
         country_data = {'name': country_idx, 'visit_days': int(country_row['visit_days']),
-                        'visitors_unq': int(country_row['visitors_unq']),  'states': []}
+                        'visitors_unq': int(country_row['visitors_unq']), 'states': []}
         tree['countries'].append(country_data)
-        country_df = site_home_locations[site_home_locations['country'] == country_idx]
+        country_df = home_locations[home_locations['country'] == country_idx]
 
         for state_idx, state_row in country_df.groupby(by=['state']).sum().iterrows():
             state_data = {'name': state_idx, 'visit_days': int(state_row['visit_days']),
@@ -32,3 +31,26 @@ def get_home_locations(siteid):
                 state_data['counties'].append(county_data)
 
     return tree
+
+
+def get_home_locations(siteid):
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    return _treefy_home_locations(siteid, site_home_locations)
+
+
+def get_project_home_locations(project):
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
+
+    # International doesn't have state and counties and hence a three column group by will exclude it
+    # extra effort to include international
+    international_visits = project_home_locations[project_home_locations['country'] == 'International']
+    international_visits = international_visits.groupby(['country'], as_index=False).sum()
+    project_home_locations = project_home_locations.groupby(by=['country', 'state', 'county'], as_index=False).sum()
+    project_home_locations = project_home_locations.append(international_visits, ignore_index=True, sort=False)
+
+    return _treefy_home_locations(project, project_home_locations)

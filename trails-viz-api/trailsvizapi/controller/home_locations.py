@@ -8,3 +8,9 @@ from trailsvizapi.repository import home_locations
 def get_home_locations(siteid):
     data = home_locations.get_home_locations(siteid)
     return jsonify(data)
+
+
+@app.route('/api/projects/<string:project>/homeLocations')
+def get_project_home_locations(project):
+    data = home_locations.get_project_home_locations(project)
+    return jsonify(data)
