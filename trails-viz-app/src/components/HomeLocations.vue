@@ -29,7 +29,7 @@
       },
       _checkLabelAndAppend: function (labels, name, parentName) {
         if (labels.includes(name)) {
-          return name + '(' + parentName + ')'
+          return name + ' (' + parentName + ')'
         }
         return name
       },
@@ -49,21 +49,24 @@
         parents.push('');
         colors.push(this._getRandomColor());
         for (let country of data['countries']) {
-          labels.push(country['name']);
+          let countryName = country['name'];
+          labels.push(countryName);
           values.push(country['visit_days']);
           parents.push(worldLabel);
           colors.push(this._getRandomColor());
 
           for (let state of country['states']) {
-            labels.push(this._checkLabelAndAppend(labels, state['name'], country['name']));
+            let stateName = this._checkLabelAndAppend(labels, state['name'], country['name']);
+            labels.push(stateName);
             values.push(state['visit_days']);
-            parents.push(country['name']);
+            parents.push(countryName);
             colors.push(this._getRandomColor());
 
             for (let county of state['counties']) {
-              labels.push(this._checkLabelAndAppend(labels, county['name'], state['name']));
+              let countyName = this._checkLabelAndAppend(labels, county['name'], state['name']);
+              labels.push(countyName);
               values.push(county['visit_days']);
-              parents.push(state['name']);
+              parents.push(stateName);
               colors.push(this._getRandomColor());
             }
           }

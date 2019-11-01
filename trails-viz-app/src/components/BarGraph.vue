@@ -1,5 +1,5 @@
 <template>
-  <div v-show="selectedSite">
+  <div>
     <b-row no-gutters>
       <b-col sm="6">
         <b-form-group>

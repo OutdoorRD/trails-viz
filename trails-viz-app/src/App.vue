@@ -69,11 +69,37 @@ export default {
   },
   methods: {
     sendProjectSelectedEventToMap: function () {
+      let project = store.selectedProject;
+      store.clearSelectedProjectData();
+
+      this.trailName = 'All Sites in ' + project;
+      store.setSelectedProject(project);
+      store.setSelectedSite({'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
+
       this.$refs['map-div'].renderProjectSites();
       this.$refs['bar-graph'].clearBarGraph();
       this.$refs['time-series'].clearTimeSeries();
       this.$refs['home-locations'].clear();
-      store.clearSelectedProjectData();
+
+
+      // render plots on project level
+      axios.all([
+        axios.get(this.$apiEndpoint + '/projects/' + project + '/annualEstimates'),
+        axios.get(this.$apiEndpoint + '/projects/' + project + '/monthlyEstimates'),
+        axios.get(this.$apiEndpoint + '/projects/' + project + '/monthlyVisitation'),
+        axios.get(this.$apiEndpoint + '/projects/' + project + '/weeklyVisitation'),
+        axios.get(this.$apiEndpoint + '/projects/' + project + '/homeLocations'),
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
+        store.setAnnualEstimates(annualEstimateRes.data);
+        store.setMonthlyEstimates(monthlyEstimateRes.data);
+        store.setMonthlyVisitation(monthlyVisitationRes.data);
+        store.setWeeklyVisitation(weeklyVisitationRes.data);
+        store.setHomeLocations(homeLocationsRes.data);
+        this.$refs['bar-graph'].renderDefaultGraph();
+        this.$refs['time-series'].renderTimeSeries();
+        this.$refs['home-locations'].renderTreeMap();
+      }))
+
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
