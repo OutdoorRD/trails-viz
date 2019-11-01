@@ -26,4 +26,3 @@ def get_monthly_visitation(siteid):
 def get_weekly_visitation(siteid):
     data = visitation.get_weekly_visitation(siteid)
     return Response(data.to_json(orient='records'), mimetype='application/json')
-
