@@ -17,7 +17,7 @@
 </template>
 
 <script>
-  import {store, constants} from '../store'
+  import {COLORS} from '../store/constants'
   import c3 from 'c3'
 
   const MONTH_DICT = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
@@ -50,12 +50,12 @@
     methods: {
       renderDefaultGraph: function () {
         let self = this;
-        this.selectedSite = store.selectedSite;
-        this.trailName = store.selectedSite['trailName'];
-        this.siteid = store.selectedSite['siteid'];
+        this.selectedSite = self.$store.getters.getSelectedSite;
+        this.trailName = self.$store.getters.getSelectedSite['trailName'];
+        this.siteid = self.$store.getters.getSelectedSite['siteid'];
 
-        self.annualEstimates = store.annualEstimates;
-        self.monthlyEstimates = store.monthlyEstimates;
+        self.annualEstimates = self.$store.getters.getAnnualEstimates;
+        self.monthlyEstimates = self.$store.getters.getMonthlyEstimates;
 
         self.averageAnnualVisits = self.annualEstimates.map(x => x.estimate).reduce((a, b) => a + b) / self.annualEstimates.length;
         self.averageAnnualVisits = Math.round(self.averageAnnualVisits);
@@ -108,10 +108,10 @@
       },
       _getSocialMediaColors:  function(trailName, comparing) {
         let colors = {};
-        colors[trailName + ' - Flickr'] =  comparing ? constants.COLORS.COMPARE_FLICKR : constants.COLORS.FLICKR;
-        colors[trailName + ' - Instagram'] =  comparing ? constants.COLORS.COMPARE_INSTA : constants.COLORS.INSTA;
-        colors[trailName + ' - Twitter'] =  comparing ? constants.COLORS.COMPARE_TWITTER : constants.COLORS.TWITTER;
-        colors[trailName + ' - WTA'] =  comparing ? constants.COLORS.COMPARE_WTA : constants.COLORS.WTA;
+        colors[trailName + ' - Flickr'] =  comparing ? COLORS.COMPARE_FLICKR : COLORS.FLICKR;
+        colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
+        colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
+        colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
         return colors;
       },
       _prepareMonthlyModelledData: function(trailName, monthlyEstimates, comparing=false) {
@@ -120,7 +120,7 @@
         monthlyEstimates.forEach(x => {
           estimates.push(Math.round(x.estimate));
         });
-        colors[trailName + ' - Monthly Average Modelled'] =  comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
+        colors[trailName + ' - Monthly Average Modelled'] =  comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
         return [[estimates], colors];
       },
       _prepareAnnualModelledData: function(trailName, annualEstimates, comparing=false) {
@@ -129,7 +129,7 @@
         annualEstimates.forEach(x => {
           estimates.push(Math.round(x.estimate));
         });
-        colors[trailName + ' - Annual Modelled'] =  comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
+        colors[trailName + ' - Annual Modelled'] =  comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
         return [[estimates], colors];
       },
       _prepareMonthlySocialMediaData: function(trailName, monthlyEstimates, comparing=false) {
@@ -170,8 +170,8 @@
           categories.push(MONTH_DICT[x.month])
         });
         let [data, colors] = self._prepareMonthlyModelledData(self.trailName, self.monthlyEstimates);
-        if (store.comparingSite) {
-          let [compareData, compareColors] = self._prepareMonthlyModelledData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getComparingSite) {
+          let [compareData, compareColors] = self._prepareMonthlyModelledData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
           self._renderBarGraph(data, categories, colors, true);
@@ -188,8 +188,8 @@
           categories.push(MONTH_DICT[x.month])
         });
         let [data, colors] = self._prepareMonthlySocialMediaData(self.trailName, self.monthlyEstimates);
-        if (store.comparingSite) {
-          let [compareData, compareColors] = self._prepareMonthlySocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getComparingSite) {
+          let [compareData, compareColors] = self._prepareMonthlySocialMediaData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
@@ -203,8 +203,8 @@
           categories.push(x.year)
         });
         let [data, colors] = self._prepareAnnualModelledData(self.trailName, self.annualEstimates);
-        if (store.comparingSite) {
-          let [compareData, compareColors] = self._prepareAnnualModelledData(store.comparingSite['trailName'], store.comparingSiteAnnualEstimates, true);
+        if (self.$store.getters.getComparingSite) {
+          let [compareData, compareColors] = self._prepareAnnualModelledData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteAnnualEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
           self._renderBarGraph(data, categories, colors, true);
@@ -220,8 +220,8 @@
           categories.push(x.year)
         });
         let [data, colors] = self._prepareAnnualSocialMediaData(self.trailName, self.annualEstimates);
-        if (store.comparingSite) {
-          let [compareData, compareColors] = self._prepareAnnualSocialMediaData(store.comparingSite['trailName'], store.comparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getComparingSite) {
+          let [compareData, compareColors] = self._prepareAnnualSocialMediaData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }

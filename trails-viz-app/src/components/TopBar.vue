@@ -24,8 +24,6 @@
 
 <script>
 
-  import {store} from '../store'
-
   export default {
     name: "TopBar",
     data: function () {
@@ -38,25 +36,26 @@
     },
     methods: {
       autoCompleteProject: function () {
-        if (store.allProjects.includes(this.projectSearchText.toUpperCase())) {
+        let store = this.$store;
+        if (store.getters.getAllProjects.includes(this.projectSearchText.toUpperCase())) {
           // don't show suggestions when a valid project is selected
           return
         }
         if (this.projectSearchText.length >= 1) {
-          this.filteredProjects = store.allProjects.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
+          this.filteredProjects = store.getters.getAllProjects.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
         } else {
           this.filteredProjects = []
         }
       },
       emitProjectNameEvent: function () {
         if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
-          store.clearSelectedProjectData();
-          store.setSelectedProject(this.projectSearchText.toUpperCase());
+          this.$store.dispatch('clearSelectedProjectData');
+          this.$store.dispatch('setSelectedProject', this.projectSearchText.toUpperCase());
           this.$emit('project-selected');
         }
       },
       autoCompleteSite:  function() {
-        let trailNames = Object.keys(store.projectSites);
+        let trailNames = Object.keys(this.$store.getters.getProjectSites);
 
         if (trailNames.includes(this.siteSearchText)) {
           return

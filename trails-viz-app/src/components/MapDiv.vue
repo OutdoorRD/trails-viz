@@ -10,7 +10,6 @@
 <script>
   import L from "leaflet";
   import axios from "axios";
-  import {store} from "../store";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -103,7 +102,7 @@
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
         axios
-          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + store.selectedProject)
+          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + self.$store.getters.getSelectedProject)
           .then(response => {
             let siteGroupsGeoJson = {};
             let allSitesGeoJson = response.data;
@@ -124,14 +123,14 @@
               let siteLayer = L.geoJSON(site, {style: defaultStyle})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
-                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                  if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
                     // do nothing
                   } else {
                     event.target.setStyle(hoverStyle);
                   }
                 })
                 .on('mouseout', function (event) {
-                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                  if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
                     // don't change the style
                   } else {
                     event.target.setStyle(defaultStyle);
@@ -139,13 +138,13 @@
                 })
                 .on('click', function (event) {
                   if (event.originalEvent.ctrlKey) {
-                    if (store.comparingSite && store.selectedSite) {
+                    if (self.$store.getters.getComparingSite && self.$store.getters.getSelectedSite) {
                       self.showAlert();
                     }
-                    else if(store.selectedSite) {
-                      store.setComparingSite(event.target);
-                      store.selectedSite.setStyle(compareStyle);
-                      store.comparingSite.setStyle(compareStyle);
+                    else if(self.$store.getters.getSelectedSite) {
+                      self.$store.dispatch('setComparingSite', event.target);
+                      self.$store.getters.getSelectedSite.setStyle(compareStyle);
+                      self.$store.getters.getComparingSite.setStyle(compareStyle);
                       self.$emit('compare-activated');
                     }
                   } else {
@@ -161,20 +160,21 @@
               projectSites[siteLayer.trailName] = siteLayer;
               siteLayer.addTo(this.mapDiv);
             });
-            store.setProjectSites(projectSites);
+            self.$store.dispatch('setProjectSites', projectSites);
         })
       },
       selectSite: function (trailName) {
-        if (store.comparingSite) {
-          store.comparingSite.setStyle(defaultStyle);
-          store.setComparingSite('');
+        let self = this;
+        if (self.$store.getters.getComparingSite) {
+          self.$store.getters.getComparingSite.setStyle(defaultStyle);
+          self.$store.dispatch('setComparingSite', '');
         }
-        if (store.selectedSite) {
-          store.selectedSite.setStyle(defaultStyle);
+        if (self.$store.getters.getSelectedSite) {
+          self.$store.getters.getSelectedSite.setStyle(defaultStyle);
         }
-        let site = store.projectSites[trailName];
+        let site = self.$store.getters.getProjectSites[trailName];
         site.setStyle(selectedStyle);
-        store.setSelectedSite(site);
+        self.$store.dispatch('setSelectedSite', site);
         this.$emit('site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
       },

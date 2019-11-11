@@ -43,7 +43,6 @@ import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
 import FooterBar from "@/components/FooterBar";
 
-import {store} from "./store";
 import axios from "axios";
 import HomeLocations from "@/components/HomeLocations";
 
@@ -64,17 +63,19 @@ export default {
     MapDiv
   },
   mounted() {
+    let self = this;
     axios.get(this.$apiEndpoint + '/projects')
-      .then(response => store.setAllProjects(response.data));
+      .then(response => self.$store.dispatch('setAllProjects', response.data));
   },
   methods: {
     sendProjectSelectedEventToMap: function () {
-      let project = store.selectedProject;
-      store.clearSelectedProjectData();
+      let store = this.$store;
+      let project = store.getters.getSelectedProject;
+      store.dispatch('clearSelectedProjectData');
 
       this.trailName = 'All Sites in ' + project;
-      store.setSelectedProject(project);
-      store.setSelectedSite({'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
+      store.dispatch('setSelectedProject', project);
+      store.dispatch('setSelectedSite', {'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
 
       this.$refs['map-div'].renderProjectSites();
       this.$refs['bar-graph'].clearBarGraph();
@@ -90,11 +91,11 @@ export default {
         axios.get(this.$apiEndpoint + '/projects/' + project + '/weeklyVisitation'),
         axios.get(this.$apiEndpoint + '/projects/' + project + '/homeLocations'),
       ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.setAnnualEstimates(annualEstimateRes.data);
-        store.setMonthlyEstimates(monthlyEstimateRes.data);
-        store.setMonthlyVisitation(monthlyVisitationRes.data);
-        store.setWeeklyVisitation(weeklyVisitationRes.data);
-        store.setHomeLocations(homeLocationsRes.data);
+        store.dispatch('setAnnualEstimates', annualEstimateRes.data);
+        store.dispatch('setMonthlyEstimates', monthlyEstimateRes.data);
+        store.dispatch('setMonthlyVisitation', monthlyVisitationRes.data);
+        store.dispatch('setWeeklyVisitation', weeklyVisitationRes.data);
+        store.dispatch('setHomeLocations', homeLocationsRes.data);
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
         this.$refs['home-locations'].renderTreeMap();
@@ -106,8 +107,9 @@ export default {
     },
     sendRenderPlotEvents: function () {
       // populate the estimates in global store to be used in bar graph and time series
-      let siteid = store.selectedSite['siteid'];
-      this.trailName = store.selectedSite['trailName'];
+      let store = this.$store;
+      let siteid = store.getters.getSelectedSite['siteid'];
+      this.trailName = store.getters.getSelectedSite['trailName'];
       this.comparingTrailName = '';
       axios.all([
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
@@ -116,19 +118,20 @@ export default {
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
       ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.setAnnualEstimates(annualEstimateRes.data);
-        store.setMonthlyEstimates(monthlyEstimateRes.data);
-        store.setMonthlyVisitation(monthlyVisitationRes.data);
-        store.setWeeklyVisitation(weeklyVisitationRes.data);
-        store.setHomeLocations(homeLocationsRes.data);
+        store.dispatch('setAnnualEstimates', annualEstimateRes.data);
+        store.dispatch('setMonthlyEstimates', monthlyEstimateRes.data);
+        store.dispatch('setMonthlyVisitation', monthlyVisitationRes.data);
+        store.dispatch('setWeeklyVisitation', weeklyVisitationRes.data);
+        store.dispatch('setHomeLocations', homeLocationsRes.data);
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
         this.$refs['home-locations'].renderTreeMap();
       }))
     },
     sendCompareSites: function () {
-      let siteid = store.comparingSite['siteid'];
-      this.comparingTrailName = store.comparingSite['trailName'];
+      let store = this.$store;
+      let siteid = store.getters.getComparingSite['siteid'];
+      this.comparingTrailName = store.getters.getComparingSite['trailName'];
       axios.all([
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
@@ -136,11 +139,11 @@ export default {
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
       ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.setComparingSiteAnnualEstimates(annualEstimateRes.data);
-        store.setComparingSiteMonthlyEstimates(monthlyEstimateRes.data);
-        store.setComparingSiteMonthlyVisitation(monthlyVisitationRes.data);
-        store.setComparingSiteWeeklyVisitation(weeklyVisitationRes.data);
-        store.setComparingHomeLocations(homeLocationsRes.data);
+        store.dispatch('setComparingSiteAnnualEstimates', annualEstimateRes.data);
+        store.dispatch('setComparingSiteMonthlyEstimates', monthlyEstimateRes.data);
+        store.dispatch('setComparingSiteMonthlyVisitation', monthlyVisitationRes.data);
+        store.dispatch('setComparingSiteWeeklyVisitation', weeklyVisitationRes.data);
+        store.dispatch('setComparingHomeLocations', homeLocationsRes.data);
         this.$refs['bar-graph'].renderSelectedGraph();
         this.$refs['time-series'].renderTimeSeries();
         this.$refs['home-locations'].renderTreeMap();

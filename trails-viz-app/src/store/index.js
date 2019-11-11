@@ -1,21 +1,9 @@
-export const constants = {
-  COLORS: {
-    MODELLED: '#1c3dc8',
-    FLICKR: '#d8021f',
-    INSTA: '#9620e5',
-    TWITTER: '#2b7782',
-    WTA: '#0ab652',
-    ON_SITE: '#640b00',
-    COMPARE_MODELLED: '#fb9205',
-    COMPARE_FLICKR: '#c9c9c4',
-    COMPARE_INSTA: '#f90dc3',
-    COMPARE_TWITTER: '#12fbf2',
-    COMPARE_WTA: '#ff0000',
-    COMPARE_ON_SITE: '#ff6400',
-  }
-};
+import Vue from 'vue'
+import Vuex from 'vuex'
 
-export const store = {
+Vue.use(Vuex);
+
+const state = {
   allProjects: [],
   selectedProject: '',
   projectSites: {},
@@ -35,63 +23,173 @@ export const store = {
 
   homeLocations: [],
   comparingHomeLocations: [],
+};
 
-  setAllProjects(allProjects) {
-    this.allProjects = allProjects;
+const mutations = {
+  setAllProjects(state, allProjects) {
+    state.allProjects = allProjects;
   },
-  setSelectedProject(project) {
-    this.selectedProject = project
+  setSelectedProject(state, project) {
+    state.selectedProject = project
   },
-  setProjectSites(projectSites) {
-    this.projectSites = projectSites
+  setProjectSites(state, projectSites) {
+    state.projectSites = projectSites
   },
-  setSelectedSite(site) {
-    this.selectedSite = site
+  setSelectedSite(state, site) {
+    state.selectedSite = site
   },
-  setAnnualEstimates(annualEstimates) {
-    this.annualEstimates = annualEstimates;
+  setAnnualEstimates(state, annualEstimates) {
+    state.annualEstimates = annualEstimates;
   },
-  setMonthlyEstimates(monthlyEstimates) {
-    this.monthlyEstimates = monthlyEstimates;
+  setMonthlyEstimates(state, monthlyEstimates) {
+    state.monthlyEstimates = monthlyEstimates;
   },
-  setMonthlyVisitation(monthlyVisitation) {
-    this.monthlyVisitation = monthlyVisitation;
+  setMonthlyVisitation(state, monthlyVisitation) {
+    state.monthlyVisitation = monthlyVisitation;
   },
-  setWeeklyVisitation(weeklyVisitation) {
-    this.weeklyVisitation = weeklyVisitation;
+  setWeeklyVisitation(state, weeklyVisitation) {
+    state.weeklyVisitation = weeklyVisitation;
   },
-  setComparingSite(comparingSite) {
-    this.comparingSite = comparingSite;
+  setComparingSite(state, comparingSite) {
+    state.comparingSite = comparingSite;
   },
-  setComparingSiteAnnualEstimates(comparingSiteAnnualEstimates) {
-    this.comparingSiteAnnualEstimates = comparingSiteAnnualEstimates;
+  setComparingSiteAnnualEstimates(state, comparingSiteAnnualEstimates) {
+    state.comparingSiteAnnualEstimates = comparingSiteAnnualEstimates;
   },
-  setComparingSiteMonthlyEstimates(comparingSiteMonthlyEstimates) {
-    this.comparingSiteMonthlyEstimates = comparingSiteMonthlyEstimates;
+  setComparingSiteMonthlyEstimates(state, comparingSiteMonthlyEstimates) {
+    state.comparingSiteMonthlyEstimates = comparingSiteMonthlyEstimates;
   },
-  setComparingSiteMonthlyVisitation(comparingSiteMonthlyVisitation) {
-    this.comparingSiteMonthlyVisitation = comparingSiteMonthlyVisitation;
+  setComparingSiteMonthlyVisitation(state, comparingSiteMonthlyVisitation) {
+    state.comparingSiteMonthlyVisitation = comparingSiteMonthlyVisitation;
   },
-  setComparingSiteWeeklyVisitation(comparingSiteWeeklyVisitation) {
-    this.comparingSiteWeeklyVisitation = comparingSiteWeeklyVisitation;
+  setComparingSiteWeeklyVisitation(state, comparingSiteWeeklyVisitation) {
+    state.comparingSiteWeeklyVisitation = comparingSiteWeeklyVisitation;
   },
-  setHomeLocations(homeLocations) {
-    this.homeLocations = homeLocations;
+  setHomeLocations(state, homeLocations) {
+    state.homeLocations = homeLocations;
   },
-  setComparingHomeLocations(comparingHomeLocations) {
-    this.comparingHomeLocations = comparingHomeLocations;
+  setComparingHomeLocations(state, comparingHomeLocations) {
+    state.comparingHomeLocations = comparingHomeLocations;
   },
-  clearSelectedProjectData() {
-    this.selectedProject = '';
-    this.projectSites = {};
-    this.selectedSite = '';
+  clearSelectedProjectData(state) {
+    state.selectedProject = '';
+    state.projectSites = {};
+    state.selectedSite = '';
 
-    this.annualEstimates = [];
-    this.monthlyEstimates = [];
+    state.annualEstimates = [];
+    state.monthlyEstimates = [];
 
-    this.monthlyVisitation = [];
-    this.weeklyVisitation = [];
+    state.monthlyVisitation = [];
+    state.weeklyVisitation = [];
 
-    this.homeLocations = [];
+    state.homeLocations = [];
   }
 };
+
+const actions = {
+  setAllProjects(context, allProjects) {
+    context.commit('setAllProjects', allProjects)
+  },
+  setSelectedProject(context, project) {
+    context.commit('setSelectedProject', project)
+  },
+  setProjectSites(context, projectSites) {
+    context.commit('setProjectSites', projectSites)
+  },
+  setSelectedSite(context, site) {
+    context.commit('setSelectedSite', site)
+  },
+  setAnnualEstimates(context, annualEstimates) {
+    context.commit('setAnnualEstimates', annualEstimates)
+  },
+  setMonthlyEstimates(context, monthlyEstimates) {
+    context.commit('setMonthlyEstimates', monthlyEstimates)
+  },
+  setMonthlyVisitation(context, monthlyVisitation) {
+    context.commit('setMonthlyVisitation', monthlyVisitation)
+  },
+  setWeeklyVisitation(context, weeklyVisitation) {
+    context.commit('setWeeklyVisitation', weeklyVisitation)
+  },
+  setComparingSite(context, comparingSite) {
+    context.commit('setComparingSite', comparingSite)
+  },
+  setComparingSiteAnnualEstimates(context, comparingSiteAnnualEstimates) {
+    context.commit('setComparingSiteAnnualEstimates', comparingSiteAnnualEstimates)
+  },
+  setComparingSiteMonthlyEstimates(context, comparingSiteMonthlyEstimates) {
+    context.commit('setComparingSiteMonthlyEstimates', comparingSiteMonthlyEstimates)
+  },
+  setComparingSiteMonthlyVisitation(context, comparingSiteMonthlyVisitation) {
+    context.commit('setComparingSiteMonthlyVisitation', comparingSiteMonthlyVisitation)
+  },
+  setComparingSiteWeeklyVisitation(context, comparingSiteWeeklyVisitation) {
+    context.commit('setComparingSiteWeeklyVisitation', comparingSiteWeeklyVisitation)
+  },
+  setHomeLocations(context, homeLocations) {
+    context.commit('setHomeLocations', homeLocations)
+  },
+  setComparingHomeLocations(context, comparingHomeLocations) {
+    context.commit('setComparingHomeLocations', comparingHomeLocations)
+  },
+  clearSelectedProjectData(context) {
+    context.commit('clearSelectedProjectData')
+  }
+};
+
+const getters = {
+  getAllProjects(state) {
+    return state.allProjects
+  },
+  getSelectedProject(state) {
+    return state.selectedProject
+  },
+  getProjectSites(state) {
+    return state.projectSites
+  },
+  getSelectedSite(state) {
+    return state.selectedSite
+  },
+  getAnnualEstimates(state) {
+    return state.annualEstimates
+  },
+  getMonthlyEstimates(state) {
+    return state.monthlyEstimates
+  },
+  getMonthlyVisitation(state) {
+    return state.monthlyVisitation
+  },
+  getWeeklyVisitation(state) {
+    return state.weeklyVisitation
+  },
+  getComparingSite(state) {
+    return state.comparingSite
+  },
+  getComparingSiteAnnualEstimates(state) {
+    return state.comparingSiteAnnualEstimates
+  },
+  getComparingSiteMonthlyEstimates(state) {
+    return state.comparingSiteMonthlyEstimates
+  },
+  getComparingSiteMonthlyVisitation(state) {
+    return state.comparingSiteMonthlyVisitation
+  },
+  getComparingSiteWeeklyVisitation(state) {
+    return state.comparingSiteWeeklyVisitation
+  },
+  getHomeLocations(state) {
+    return state.homeLocations
+  },
+  getComparingHomeLocations(state) {
+    return state.comparingHomeLocations
+  }
+};
+
+const store = new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters
+});
+
+export default store;

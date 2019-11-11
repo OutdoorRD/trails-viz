@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import {store, constants} from '../store'
+  import {COLORS} from '../store/constants'
   import c3 from 'c3'
 
   Number.prototype.pad = function (size) {
@@ -60,12 +60,12 @@
       },
       _getColors: function(trailName, comparing=false) {
         let colors = {};
-        colors[trailName + ' - Modelled'] = comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
-        colors[trailName + ' - On Site'] = comparing ? constants.COLORS.COMPARE_ON_SITE : constants.COLORS.ON_SITE;
-        colors[trailName + ' - Flickr'] =  comparing ? constants.COLORS.COMPARE_FLICKR : constants.COLORS.FLICKR;
-        colors[trailName + ' - Instagram'] =  comparing ? constants.COLORS.COMPARE_INSTA : constants.COLORS.INSTA;
-        colors[trailName + ' - Twitter'] =  comparing ? constants.COLORS.COMPARE_TWITTER : constants.COLORS.TWITTER;
-        colors[trailName + ' - WTA'] =  comparing ? constants.COLORS.COMPARE_WTA : constants.COLORS.WTA;
+        colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
+        colors[trailName + ' - On Site'] = comparing ? COLORS.COMPARE_ON_SITE : COLORS.ON_SITE;
+        colors[trailName + ' - Flickr'] =  comparing ? COLORS.COMPARE_FLICKR : COLORS.FLICKR;
+        colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
+        colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
+        colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
@@ -120,20 +120,20 @@
       },
       renderTimeSeries: function () {
         let self = this;
-        this.selectedSite = store.selectedSite;
-        this.trailName = store.selectedSite['trailName'];
-        this.siteid = store.selectedSite['siteid'];
-        this.monthlyVisitation = store.monthlyVisitation;
-        this.weeklyVisitation = store.weeklyVisitation;
+        this.selectedSite = self.$store.getters.getSelectedSite;
+        this.trailName = self.$store.getters.getSelectedSite['trailName'];
+        this.siteid = self.$store.getters.getSelectedSite['siteid'];
+        this.monthlyVisitation = self.$store.getters.getMonthlyVisitation;
+        this.weeklyVisitation = self.$store.getters.getWeeklyVisitation;
 
         self.timeseriesMonthlyData = self._prepareMonthlyData(this.trailName, this.monthlyVisitation);
         self.timeseriesWeeklyData = self._prepareWeeklyData(this.trailName, this.weeklyVisitation);
 
         let colors = self._getColors(self.trailName);
 
-        if (store.comparingSite) {
-          let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(store.comparingSite['trailName'], store.comparingSiteMonthlyVisitation, true));
-          let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(store.comparingSite['trailName'], store.comparingSiteWeeklyVisitation, true));
+        if (self.$store.getters.getComparingSite) {
+          let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyVisitation, true));
+          let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteWeeklyVisitation, true));
 
           // filter out social media data to remove the clutter
           joinedMonthlyData.splice(3, 4);
@@ -145,7 +145,7 @@
           self.timeseriesMonthlyData = joinedMonthlyData;
           self.timeseriesWeeklyData = joinedWeeklyData;
 
-          let compareColors = self._getColors(store.comparingSite['trailName'], true);
+          let compareColors = self._getColors(self.$store.getters.getComparingSite['trailName'], true);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
 

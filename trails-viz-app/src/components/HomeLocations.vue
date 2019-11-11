@@ -3,7 +3,6 @@
 </template>
 
 <script>
-  import {store} from "../store";
   import Plotly from 'plotly.js-dist';
 
   export default {
@@ -114,10 +113,10 @@
         // Initialize at this seed
         this.randomSeed = 12;
         let self = this;
-        self.homeLocations = store.homeLocations;
+        self.homeLocations = self.$store.getters.getHomeLocations;
         let data = self.homeLocations;
-        if (store.comparingSite) {
-          data = self._mergeTrees(self.homeLocations, store.comparingHomeLocations)
+        if (self.$store.getters.getComparingSite) {
+          data = self._mergeTrees(self.homeLocations, self.$store.getters.getComparingHomeLocations)
         }
         let labels = [];
         let parents = [];
