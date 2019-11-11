@@ -27,13 +27,12 @@ def _get_project_estimates(project, period):
     project_site_ids = project_sites['siteid'].drop_duplicates()
     df = get_from_data_source('MONTHLY_VISITATION_DF')
     project_sites_data = df[df['trail'].isin(project_site_ids)]
-    project_sites_data = project_sites_data.groupby(by=['trail', 'year', 'month'], as_index=False).sum()
-    project_sites_data = project_sites_data.drop('trail', axis=1)
 
     if period == 'monthly':
-        project_sites_data = project_sites_data.groupby(by=['month']).mean()
+        project_sites_data = project_sites_data.drop(columns='year').groupby(by=['trail', 'month'], as_index=False).mean()
+        project_sites_data = project_sites_data.drop(columns='trail').groupby(by=['month'], as_index=False).sum()
     elif period == 'annual':
-        project_sites_data = project_sites_data.groupby(by=['year']).sum()
+        project_sites_data = project_sites_data.drop(columns=['trail', 'month']).groupby(by=['year'], as_index=False).sum()
 
     project_sites_data = project_sites_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
                                              'onsite', 'log_onsite', 'data_days']]
