@@ -134,13 +134,16 @@ export default {
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
         axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes) => {
+        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
+      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
         store.setComparingSiteAnnualEstimates(annualEstimateRes.data);
         store.setComparingSiteMonthlyEstimates(monthlyEstimateRes.data);
         store.setComparingSiteMonthlyVisitation(monthlyVisitationRes.data);
         store.setComparingSiteWeeklyVisitation(weeklyVisitationRes.data);
+        store.setComparingHomeLocations(homeLocationsRes.data);
         this.$refs['bar-graph'].renderSelectedGraph();
         this.$refs['time-series'].renderTimeSeries();
+        this.$refs['home-locations'].renderTreeMap();
       }))
     }
   }

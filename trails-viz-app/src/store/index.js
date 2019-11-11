@@ -34,6 +34,7 @@ export const store = {
   comparingSiteWeeklyVisitation: [],
 
   homeLocations: [],
+  comparingHomeLocations: [],
 
   setAllProjects(allProjects) {
     this.allProjects = allProjects;
@@ -76,6 +77,9 @@ export const store = {
   },
   setHomeLocations(homeLocations) {
     this.homeLocations = homeLocations;
+  },
+  setComparingHomeLocations(comparingHomeLocations) {
+    this.comparingHomeLocations = comparingHomeLocations;
   },
   clearSelectedProjectData() {
     this.selectedProject = '';

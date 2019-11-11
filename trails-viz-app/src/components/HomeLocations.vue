@@ -33,17 +33,97 @@
         }
         return name
       },
+      _mergeTrees: function (x, y) {
+        let mergedTree = Object.assign({}, x);
+        mergedTree['visit_days'] += y['visit_days'];
+        mergedTree['visitors_unq'] += y['visitors_unq'];
+
+        let findCountry = function (countries, name) {
+          for (let c of countries) {
+            if (c['name'] === name) {
+              return c
+            }
+          }
+          return null;
+        };
+
+        let findState = function (states, name) {
+          for (let s of states) {
+            if (s['name'] === name) {
+              return s
+            }
+          }
+          return null;
+        };
+
+        let findCounty = function (counties, name) {
+          for (let c of counties) {
+            if (c['name'] === name) {
+              return c
+            }
+          }
+          return null;
+        };
+
+        for (let country of y['countries']) {
+          let mergedTreeCountry = findCountry(mergedTree['countries'], country['name']);
+          if (mergedTreeCountry == null) {
+            mergedTreeCountry = {'name': country['name'], 'visit_days': 0, 'visitors_unq': 0};
+            mergedTree['countries'].push(mergedTreeCountry)
+          }
+          mergedTreeCountry['visit_days'] += country['visit_days'];
+          mergedTreeCountry['visitors_unq'] += country['visitors_unq'];
+
+          if (typeof country['states'] === 'undefined') {
+            country['states'] = []
+          }
+          if (typeof mergedTree['states'] === 'undefined') {
+            mergedTree['states'] = []
+          }
+
+          for (let state of country['states']) {
+            let mergedTreeState = findState(mergedTreeCountry['states'], state['name']);
+            if (mergedTreeState == null) {
+              mergedTreeState = {'name': state['name'], 'visit_days': 0, 'visitors_unq': 0};
+              mergedTreeCountry['states'].push(mergedTreeState)
+            }
+            mergedTreeState['visit_days'] += state['visit_days'];
+            mergedTreeState['visitors_unq'] += state['visitors_unq'];
+
+            if (typeof state['counties'] === 'undefined') {
+              state['counties'] = []
+            }
+            if (typeof mergedTreeState['counties'] === 'undefined') {
+              mergedTreeState['counties'] = []
+            }
+
+            for (let county of state['counties']) {
+              let mergedTreeCounty = findCounty(mergedTreeState['counties'], county['name']);
+              if (mergedTreeCounty == null) {
+                mergedTreeCounty = {'name': county['name'], 'visit_days': 0, 'visitors_unq': 0};
+                mergedTreeState['counties'].push(mergedTreeCounty)
+              }
+              mergedTreeCounty['visit_days'] += county['visit_days'];
+              mergedTreeCounty['visitors_unq'] += county['visitors_unq'];
+            }
+          }
+        }
+        return mergedTree
+      },
       renderTreeMap: function () {
         // Initialize at this seed
         this.randomSeed = 12;
         let self = this;
         self.homeLocations = store.homeLocations;
         let data = self.homeLocations;
+        if (store.comparingSite) {
+          data = self._mergeTrees(self.homeLocations, store.comparingHomeLocations)
+        }
         let labels = [];
         let parents = [];
         let values = [];
         let colors = [];
-        let worldLabel = 'World (' + self.homeLocations['visit_days'] + ')';
+        let worldLabel = 'World (' + data['visit_days'] + ')';
         labels.push(worldLabel);
         values.push(data['visit_days']);
         parents.push('');
