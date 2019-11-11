@@ -28,11 +28,6 @@
         </b-row>
       </b-col>
     </b-row>
-    <b-row no-gutters>
-      <b-col sm="12">
-        <footer-bar></footer-bar>
-      </b-col>
-    </b-row>
   </b-container>
 </template>
 
@@ -41,10 +36,9 @@ import MapDiv from "@/components/MapDiv";
 import TopBar from "@/components/TopBar";
 import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
-import FooterBar from "@/components/FooterBar";
+import HomeLocations from "@/components/HomeLocations";
 
 import axios from "axios";
-import HomeLocations from "@/components/HomeLocations";
 
 export default {
   name: 'app',
@@ -56,7 +50,6 @@ export default {
   },
   components: {
     HomeLocations,
-    FooterBar,
     TimeSeries,
     BarGraph,
     TopBar,
