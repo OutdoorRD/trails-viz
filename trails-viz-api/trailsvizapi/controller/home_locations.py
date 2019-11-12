@@ -26,3 +26,9 @@ def get_census_tract():
 def get_home_locations_census_tract(siteid):
     data = home_locations.get_home_locations_by_census_tract(siteid)
     return Response(data.to_json(), mimetype='application/json')
+
+
+@app.route('/api/projects/<string:project>/homeLocationsCensusTract')
+def get_project_home_locations_census_tract(project):
+    data = home_locations.get_project_home_locations_by_census_tract(project)
+    return Response(data.to_json(), mimetype='application/json')

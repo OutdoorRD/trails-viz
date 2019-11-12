@@ -66,3 +66,15 @@ def get_home_locations_by_census_tract(siteid):
     site_home_locations = home_locations[home_locations['siteid'] == siteid]
     site_home_census_data = census_tract.merge(site_home_locations, left_on='GEOID', right_on='tract', how='inner')
     return site_home_census_data
+
+
+def get_project_home_locations_by_census_tract(project):
+    home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
+
+    census_tract = get_from_data_source('CENSUS_TRACT')
+    project_home_census_data = census_tract.merge(project_home_locations, left_on='GEOID', right_on='tract', how='inner')
+    return project_home_census_data
