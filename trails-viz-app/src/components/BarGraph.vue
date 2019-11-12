@@ -17,8 +17,9 @@
 </template>
 
 <script>
-  import {COLORS} from '../store/constants'
+  import {COLORS, VIZ_MODES} from '../store/constants'
   import c3 from 'c3'
+  import axios from 'axios'
 
   const MONTH_DICT = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
     7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'};
@@ -27,13 +28,16 @@
     name: "BarGraph",
     data: function() {
       return {
+        project: null,
         siteid: null,
         trailName: null,
         selectedSite: null,
-        weeklyEstimates: null,
         monthlyEstimates: null,
         annualEstimates: null,
-        averageAnnualVisits: '',
+
+        comparingSite: null,
+        comparingSiteMonthlyEstimates: null,
+        comparingSiteAnnualEstimates: null,
 
         timePeriodOptions: [
           {text: 'Annual', value: 'annual'},
@@ -50,24 +54,56 @@
     methods: {
       renderDefaultGraph: function () {
         let self = this;
-        this.selectedSite = self.$store.getters.getSelectedSite;
-        this.trailName = self.$store.getters.getSelectedSite['trailName'];
-        this.siteid = self.$store.getters.getSelectedSite['siteid'];
+        let vizMode = self.$store.getters.getVizMode;
 
-        self.annualEstimates = self.$store.getters.getAnnualEstimates;
-        self.monthlyEstimates = self.$store.getters.getMonthlyEstimates;
+        // If mode is compare, fetch the data for comparing sites,
+        // render plot and return without overwriting current site data
+        if (vizMode === VIZ_MODES.COMPARE) {
+          let comparingSiteId = self.$store.getters.getComparingSite['siteid'];
+          self.comparingSite = self.$store.getters.getComparingSite;
+          axios.all([
+            axios.get(self.$apiEndpoint + '/sites/' + comparingSiteId + '/annualEstimates'),
+            axios.get(self.$apiEndpoint + '/sites/' + comparingSiteId + '/monthlyEstimates'),
+          ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes) => {
+            self.comparingSiteAnnualEstimates = annualEstimateRes.data;
+            self.comparingSiteMonthlyEstimates = monthlyEstimateRes.data;
 
-        self.averageAnnualVisits = self.annualEstimates.map(x => x.estimate).reduce((a, b) => a + b) / self.annualEstimates.length;
-        self.averageAnnualVisits = Math.round(self.averageAnnualVisits);
-
-        // on load, render the default graph which is monthly modelled
-        if (!self.timePeriod) {
-          self.timePeriod = 'monthly';
+            self.renderSelectedGraph();
+          }));
+          return
         }
-        if (!self.dataSource) {
-          self.dataSource = 'modelled';
+
+        self.clearBarGraph();
+        self.project = self.$store.getters.getSelectedProject;
+        self.selectedSite = self.$store.getters.getSelectedSite;
+        self.trailName = self.$store.getters.getSelectedSite['trailName'];
+        self.siteid = self.$store.getters.getSelectedSite['siteid'];
+
+        let annualEstimatesUrl, monthlyEstimatesUrl;
+        if (vizMode === VIZ_MODES.PROJECT) {
+          annualEstimatesUrl = self.$apiEndpoint + '/projects/' + self.project + '/annualEstimates';
+          monthlyEstimatesUrl = self.$apiEndpoint + '/projects/' + self.project + '/monthlyEstimates';
+        } else if (vizMode === VIZ_MODES.SITE) {
+          annualEstimatesUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/annualEstimates';
+          monthlyEstimatesUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/monthlyEstimates'
         }
-        self.renderSelectedGraph();
+
+        axios.all([
+          axios.get(annualEstimatesUrl),
+          axios.get(monthlyEstimatesUrl)
+        ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes) => {
+          self.annualEstimates = annualEstimateRes.data;
+          self.monthlyEstimates = monthlyEstimateRes.data;
+
+          // on load, render the default graph which is monthly modelled
+          if (!self.timePeriod) {
+            self.timePeriod = 'monthly';
+          }
+          if (!self.dataSource) {
+            self.dataSource = 'modelled';
+          }
+          self.renderSelectedGraph();
+        }));
       },
       _addLabelToArray: function(arr, label) {
         arr.unshift(label);
@@ -170,8 +206,8 @@
           categories.push(MONTH_DICT[x.month])
         });
         let [data, colors] = self._prepareMonthlyModelledData(self.trailName, self.monthlyEstimates);
-        if (self.$store.getters.getComparingSite) {
-          let [compareData, compareColors] = self._prepareMonthlyModelledData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let [compareData, compareColors] = self._prepareMonthlyModelledData(self.comparingSite['trailName'], self.comparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
           self._renderBarGraph(data, categories, colors, true);
@@ -188,8 +224,8 @@
           categories.push(MONTH_DICT[x.month])
         });
         let [data, colors] = self._prepareMonthlySocialMediaData(self.trailName, self.monthlyEstimates);
-        if (self.$store.getters.getComparingSite) {
-          let [compareData, compareColors] = self._prepareMonthlySocialMediaData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let [compareData, compareColors] = self._prepareMonthlySocialMediaData(self.comparingSite['trailName'], self.comparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
@@ -203,8 +239,8 @@
           categories.push(x.year)
         });
         let [data, colors] = self._prepareAnnualModelledData(self.trailName, self.annualEstimates);
-        if (self.$store.getters.getComparingSite) {
-          let [compareData, compareColors] = self._prepareAnnualModelledData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteAnnualEstimates, true);
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let [compareData, compareColors] = self._prepareAnnualModelledData(self.comparingSite['trailName'], self.comparingSiteAnnualEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
           self._renderBarGraph(data, categories, colors, true);
@@ -220,8 +256,8 @@
           categories.push(x.year)
         });
         let [data, colors] = self._prepareAnnualSocialMediaData(self.trailName, self.annualEstimates);
-        if (self.$store.getters.getComparingSite) {
-          let [compareData, compareColors] = self._prepareAnnualSocialMediaData(self.$store.getters.getComparingSite['trailName'], self.$store.getters.getComparingSiteMonthlyEstimates, true);
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let [compareData, compareColors] = self._prepareAnnualSocialMediaData(self.comparingSite['trailName'], self.comparingSiteAnnualEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
@@ -239,15 +275,12 @@
         }
       },
       clearBarGraph: function () {
+        this.project = null;
         this.siteid = null;
         this.trailName = null;
         this.selectedSite = null;
-        this.weeklyEstimates = null;
         this.monthlyEstimates = null;
         this.annualEstimates = null;
-        this.averageAnnualVisits = '';
-        this.timePeriod = '';
-        this.dataSource = '';
       }
     }
   }

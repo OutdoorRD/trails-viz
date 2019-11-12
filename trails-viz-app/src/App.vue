@@ -39,6 +39,7 @@ import TimeSeries from "@/components/TimeSeries";
 import HomeLocations from "@/components/HomeLocations";
 
 import axios from "axios";
+import {VIZ_MODES} from "./store/constants";
 
 export default {
   name: 'app',
@@ -64,83 +65,37 @@ export default {
     sendProjectSelectedEventToMap: function () {
       let store = this.$store;
       let project = store.getters.getSelectedProject;
-      store.dispatch('clearSelectedProjectData');
 
       this.trailName = 'All Sites in ' + project;
       store.dispatch('setSelectedProject', project);
       store.dispatch('setSelectedSite', {'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
 
+      store.dispatch('setVizMode', VIZ_MODES.PROJECT);
       this.$refs['map-div'].renderProjectSites();
-      this.$refs['bar-graph'].clearBarGraph();
-      this.$refs['time-series'].clearTimeSeries();
-      this.$refs['home-locations'].clear();
-
 
       // render plots on project level
-      axios.all([
-        axios.get(this.$apiEndpoint + '/projects/' + project + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/projects/' + project + '/monthlyEstimates'),
-        axios.get(this.$apiEndpoint + '/projects/' + project + '/monthlyVisitation'),
-        axios.get(this.$apiEndpoint + '/projects/' + project + '/weeklyVisitation'),
-        axios.get(this.$apiEndpoint + '/projects/' + project + '/homeLocations'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.dispatch('setAnnualEstimates', annualEstimateRes.data);
-        store.dispatch('setMonthlyEstimates', monthlyEstimateRes.data);
-        store.dispatch('setMonthlyVisitation', monthlyVisitationRes.data);
-        store.dispatch('setWeeklyVisitation', weeklyVisitationRes.data);
-        store.dispatch('setHomeLocations', homeLocationsRes.data);
-        this.$refs['bar-graph'].renderDefaultGraph();
-        this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
-      }))
-
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
     },
     sendRenderPlotEvents: function () {
-      // populate the estimates in global store to be used in bar graph and time series
-      let store = this.$store;
-      let siteid = store.getters.getSelectedSite['siteid'];
-      this.trailName = store.getters.getSelectedSite['trailName'];
+      this.trailName = this.$store.getters.getSelectedSite['trailName'];
       this.comparingTrailName = '';
-      axios.all([
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.dispatch('setAnnualEstimates', annualEstimateRes.data);
-        store.dispatch('setMonthlyEstimates', monthlyEstimateRes.data);
-        store.dispatch('setMonthlyVisitation', monthlyVisitationRes.data);
-        store.dispatch('setWeeklyVisitation', weeklyVisitationRes.data);
-        store.dispatch('setHomeLocations', homeLocationsRes.data);
-        this.$refs['bar-graph'].renderDefaultGraph();
-        this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
-      }))
+
+      this.$store.dispatch('setVizMode', VIZ_MODES.SITE);
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
     },
     sendCompareSites: function () {
-      let store = this.$store;
-      let siteid = store.getters.getComparingSite['siteid'];
-      this.comparingTrailName = store.getters.getComparingSite['trailName'];
-      axios.all([
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.dispatch('setComparingSiteAnnualEstimates', annualEstimateRes.data);
-        store.dispatch('setComparingSiteMonthlyEstimates', monthlyEstimateRes.data);
-        store.dispatch('setComparingSiteMonthlyVisitation', monthlyVisitationRes.data);
-        store.dispatch('setComparingSiteWeeklyVisitation', weeklyVisitationRes.data);
-        store.dispatch('setComparingHomeLocations', homeLocationsRes.data);
-        this.$refs['bar-graph'].renderSelectedGraph();
-        this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
-      }))
+      this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
+      this.comparingTrailName = this.$store.getters.getComparingSite['trailName'];
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
     }
   }
 }

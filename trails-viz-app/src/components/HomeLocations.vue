@@ -3,14 +3,20 @@
 </template>
 
 <script>
+  import axios from 'axios';
   import Plotly from 'plotly.js-dist';
+  import {VIZ_MODES} from '../store/constants';
 
   export default {
     name: "HomeLocations",
     data: function () {
       return {
+        project: null,
+        siteid: null,
         homeLocations: null,
-        randomSeed: null,
+        comparingSite: null,
+        comparingSiteHomeLocations: null,
+        randomSeed: null
       }
     },
     methods: {
@@ -113,7 +119,38 @@
         // Initialize at this seed
         this.randomSeed = 12;
         let self = this;
-        self.homeLocations = self.$store.getters.getHomeLocations;
+
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let comparingSiteId = self.$store.getters.getComparingSite['siteid'];
+          self.comparingSite = self.$store.getters.getComparingSite;
+          axios.get(self.$apiEndpoint + '/sites/' + comparingSiteId + '/homeLocations')
+            .then(response => {
+              self.comparingSiteHomeLocations = response.data;
+              self._renderTreeMap();
+            });
+          return
+        }
+
+        self.clear();
+
+        self.project = self.$store.getters.getSelectedProject;
+        self.siteid = self.$store.getters.getSelectedSite['siteid'];
+
+        let homeLocationsUrl;
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.project + '/homeLocations'
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          homeLocationsUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocations'
+        }
+
+        axios.get(homeLocationsUrl)
+          .then(response => {
+            self.homeLocations = response.data;
+            self._renderTreeMap();
+          });
+      },
+      _renderTreeMap: function() {
+        let self = this;
         let data = self.homeLocations;
         if (self.$store.getters.getComparingSite) {
           data = self._mergeTrees(self.homeLocations, self.$store.getters.getComparingHomeLocations)

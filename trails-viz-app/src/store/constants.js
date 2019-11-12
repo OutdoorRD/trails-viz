@@ -12,3 +12,9 @@ export const COLORS = {
     COMPARE_WTA: '#ff0000',
     COMPARE_ON_SITE: '#ff6400',
 };
+
+export const VIZ_MODES = {
+  PROJECT: 'project',
+  SITE: 'site',
+  COMPARE: 'compare'
+};

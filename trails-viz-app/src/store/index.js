@@ -8,21 +8,9 @@ const state = {
   selectedProject: '',
   projectSites: {},
   selectedSite: '',
-
-  annualEstimates: [],
-  monthlyEstimates: [],
-
-  monthlyVisitation: [],
-  weeklyVisitation: [],
+  vizMode: '',
 
   comparingSite: '',
-  comparingSiteAnnualEstimates: [],
-  comparingSiteMonthlyEstimates: [],
-  comparingSiteMonthlyVisitation: [],
-  comparingSiteWeeklyVisitation: [],
-
-  homeLocations: [],
-  comparingHomeLocations: [],
 };
 
 const mutations = {
@@ -38,38 +26,11 @@ const mutations = {
   setSelectedSite(state, site) {
     state.selectedSite = site
   },
-  setAnnualEstimates(state, annualEstimates) {
-    state.annualEstimates = annualEstimates;
-  },
-  setMonthlyEstimates(state, monthlyEstimates) {
-    state.monthlyEstimates = monthlyEstimates;
-  },
-  setMonthlyVisitation(state, monthlyVisitation) {
-    state.monthlyVisitation = monthlyVisitation;
-  },
-  setWeeklyVisitation(state, weeklyVisitation) {
-    state.weeklyVisitation = weeklyVisitation;
+  setVizMode(state, vizMode) {
+    state.vizMode = vizMode
   },
   setComparingSite(state, comparingSite) {
     state.comparingSite = comparingSite;
-  },
-  setComparingSiteAnnualEstimates(state, comparingSiteAnnualEstimates) {
-    state.comparingSiteAnnualEstimates = comparingSiteAnnualEstimates;
-  },
-  setComparingSiteMonthlyEstimates(state, comparingSiteMonthlyEstimates) {
-    state.comparingSiteMonthlyEstimates = comparingSiteMonthlyEstimates;
-  },
-  setComparingSiteMonthlyVisitation(state, comparingSiteMonthlyVisitation) {
-    state.comparingSiteMonthlyVisitation = comparingSiteMonthlyVisitation;
-  },
-  setComparingSiteWeeklyVisitation(state, comparingSiteWeeklyVisitation) {
-    state.comparingSiteWeeklyVisitation = comparingSiteWeeklyVisitation;
-  },
-  setHomeLocations(state, homeLocations) {
-    state.homeLocations = homeLocations;
-  },
-  setComparingHomeLocations(state, comparingHomeLocations) {
-    state.comparingHomeLocations = comparingHomeLocations;
   },
   clearSelectedProjectData(state) {
     state.selectedProject = '';
@@ -99,38 +60,11 @@ const actions = {
   setSelectedSite(context, site) {
     context.commit('setSelectedSite', site)
   },
-  setAnnualEstimates(context, annualEstimates) {
-    context.commit('setAnnualEstimates', annualEstimates)
-  },
-  setMonthlyEstimates(context, monthlyEstimates) {
-    context.commit('setMonthlyEstimates', monthlyEstimates)
-  },
-  setMonthlyVisitation(context, monthlyVisitation) {
-    context.commit('setMonthlyVisitation', monthlyVisitation)
-  },
-  setWeeklyVisitation(context, weeklyVisitation) {
-    context.commit('setWeeklyVisitation', weeklyVisitation)
+  setVizMode(context, vizMode) {
+    context.commit('setVizMode', vizMode)
   },
   setComparingSite(context, comparingSite) {
     context.commit('setComparingSite', comparingSite)
-  },
-  setComparingSiteAnnualEstimates(context, comparingSiteAnnualEstimates) {
-    context.commit('setComparingSiteAnnualEstimates', comparingSiteAnnualEstimates)
-  },
-  setComparingSiteMonthlyEstimates(context, comparingSiteMonthlyEstimates) {
-    context.commit('setComparingSiteMonthlyEstimates', comparingSiteMonthlyEstimates)
-  },
-  setComparingSiteMonthlyVisitation(context, comparingSiteMonthlyVisitation) {
-    context.commit('setComparingSiteMonthlyVisitation', comparingSiteMonthlyVisitation)
-  },
-  setComparingSiteWeeklyVisitation(context, comparingSiteWeeklyVisitation) {
-    context.commit('setComparingSiteWeeklyVisitation', comparingSiteWeeklyVisitation)
-  },
-  setHomeLocations(context, homeLocations) {
-    context.commit('setHomeLocations', homeLocations)
-  },
-  setComparingHomeLocations(context, comparingHomeLocations) {
-    context.commit('setComparingHomeLocations', comparingHomeLocations)
   },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
@@ -150,38 +84,11 @@ const getters = {
   getSelectedSite(state) {
     return state.selectedSite
   },
-  getAnnualEstimates(state) {
-    return state.annualEstimates
-  },
-  getMonthlyEstimates(state) {
-    return state.monthlyEstimates
-  },
-  getMonthlyVisitation(state) {
-    return state.monthlyVisitation
-  },
-  getWeeklyVisitation(state) {
-    return state.weeklyVisitation
+  getVizMode(state) {
+    return state.vizMode
   },
   getComparingSite(state) {
     return state.comparingSite
-  },
-  getComparingSiteAnnualEstimates(state) {
-    return state.comparingSiteAnnualEstimates
-  },
-  getComparingSiteMonthlyEstimates(state) {
-    return state.comparingSiteMonthlyEstimates
-  },
-  getComparingSiteMonthlyVisitation(state) {
-    return state.comparingSiteMonthlyVisitation
-  },
-  getComparingSiteWeeklyVisitation(state) {
-    return state.comparingSiteWeeklyVisitation
-  },
-  getHomeLocations(state) {
-    return state.homeLocations
-  },
-  getComparingHomeLocations(state) {
-    return state.comparingHomeLocations
   }
 };
 
