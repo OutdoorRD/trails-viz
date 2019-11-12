@@ -9,7 +9,7 @@ const state = {
   projectSites: {},
   selectedSite: '',
   vizMode: '',
-
+  censusTract: '',
   comparingSite: '',
 };
 
@@ -28,6 +28,9 @@ const mutations = {
   },
   setVizMode(state, vizMode) {
     state.vizMode = vizMode
+  },
+  setCensusTract(state, censusTract) {
+    state.censusTract = censusTract
   },
   setComparingSite(state, comparingSite) {
     state.comparingSite = comparingSite;
@@ -63,6 +66,9 @@ const actions = {
   setVizMode(context, vizMode) {
     context.commit('setVizMode', vizMode)
   },
+  setCensusTract(context, censusTract) {
+    context.commit('setCensusTract', censusTract)
+  },
   setComparingSite(context, comparingSite) {
     context.commit('setComparingSite', comparingSite)
   },
@@ -86,6 +92,9 @@ const getters = {
   },
   getVizMode(state) {
     return state.vizMode
+  },
+  getCensusTract(state) {
+    return state.censusTract
   },
   getComparingSite(state) {
     return state.comparingSite

@@ -10,6 +10,7 @@
 <script>
   import L from "leaflet";
   import axios from "axios";
+  import {MAPBOX_CONSTS} from "../store/constants";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -25,12 +26,6 @@
   L.Icon.Default.prototype.options.iconAnchor = [6, 20];
   L.Icon.Default.prototype.options.iconSize = [13, 20];
   L.Icon.Default.prototype.options.shadowSize = [20, 20];
-
-  const MAPBOX_TOKEN = "pk.eyJ1Ijoid29vZHNwIiwiYSI6ImNrMjEwY3oycTFlcnEzbXFvbzR4bmNqNjgifQ.pM7-As9W2Ce9xXMv3W-NNg";
-  const MAPBOX_TILES_API = "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}";
-  const MAPBOX_ATTRIBUTION = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
-    '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-    '<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>';
 
   const defaultStyle = {
     color: "#ff0000",
@@ -67,25 +62,25 @@
         zoom: 5
       });
 
-      const outdoorLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const outdoorLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.outdoors",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
-      const streetsLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const streetsLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.streets",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
-      const satelliteLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const satelliteLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.satellite",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
       L.control.layers({"outdoor": outdoorLayer, "streets": streetsLayer, "satellite": satelliteLayer}).addTo(mapDiv);

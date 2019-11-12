@@ -23,6 +23,9 @@
               <b-tab title="Home Locations">
                 <home-locations ref="home-locations"></home-locations>
               </b-tab>
+              <b-tab title="Home Locations Map">
+                <home-locations-map ref="home-locations-map"></home-locations-map>
+              </b-tab>
             </b-tabs>
           </b-col>
         </b-row>
@@ -37,6 +40,7 @@ import TopBar from "@/components/TopBar";
 import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
 import HomeLocations from "@/components/HomeLocations";
+import HomeLocationsMap from "@/components/HomeLocationsMap";
 
 import axios from "axios";
 import {VIZ_MODES} from "./store/constants";
@@ -50,6 +54,7 @@ export default {
     }
   },
   components: {
+    HomeLocationsMap,
     HomeLocations,
     TimeSeries,
     BarGraph,
@@ -58,8 +63,10 @@ export default {
   },
   mounted() {
     let self = this;
-    axios.get(this.$apiEndpoint + '/projects')
+    axios.get(self.$apiEndpoint + '/projects')
       .then(response => self.$store.dispatch('setAllProjects', response.data));
+    axios.get(self.$apiEndpoint + '/sites/censusTract')
+      .then(response => self.$store.dispatch('setCensusTract', response.data));
   },
   methods: {
     sendProjectSelectedEventToMap: function () {
@@ -89,6 +96,7 @@ export default {
       this.$refs['bar-graph'].renderDefaultGraph();
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
+      this.$refs['home-locations-map'].renderHomeLocationsMap();
     },
     sendCompareSites: function () {
       this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
