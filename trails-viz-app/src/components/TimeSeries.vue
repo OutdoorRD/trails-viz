@@ -190,6 +190,12 @@
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
 
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          // drop on site when viz is project wide.
+          self.timeseriesMonthlyData.splice(2, 1);
+          self.timeseriesWeeklyData.splice(2, 1);
+        }
+
         let data;
         if (self.dataRange === "weekly") {
           data = self.timeseriesWeeklyData
