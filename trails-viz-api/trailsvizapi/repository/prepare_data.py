@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 
@@ -10,6 +11,7 @@ _ALLSITES_POLYGONS_FILE = 'allsites.geojson'
 _ALLSITES_LINES_FILE = 'allsites_lines.geojson'
 _ALLSITES_ACCESS_POINTS_FILE = 'allsites_access_points.geojson'
 _ALLSITES_HOME_LOCATIONS_FILE = 'allsites_homes_by_site.csv'
+_ALLSITES_HOME_LOCATIONS_CENSUS_TRACT_FILE = 'allsites_homes_by_site_census.csv'
 _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
@@ -140,6 +142,14 @@ def _prepare_census_tract_df():
     return gpd.read_file(config.DATA_FILES_ROOT + 'tl_2019_53_tract.shp')
 
 
+def _prepare_home_locations_census_tract_df():
+    data = pd.read_csv(config.DATA_FILES_ROOT + 'allsites_homes_by_site_census.csv')
+    data = data.dropna(subset=['tract'])
+    data['tract'] = data['tract'].astype(np.int64)
+    data['tract'] = data['tract'].astype(str)
+    return data
+
+
 def get_from_data_source(key):
     if key not in DATA_SOURCE:
         DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
@@ -147,5 +157,6 @@ def get_from_data_source(key):
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
         DATA_SOURCE['CENSUS_TRACT'] = _prepare_census_tract_df()
+        DATA_SOURCE['HOME_LOCATIONS_CENSUS_TRACT_DF'] = _prepare_home_locations_census_tract_df()
 
     return DATA_SOURCE[key]

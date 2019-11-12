@@ -58,3 +58,11 @@ def get_project_home_locations(project):
 
 def get_census_tract():
     return get_from_data_source('CENSUS_TRACT')
+
+
+def get_home_locations_by_census_tract(siteid):
+    home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
+    census_tract = get_from_data_source('CENSUS_TRACT')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    site_home_census_data = census_tract.merge(site_home_locations, left_on='GEOID', right_on='tract', how='inner')
+    return site_home_census_data
