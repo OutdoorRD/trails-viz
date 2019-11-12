@@ -136,11 +136,16 @@ def _prepare_home_locations_df():
     return home_locations
 
 
+def _prepare_census_tract_df():
+    return gpd.read_file(config.DATA_FILES_ROOT + 'tl_2019_53_tract.shp')
+
+
 def get_from_data_source(key):
     if key not in DATA_SOURCE:
         DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
         DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
+        DATA_SOURCE['CENSUS_TRACT'] = _prepare_census_tract_df()
 
     return DATA_SOURCE[key]

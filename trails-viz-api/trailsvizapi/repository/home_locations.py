@@ -54,3 +54,7 @@ def get_project_home_locations(project):
     project_home_locations = project_home_locations.append(international_visits, ignore_index=True, sort=False)
 
     return _treefy_home_locations(project, project_home_locations)
+
+
+def get_census_tract():
+    return get_from_data_source('CENSUS_TRACT')
