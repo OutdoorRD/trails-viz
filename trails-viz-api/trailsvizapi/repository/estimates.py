@@ -1,7 +1,7 @@
 import numpy as np
 
 from trailsvizapi.repository.prepare_data import get_from_data_source
-from trailsvizapi.repository.sites import get_project_sites
+from trailsvizapi.repository.projects_and_sites import get_project_sites
 
 
 def _get_estimates(siteid, period):

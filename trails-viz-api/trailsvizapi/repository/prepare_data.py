@@ -17,8 +17,8 @@ _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
-_CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract'
-
+_CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract/'
+_README_DIR = config.DATA_FILES_ROOT + 'readme/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
@@ -145,7 +145,7 @@ def _prepare_census_tract_df():
     census_tract_df = None
     for item in os.listdir(_CENSUS_TRACT_FILES_DIR):
         if item.endswith('.geojson'):
-            geojson_file = _CENSUS_TRACT_FILES_DIR + '/' + item
+            geojson_file = _CENSUS_TRACT_FILES_DIR + item
             if census_tract_df is None:
                 census_tract_df = gpd.read_file(geojson_file)
             else:
@@ -163,6 +163,19 @@ def _prepare_home_locations_census_tract_df():
     return data
 
 
+def _prepare_project_readme():
+    project_readme_cache = dict()
+    readme_files = os.listdir(_README_DIR)
+    readme_files = list(filter(lambda x: x.endswith('.md'), readme_files))
+    for project in config.PROJECT_GROUPS:
+        project_readme_file = list(filter(lambda x: x.split('.')[0] in project, readme_files))[0]
+        with open(_README_DIR + project_readme_file, 'r') as f:
+            project_readme_cache[project] = f.read()
+
+    assert len(config.PROJECT_GROUPS) == len(project_readme_cache)
+    return project_readme_cache
+
+
 def get_from_data_source(key):
     if key not in DATA_SOURCE:
         DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
@@ -171,5 +184,6 @@ def get_from_data_source(key):
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
         DATA_SOURCE['CENSUS_TRACT'] = _prepare_census_tract_df()
         DATA_SOURCE['HOME_LOCATIONS_CENSUS_TRACT_DF'] = _prepare_home_locations_census_tract_df()
+        DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
 
     return DATA_SOURCE[key]
