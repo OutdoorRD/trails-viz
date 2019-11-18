@@ -186,6 +186,6 @@
 <style scoped>
   @import "~leaflet/dist/leaflet.css";
   .map-div {
-    height: 640px;
+    height: 85vh;
   }
 </style>

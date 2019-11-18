@@ -1,7 +1,8 @@
 <template>
   <b-container fluid id="app">
-    <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap"></top-bar>
-    <b-row no-gutters>
+    <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap" class="top-bar"></top-bar>
+    <landing-page class="landing-page"/>
+    <b-row no-gutters class="app-container" id="explore">
       <b-col sm="6" class="map-col">
         <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents" v-on:compare-activated="sendCompareSites"></map-div>
       </b-col>
@@ -48,6 +49,7 @@ import HomeLocationsMap from "@/components/HomeLocationsMap";
 import axios from "axios";
 import {VIZ_MODES} from "./store/constants";
 import SiteInfo from "./components/SiteInfo";
+import LandingPage from "./components/LandingPage";
 
 export default {
   name: 'app',
@@ -58,6 +60,7 @@ export default {
     }
   },
   components: {
+    LandingPage,
     SiteInfo,
     HomeLocationsMap,
     HomeLocations,
@@ -129,6 +132,19 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding: 0;
+    height: 100vh;
+  }
+
+  .top-bar {
+    height: 60px;
+  }
+
+  .landing-page {
+    height: calc(100vh - 60px);
+  }
+
+  .app-container {
+    height: calc(100vh - 60px);
   }
 
   .map-col {
