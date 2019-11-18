@@ -14,7 +14,10 @@
         <b-row no-gutters v-show="trailName">
           <b-col sm="12">
             <b-tabs content-class="mt-3" nav-item-class="text info" fill>
-              <b-tab title="Bar Graph" active>
+              <b-tab title="Info" active>
+                <site-info ref="site-info"></site-info>
+              </b-tab>
+              <b-tab title="Bar Graph">
                 <bar-graph ref="bar-graph"></bar-graph>
               </b-tab>
               <b-tab title="Time Series">
@@ -44,6 +47,7 @@ import HomeLocationsMap from "@/components/HomeLocationsMap";
 
 import axios from "axios";
 import {VIZ_MODES} from "./store/constants";
+import SiteInfo from "./components/SiteInfo";
 
 export default {
   name: 'app',
@@ -54,6 +58,7 @@ export default {
     }
   },
   components: {
+    SiteInfo,
     HomeLocationsMap,
     HomeLocations,
     TimeSeries,
@@ -85,6 +90,7 @@ export default {
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
       this.$refs['home-locations-map'].renderHomeLocationsMap();
+      this.$refs['site-info'].renderProjectInfo();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
