@@ -23,7 +23,7 @@
               <b-tab title="Home Locations">
                 <home-locations ref="home-locations"></home-locations>
               </b-tab>
-              <b-tab title="Home Locations Map">
+              <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
                 <home-locations-map ref="home-locations-map"></home-locations-map>
               </b-tab>
             </b-tabs>
@@ -84,6 +84,7 @@ export default {
       this.$refs['bar-graph'].renderDefaultGraph();
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
+      this.$refs['home-locations-map'].renderHomeLocationsMap();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
@@ -104,6 +105,13 @@ export default {
       this.$refs['bar-graph'].renderDefaultGraph();
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
+    },
+    activateHomeLocationsMap: function (event) {
+      // The event here is a boolean variable which tell if the
+      // tab was activated (true) or deactivated (false)
+      if (event) {
+        this.$refs['home-locations-map'].activateHomeLocationsMap()
+      }
     }
   }
 }

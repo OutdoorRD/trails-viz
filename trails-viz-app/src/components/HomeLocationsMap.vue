@@ -6,7 +6,7 @@
 
   import L from "leaflet";
   import axios from "axios";
-  import {MAPBOX_CONSTS} from "../store/constants"
+  import {MAPBOX_CONSTS, VIZ_MODES} from "../store/constants"
 
   export default {
     name: "HomeLocationsMap",
@@ -14,7 +14,8 @@
       return {
         mapDiv: '',
         homeLocationsGeoJson: '',
-        visibleLayer: ''
+        visibleLayer: '',
+        activated: false
       }
     },
     methods: {
@@ -44,15 +45,23 @@
       },
       renderHomeLocationsMap: function () {
         let self = this;
-        let siteid = self.$store.getters.getSelectedSite['siteid'];
+        let url;
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          let project = self.$store.getters.getSelectedProject;
+          url = self.$apiEndpoint + '/projects/' + project + '/homeLocationsCensusTract';
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          let siteid = self.$store.getters.getSelectedSite['siteid'];
+          url = self.$apiEndpoint + '/sites/' + siteid + '/homeLocationsCensusTract';
+        }
 
-        axios.get(self.$apiEndpoint + '/sites/' + siteid + '/homeLocationsCensusTract')
+        axios.get(url)
           .then(response => {
             self.homeLocationsGeoJson = response.data;
-            if (!self.mapDiv) {
+            if (self.activated) {
+              self._addLayersToMap();
+            } else {
               self._mountMap();
             }
-            self._addLayersToMap();
           })
 
       },
@@ -77,6 +86,16 @@
           .bindTooltip(layer => layer.feature.properties.visit_days.toString());
         self.visibleLayer.addTo(self.mapDiv);
         self.mapDiv.fitBounds(self.visibleLayer.getBounds(), {maxZoom: 9});
+      },
+      activateHomeLocationsMap: function () {
+        let self = this;
+        if (!self.activated) {
+          self.activated = true;
+          setTimeout(() => {
+            self.mapDiv.invalidateSize();
+            self._addLayersToMap();
+          }, 100)
+        }
       }
     }
   }
