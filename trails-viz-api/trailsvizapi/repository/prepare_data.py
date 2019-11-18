@@ -16,6 +16,8 @@ _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
+_CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract'
+
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
@@ -139,7 +141,17 @@ def _prepare_home_locations_df():
 
 
 def _prepare_census_tract_df():
-    return gpd.read_file(config.DATA_FILES_ROOT + 'tl_2019_53_tract.shp')
+    census_tract_df = None
+    for item in os.listdir(_CENSUS_TRACT_FILES_DIR):
+        if item.endswith('.geojson'):
+            geojson_file = _CENSUS_TRACT_FILES_DIR + '/' + item
+            if census_tract_df is None:
+                census_tract_df = gpd.read_file(geojson_file)
+            else:
+                census_tract_df = census_tract_df.append(gpd.read_file(geojson_file), sort=False)
+
+    assert census_tract_df is not None
+    return census_tract_df
 
 
 def _prepare_home_locations_census_tract_df():
