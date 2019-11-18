@@ -30,16 +30,16 @@ def _get_project_estimates(project, period):
 
     if period == 'monthly':
         project_sites_data = project_sites_data.drop(columns='year').groupby(by=['trail', 'month'], as_index=False).mean()
-        project_sites_data = project_sites_data.drop(columns='trail').groupby(by=['month'], as_index=False).sum()
+        project_sites_data = project_sites_data.drop(columns='trail').groupby(by=['month']).sum()
     elif period == 'annual':
-        project_sites_data = project_sites_data.drop(columns=['trail', 'month']).groupby(by=['year'], as_index=False).sum()
+        project_sites_data = project_sites_data.drop(columns=['trail', 'month']).groupby(by=['year']).sum()
 
     project_sites_data = project_sites_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
                                              'onsite', 'log_onsite', 'data_days']]
 
     project_sites_data['log_estimate'] = np.log(project_sites_data['estimate'] + 1)
     project_sites_data['log_onsite'] = np.log(project_sites_data['onsite'] + 1)
-    project_sites_data.reset_index(inplace=True)
+    project_sites_data.reset_index(drop=False, inplace=True)
     return project_sites_data
 
 
