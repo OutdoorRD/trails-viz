@@ -20,6 +20,7 @@
     },
     methods: {
       _mountMap: function() {
+        let self = this;
         const mapDiv = L.map(this.$refs["mapHomeLocations"], {
           center: [40.53, -99.1],
           zoom: 5
@@ -31,16 +32,30 @@
           accessToken: MAPBOX_CONSTS.TOKEN
         }).addTo(mapDiv);
 
-        this.mapDiv = mapDiv;
+        let legend = L.control({position: 'bottomright'});
+        legend.onAdd = function () {
+          let div = L.DomUtil.create('div', 'info legend');
+          let grades = [1, 5, 10, 20, 50, 75, 100];
+          // loop through our density intervals and generate a label with a colored square for each interval
+          for (let i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+              '<i style="background:' + self._getColors(grades[i] + 1) + '"></i> ' +
+              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+          }
+          return div;
+        };
+        legend.addTo(mapDiv);
+
+        self.mapDiv = mapDiv;
       },
       _getColors: function(d) {
-        return d > 1000 ? '#800026' :
-          d > 500  ? '#BD0026' :
-            d > 200  ? '#E31A1C' :
-              d > 100  ? '#FC4E2A' :
-                d > 50   ? '#FD8D3C' :
-                  d > 20   ? '#FEB24C' :
-                    d > 10   ? '#FED976' :
+        return d > 100 ? '#800026' :
+          d > 75  ? '#BD0026' :
+            d > 50  ? '#E31A1C' :
+              d > 20  ? '#FC4E2A' :
+                d > 10   ? '#FD8D3C' :
+                  d > 5   ? '#FEB24C' :
+                    d > 0   ? '#FED976' :
                       '#FFEDA0';
       },
       renderHomeLocationsMap: function () {
@@ -69,7 +84,7 @@
         let self = this;
         function layerStyle(layer) {
           return {
-            fillColor: self._getColors(layer.properties.visit_days * 50),
+            fillColor: self._getColors(layer.properties.visit_days),
             weight: 0.5,
             opacity: 1,
             color: 'white',
@@ -104,6 +119,7 @@
 
 <style scoped>
   @import "~leaflet/dist/leaflet.css";
+  @import "../assets/styles/home-locations-map.css";
 
   #mapHomeLocations {
     height: 540px;
