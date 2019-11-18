@@ -74,7 +74,7 @@
             self.homeLocationsGeoJson = response.data;
             if (self.activated) {
               self._addLayersToMap();
-            } else {
+            } else if (!self.mapDiv) {
               self._mountMap();
             }
           })
