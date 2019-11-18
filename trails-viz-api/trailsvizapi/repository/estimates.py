@@ -49,3 +49,14 @@ def get_project_monthly_estimates(project):
 
 def get_project_annual_estimates(project):
     return _get_project_estimates(project, 'annual')
+
+
+def get_project_last_year_estimates(project):
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+    df = get_from_data_source('MONTHLY_VISITATION_DF')
+    project_sites_data = df[df['trail'].isin(project_site_ids)]
+    project_sites_data = project_sites_data[project_sites_data['year'] == 2018]
+    project_sites_data = project_sites_data.groupby(by=['trail'], as_index=False).sum()
+    project_sites_data = project_sites_data[['trail', 'estimate']]
+    return project_sites_data
