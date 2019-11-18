@@ -7,6 +7,7 @@ import geopandas as gpd
 
 import trailsvizapi.app_config as config
 
+_PROJECT_FILES_ROOT = config.DATA_FILES_ROOT + 'projects/'
 _ALLSITES_POLYGONS_FILE = 'allsites.geojson'
 _ALLSITES_LINES_FILE = 'allsites_lines.geojson'
 _ALLSITES_ACCESS_POINTS_FILE = 'allsites_access_points.geojson'
@@ -27,23 +28,23 @@ def _prepare_geo_dfs():
     polygons = None
     lines = None
     access_points = None
-    for item in os.listdir(config.DATA_FILES_ROOT):
-        if Path(config.DATA_FILES_ROOT + item).is_dir():
-            polygons_file = config.DATA_FILES_ROOT + item + '/' + _ALLSITES_POLYGONS_FILE
+    for item in os.listdir(_PROJECT_FILES_ROOT):
+        if Path(_PROJECT_FILES_ROOT + item).is_dir():
+            polygons_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_POLYGONS_FILE
             if Path(polygons_file).exists():
                 if polygons is not None:
                     polygons = polygons.append(gpd.read_file(polygons_file), sort=False)
                 else:
                     polygons = gpd.read_file(polygons_file)
 
-            lines_file = config.DATA_FILES_ROOT + item + '/' + _ALLSITES_LINES_FILE
+            lines_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_LINES_FILE
             if Path(lines_file).exists():
                 if lines is not None:
                     lines = lines.append(gpd.read_file(lines_file), sort=False)
                 else:
                     lines = gpd.read_file(lines_file)
 
-            access_points_file = config.DATA_FILES_ROOT + item + '/' + _ALLSITES_ACCESS_POINTS_FILE
+            access_points_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_ACCESS_POINTS_FILE
             if Path(access_points_file).exists():
                 if access_points is not None:
                     access_points = access_points.append(gpd.read_file(access_points_file), sort=False)
@@ -88,16 +89,16 @@ def _prepare_estimates_and_visitation_df(period):
     estimates_file = _MONTHLY_ESTIMATES_FILE if period == 'monthly' else _WEEKLY_ESTIMATES_FILE
     onsite_file = _MONTHLY_ONSITE_FILE if period == 'monthly' else _WEEKLY_ONSITE_FILE
 
-    for item in os.listdir(config.DATA_FILES_ROOT):
-        if Path(config.DATA_FILES_ROOT + item).is_dir():
-            project_estimates_file = config.DATA_FILES_ROOT + item + '/' + estimates_file
+    for item in os.listdir(_PROJECT_FILES_ROOT):
+        if Path(_PROJECT_FILES_ROOT + item).is_dir():
+            project_estimates_file = _PROJECT_FILES_ROOT + item + '/' + estimates_file
             if Path(project_estimates_file).exists():
                 if estimates_df is not None:
                     estimates_df = estimates_df.append(pd.read_csv(project_estimates_file), sort=False)
                 else:
                     estimates_df = pd.read_csv(project_estimates_file)
 
-            project_onsite_file = config.DATA_FILES_ROOT + item + '/' + onsite_file
+            project_onsite_file = _PROJECT_FILES_ROOT + item + '/' + onsite_file
             if Path(project_onsite_file).exists():
                 if estimates_onsite is not None:
                     estimates_onsite = estimates_onsite.append(pd.read_csv(project_onsite_file), sort=False)
@@ -127,9 +128,9 @@ def _prepare_weekly_df():
 
 def _prepare_home_locations_df():
     home_locations = None
-    for item in os.listdir(config.DATA_FILES_ROOT):
-        if Path(config.DATA_FILES_ROOT + item).is_dir():
-            home_locations_file = config.DATA_FILES_ROOT + item + '/' + _ALLSITES_HOME_LOCATIONS_FILE
+    for item in os.listdir(_PROJECT_FILES_ROOT):
+        if Path(_PROJECT_FILES_ROOT + item).is_dir():
+            home_locations_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_HOME_LOCATIONS_FILE
             if Path(home_locations_file).exists():
                 if home_locations is not None:
                     home_locations = home_locations.append(pd.read_csv(home_locations_file), sort=False)
