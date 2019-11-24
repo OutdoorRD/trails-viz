@@ -1,6 +1,6 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info" sticky>
-    <b-navbar-brand>SocialTrails</b-navbar-brand>
+    <b-navbar-brand href="javascript:void()" v-on:click="moveToTop">SocialTrails</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -9,7 +9,7 @@
         <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-form v-on:submit="doNothing">
+        <b-nav-form v-on:submit="doNothing" v-show="this.$store.getters.getSelectedProject">
           <b-form-input class="form-input" size="sm" list="project-list" placeholder="Search Project" v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
           <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
 
@@ -71,6 +71,9 @@
       },
       doNothing: function(event) {
         event.preventDefault()
+      },
+      moveToTop: function () {
+        document.getElementById("landing-page").scrollIntoView({behavior: "smooth", block: "end"})
       }
     }
   }

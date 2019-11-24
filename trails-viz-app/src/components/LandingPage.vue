@@ -18,11 +18,14 @@
       <a href="https://www.outdoorrd.org/people/" target="_blank">Outdoor R&D team</a>.
     </p>
 
-    <h3>To get started, simply start typing the project name in the search bar.</h3>
-    <p>
-      Currently supported project names are <i>MBS_PIL</i>, <i>MBS_SARL</i>, and <i>DOI</i>.
-      <br/>
-      <a href="#explore">Explore</a>
+    <p class="form-para">
+      <b-form-input list="landing-project-list" placeholder="To get started start typing the project name"
+                    v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
+
+      <b-form-datalist id="landing-project-list" :options="filteredProjects"></b-form-datalist>
+    </p>
+    <p class="form-para">
+      <small>*Currently supported projects are <i>MBS_PIL</i>, <i>MBS_SARL</i>, and <i>DOI</i></small>.
     </p>
 
   </div>
@@ -30,7 +33,38 @@
 
 <script>
   export default {
-    name: "LandingPage"
+    name: "LandingPage",
+    data: function() {
+      return {
+        projectSearchText: '',
+        filteredProjects: []
+      }
+    },
+    methods: {
+      scrollToMap: function () {
+        document.getElementById("explore").scrollIntoView({behavior: "smooth"});
+      },
+      autoCompleteProject: function () {
+        let store = this.$store;
+        if (store.getters.getAllProjects.includes(this.projectSearchText.toUpperCase())) {
+          // don't show suggestions when a valid project is selected
+          return
+        }
+        if (this.projectSearchText.length >= 1) {
+          this.filteredProjects = store.getters.getAllProjects.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
+        } else {
+          this.filteredProjects = []
+        }
+      },
+      emitProjectNameEvent: function () {
+        if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
+          this.$store.dispatch('clearSelectedProjectData');
+          this.$store.dispatch('setSelectedProject', this.projectSearchText.toUpperCase());
+          this.$emit('project-selected');
+          document.getElementById('visualization-zone').scrollIntoView({behavior: "smooth"})
+        }
+      }
+    }
   }
 </script>
 
@@ -60,6 +94,10 @@
 
   a {
    color: #2f93a1;
+  }
+
+  .form-para {
+    margin: 0 200px 0 200px;
   }
 
 </style>

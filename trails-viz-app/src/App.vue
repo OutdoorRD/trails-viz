@@ -1,8 +1,8 @@
 <template>
   <b-container fluid id="app">
     <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap" class="top-bar"></top-bar>
-    <landing-page class="landing-page"/>
-    <b-row no-gutters class="app-container" id="explore">
+    <landing-page id="landing-page" class="landing-page" v-on:project-selected="sendProjectSelectedEventToMap"/>
+    <b-row no-gutters class="app-container" id="visualization-zone">
       <b-col sm="6" class="map-col">
         <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents" v-on:compare-activated="sendCompareSites"></map-div>
       </b-col>
