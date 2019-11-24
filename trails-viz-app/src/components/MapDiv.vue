@@ -11,6 +11,7 @@
   import L from "leaflet";
   import axios from "axios";
   import {MAPBOX_CONSTS} from "../store/constants";
+  import {MARKER} from "../store/vectors";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -26,6 +27,11 @@
   L.Icon.Default.prototype.options.iconAnchor = [6, 20];
   L.Icon.Default.prototype.options.iconSize = [13, 20];
   L.Icon.Default.prototype.options.shadowSize = [20, 20];
+
+  // Update icon URL to use the SVG
+  let IconSuper = L.Icon.extend({
+    options: L.Icon.Default.prototype.options
+  });
 
   const defaultStyle = {
     color: "#ff0000",
@@ -53,7 +59,8 @@
       return {
         dismissSecs: 5,
         dismissCountDown: 0,
-        visibleLayers : []
+        visibleLayers : [],
+        lastYearEstimates: undefined
       }
     },
     mounted() {
@@ -89,6 +96,36 @@
       this.mapDiv = mapDiv
     },
     methods: {
+      _pointToMarker: function(feature, latlng) {
+        let self = this;
+        let siteid = feature['properties']['siteid'];
+        let estimate = self.lastYearEstimates[siteid];
+
+        let getColor = function (value) {
+          if (value > 50000) {
+            return '#253494';
+          }
+          if (value > 10000) {
+            return '#2c7fb8';
+          }
+          if (value > 5000) {
+            return '#41b6c4';
+          }
+          if (value > 1000) {
+            return '#7fcdbb';
+          }
+          if (value > 500) {
+            return '#c7e9b4';
+          }
+          if (value >= 0) {
+            return '#ffffcc';
+          }
+        };
+
+        let iconUrl = 'data:image/svg+xml;base64,' + btoa(MARKER.replace('{fillMe}', getColor(estimate)));
+        let icon = new IconSuper({iconUrl: iconUrl});
+        return L.marker(latlng, {icon: icon});
+      },
       renderProjectSites: function () {
         let self = this;
         let projectSites = {};
@@ -96,11 +133,17 @@
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
-        axios
-          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + self.$store.getters.getSelectedProject)
-          .then(response => {
+        axios.all([
+          axios.get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + self.$store.getters.getSelectedProject),
+          axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProject + '/lastYearEstimates')
+          ]).then(axios.spread((geoJsonRes, estimatesRes) => {
+            let allSitesGeoJson = geoJsonRes.data;
+            let lastYearEstimates = {};
             let siteGroupsGeoJson = {};
-            let allSitesGeoJson = response.data;
+
+            estimatesRes.data.forEach(x => lastYearEstimates[x.trail] = x.estimate);
+            self.lastYearEstimates = lastYearEstimates;
+
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
 
             for (let feature of allSitesGeoJson["features"]) {
@@ -115,7 +158,7 @@
             }
 
             Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-              let siteLayer = L.geoJSON(site, {style: defaultStyle})
+              let siteLayer = L.geoJSON(site, {style: defaultStyle, pointToLayer: self._pointToMarker})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
                   if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
@@ -156,7 +199,7 @@
               siteLayer.addTo(this.mapDiv);
             });
             self.$store.dispatch('setProjectSites', projectSites);
-        })
+        }))
       },
       selectSite: function (trailName) {
         let self = this;
