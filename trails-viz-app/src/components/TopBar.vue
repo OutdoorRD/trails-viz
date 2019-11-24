@@ -51,6 +51,7 @@
         if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
           this.$store.dispatch('clearSelectedProjectData');
           this.$store.dispatch('setSelectedProject', this.projectSearchText.toUpperCase());
+          this.projectSearchText = '';
           this.$emit('project-selected');
         }
       },
@@ -68,6 +69,7 @@
       },
       emitSiteNameEvent: function() {
         this.$emit('site-selected', this.siteSearchText);
+        this.siteSearchText = '';
       },
       doNothing: function(event) {
         event.preventDefault()

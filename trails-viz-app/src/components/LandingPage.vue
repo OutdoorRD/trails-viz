@@ -61,6 +61,7 @@
           this.$store.dispatch('clearSelectedProjectData');
           this.$store.dispatch('setSelectedProject', this.projectSearchText.toUpperCase());
           this.$emit('project-selected');
+          this.projectSearchText = '';
           document.getElementById('visualization-zone').scrollIntoView({behavior: "smooth"})
         }
       }
