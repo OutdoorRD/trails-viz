@@ -30,6 +30,9 @@
               <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
                 <home-locations-map ref="home-locations-map"></home-locations-map>
               </b-tab>
+              <b-tab title="Demographics">
+                <demographics-summary ref="demographics-summary"></demographics-summary>
+              </b-tab>
             </b-tabs>
           </b-col>
         </b-row>
@@ -45,11 +48,12 @@ import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
 import HomeLocations from "@/components/HomeLocations";
 import HomeLocationsMap from "@/components/HomeLocationsMap";
+import SiteInfo from "./components/SiteInfo";
+import LandingPage from "./components/LandingPage";
+import DemographicsSummary from "./components/DemographicsSummary";
 
 import axios from "axios";
 import {VIZ_MODES} from "./store/constants";
-import SiteInfo from "./components/SiteInfo";
-import LandingPage from "./components/LandingPage";
 
 export default {
   name: 'app',
@@ -60,6 +64,7 @@ export default {
     }
   },
   components: {
+    DemographicsSummary,
     LandingPage,
     SiteInfo,
     HomeLocationsMap,
@@ -94,6 +99,7 @@ export default {
       this.$refs['home-locations'].renderTreeMap();
       this.$refs['home-locations-map'].renderHomeLocationsMap();
       this.$refs['site-info'].renderProjectInfo();
+      this.$refs['demographics-summary'].renderDemographicsSummary();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
@@ -107,6 +113,7 @@ export default {
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
       this.$refs['home-locations-map'].renderHomeLocationsMap();
+      this.$refs['demographics-summary'].renderDemographicsSummary();
     },
     sendCompareSites: function () {
       this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
