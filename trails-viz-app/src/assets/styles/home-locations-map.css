@@ -9,3 +9,9 @@
     margin-right: 8px;
     opacity: 0.7;
 }
+
+.home-location-tooltip {
+    opacity: 0.9;
+    margin: 0 auto;
+    padding: 0;
+}

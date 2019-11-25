@@ -93,12 +93,23 @@
           };
         }
 
+        function getTooltipHtml(layer) {
+          let props = layer.feature.properties;
+          return '<table class="home-location-tooltip">' +
+            '<tr><td> Visit Days</td><td>' + props.visit_days + '</td></tr>' +
+            '<tr><td> Total Population</td><td>' + props.population + '</td></tr>' +
+            '<tr><td> Median Income</td><td>' + props.median_income + '</td></tr>' +
+            '<tr><td> Percent Minority</td><td>' + props.minority_percentage + '</td></tr>' +
+            '<tr><td> Social Vulnerability Index</td><td>' + parseFloat(Math.round(props.svi * 100)/ 100).toFixed(2) + '</td></tr>' +
+            '</table>';
+        }
+
         if (self.visibleLayer) {
           self.mapDiv.removeLayer(self.visibleLayer);
         }
 
         self.visibleLayer = L.geoJSON(self.homeLocationsGeoJson, {style: layerStyle})
-          .bindTooltip(layer => layer.feature.properties.visit_days.toString());
+          .bindTooltip(layer => getTooltipHtml(layer));
         self.visibleLayer.addTo(self.mapDiv);
         self.mapDiv.fitBounds(self.visibleLayer.getBounds(), {maxZoom: 9});
       },
