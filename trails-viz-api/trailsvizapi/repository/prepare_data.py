@@ -181,7 +181,8 @@ def _prepare_home_locations_census_tract_df():
         'FIPS': 'tract',
         'E_TOTPOP': 'population',
         'EP_PCI': 'median_income',
-        'EP_MINRTY': 'minority_percentage'
+        'EP_MINRTY': 'minority_percentage',
+        'RPL_THEMES': 'svi'
     }
     svi_df = svi_df[list(renamed_columns.keys())]
     svi_df.rename(columns=renamed_columns, inplace=True)
