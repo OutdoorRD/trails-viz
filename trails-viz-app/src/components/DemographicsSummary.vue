@@ -10,7 +10,9 @@
         </b-list-group>
       </b-col>
     </b-row>
+    <b-row no-gutters><h5>Median Income</h5></b-row>
     <b-row no-gutters id="income-chart"></b-row>
+    <b-row no-gutters><h5>Social Vulnerability Index</h5></b-row>
     <b-row no-gutters id="svi-chart"></b-row>
   </div>
 </template>
