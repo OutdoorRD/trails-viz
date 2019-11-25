@@ -1,3 +1,5 @@
+import pandas as pd
+
 from trailsvizapi.repository.prepare_data import get_from_data_source
 from trailsvizapi.repository.projects_and_sites import get_project_sites
 
@@ -89,4 +91,16 @@ def get_project_home_locations_by_census_tract(project):
 
     census_tract = get_from_data_source('CENSUS_TRACT')
     project_home_census_data = census_tract.merge(project_home_locations, on='tract', how='inner')
+    return project_home_census_data
+
+
+def get_demographic_summary(siteid):
+    site_home_census_data = get_home_locations_by_census_tract(siteid)
+    site_home_census_data = pd.DataFrame(site_home_census_data.drop('geometry', axis=1))
+    return site_home_census_data
+
+
+def get_project_demographic_summary(project):
+    project_home_census_data = get_project_home_locations_by_census_tract(project)
+    project_home_census_data = pd.DataFrame(project_home_census_data.drop('geometry', axis=1))
     return project_home_census_data

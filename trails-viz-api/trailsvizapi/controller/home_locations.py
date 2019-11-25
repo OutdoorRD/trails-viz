@@ -32,3 +32,15 @@ def get_home_locations_census_tract(siteid):
 def get_project_home_locations_census_tract(project):
     data = home_locations.get_project_home_locations_by_census_tract(project)
     return Response(data.to_json(), mimetype='application/json')
+
+
+@app.route('/api/sites/<int:siteid>/homeLocationsDemographics')
+def get_home_locations_demographics(siteid):
+    data = home_locations.get_demographic_summary(siteid)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
+
+
+@app.route('/api/projects/<string:project>/homeLocationsDemographics')
+def get_project_home_locations_demographics(project):
+    data = home_locations.get_project_demographic_summary(project)
+    return Response(data.to_json(orient='records'), mimetype='application/json')
