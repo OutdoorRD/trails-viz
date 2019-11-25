@@ -16,22 +16,36 @@
           <b-col sm="12">
             <b-tabs content-class="mt-3" nav-item-class="text info" fill>
               <b-tab title="Info" active>
-                <site-info ref="site-info"></site-info>
+                <info-viewer ref="project-info"></info-viewer>
               </b-tab>
-              <b-tab title="Bar Graph">
-                <bar-graph ref="bar-graph"></bar-graph>
-              </b-tab>
-              <b-tab title="Time Series">
-                <time-series ref="time-series"></time-series>
+              <b-tab title="Visitation">
+                <b-tabs content-class="mt-3" nav-item-class="text info" fill>
+                  <b-tab title="Info" active>
+                    <info-viewer ref="visitation-info"></info-viewer>
+                  </b-tab>
+                  <b-tab title="Bar Graph">
+                    <bar-graph ref="bar-graph"></bar-graph>
+                  </b-tab>
+                  <b-tab title="Time Series">
+                    <time-series ref="time-series"></time-series>
+                  </b-tab>
+                </b-tabs>
               </b-tab>
               <b-tab title="Home Locations">
-                <home-locations ref="home-locations"></home-locations>
-              </b-tab>
-              <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
-                <home-locations-map ref="home-locations-map"></home-locations-map>
-              </b-tab>
-              <b-tab title="Demographics">
-                <demographics-summary ref="demographics-summary"></demographics-summary>
+                <b-tabs content-class="mt-3" nav-item-class="text info" fill>
+                  <b-tab title="Info" active>
+                    <info-viewer ref="home-locations-info"></info-viewer>
+                  </b-tab>
+                  <b-tab title="Tree Map">
+                    <home-locations ref="home-locations"></home-locations>
+                  </b-tab>
+                  <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
+                    <home-locations-map ref="home-locations-map"></home-locations-map>
+                  </b-tab>
+                  <b-tab title="Demographics">
+                    <demographics-summary ref="demographics-summary"></demographics-summary>
+                  </b-tab>
+                </b-tabs>
               </b-tab>
             </b-tabs>
           </b-col>
@@ -48,7 +62,7 @@ import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
 import HomeLocations from "@/components/HomeLocations";
 import HomeLocationsMap from "@/components/HomeLocationsMap";
-import SiteInfo from "./components/SiteInfo";
+import InfoViewer from "@/components/InfoViewer";
 import LandingPage from "./components/LandingPage";
 import DemographicsSummary from "./components/DemographicsSummary";
 
@@ -64,9 +78,9 @@ export default {
     }
   },
   components: {
+    InfoViewer,
     DemographicsSummary,
     LandingPage,
-    SiteInfo,
     HomeLocationsMap,
     HomeLocations,
     TimeSeries,
@@ -98,7 +112,9 @@ export default {
       this.$refs['time-series'].renderTimeSeries();
       this.$refs['home-locations'].renderTreeMap();
       this.$refs['home-locations-map'].renderHomeLocationsMap();
-      this.$refs['site-info'].renderProjectInfo();
+      this.$refs['project-info'].renderInfo('project');
+      this.$refs['visitation-info'].renderInfo('visitation');
+      this.$refs['home-locations-info'].renderInfo('homeLocations');
       this.$refs['demographics-summary'].renderDemographicsSummary();
     },
     sendSiteSelectedEventToMap: function(trailName) {
