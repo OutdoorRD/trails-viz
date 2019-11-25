@@ -19,6 +19,7 @@ _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
 _CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract/'
 _README_DIR = config.DATA_FILES_ROOT + 'readme/'
+_SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
@@ -152,6 +153,10 @@ def _prepare_census_tract_df():
                 census_tract_df = census_tract_df.append(gpd.read_file(geojson_file), sort=False)
 
     assert census_tract_df is not None
+
+    # keep only required columns
+    census_tract_df = census_tract_df[['GEOID', 'geometry']]
+    census_tract_df.rename(columns={'GEOID': 'tract'}, inplace=True)
     return census_tract_df
 
 
@@ -160,6 +165,32 @@ def _prepare_home_locations_census_tract_df():
     data = data.dropna(subset=['tract'])
     data['tract'] = data['tract'].astype(np.int64)
     data['tract'] = data['tract'].astype(str)
+
+    # read the SVI data and merge to it
+    svi_df = None
+    for item in os.listdir(_SVI_DIR):
+        if item.endswith('.csv'):
+            file = _SVI_DIR + item
+            if svi_df is None:
+                svi_df = pd.read_csv(file)
+            else:
+                svi_df = svi_df.append(pd.read_csv(file), sort=False)
+
+    # extract only required columns
+    renamed_columns = {
+        'FIPS': 'tract',
+        'E_TOTPOP': 'population',
+        'EP_PCI': 'median_income',
+        'EP_MINRTY': 'minority_percentage'
+    }
+    svi_df = svi_df[list(renamed_columns.keys())]
+    svi_df.rename(columns=renamed_columns, inplace=True)
+    svi_df['tract'] = svi_df['tract'].astype(str)
+
+    assert svi_df is not None
+
+    data = data.merge(svi_df, how='left', on='tract')
+
     return data
 
 

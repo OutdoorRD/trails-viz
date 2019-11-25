@@ -64,7 +64,7 @@ def get_home_locations_by_census_tract(siteid):
     home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
     census_tract = get_from_data_source('CENSUS_TRACT')
     site_home_locations = home_locations[home_locations['siteid'] == siteid]
-    site_home_census_data = census_tract.merge(site_home_locations, left_on='GEOID', right_on='tract', how='inner')
+    site_home_census_data = census_tract.merge(site_home_locations, on='tract', how='inner')
     return site_home_census_data
 
 
@@ -75,6 +75,18 @@ def get_project_home_locations_by_census_tract(project):
 
     project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
 
+    # for each tract, we need to sum visit days and visitors_unq
+    sum_visits = project_home_locations.groupby(by=['tract'], as_index=False)['visit_days', 'visitors_unq'].sum()
+
+    # income, population, minority percentage are same across all rows so we can just drop duplicates
+    project_home_locations = project_home_locations.drop(['siteid', 'visit_days', 'visitors_unq'], axis=1)
+    project_home_locations = project_home_locations.drop_duplicates()
+
+    assert sum_visits.shape[0] == project_home_locations.shape[0]
+
+    # now we can merge the two and find the project level data
+    project_home_locations = project_home_locations.merge(sum_visits, how='inner', on='tract')
+
     census_tract = get_from_data_source('CENSUS_TRACT')
-    project_home_census_data = census_tract.merge(project_home_locations, left_on='GEOID', right_on='tract', how='inner')
+    project_home_census_data = census_tract.merge(project_home_locations, on='tract', how='inner')
     return project_home_census_data
