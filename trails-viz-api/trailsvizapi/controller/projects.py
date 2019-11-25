@@ -20,3 +20,10 @@ def get_geojson_data():
 def get_project_readme(project):
     data = projects_and_sites.get_project_readme(project)
     return Response(data, mimetype='text/markdown')
+
+
+@app.route('/api/readme')
+def get_readme():
+    readme_type = request.args.get('type')
+    data = projects_and_sites.get_project_readme(readme_type)
+    return Response(data, mimetype='text/markdown')

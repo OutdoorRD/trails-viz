@@ -201,10 +201,16 @@ def _prepare_project_readme():
     readme_files = list(filter(lambda x: x.endswith('.md'), readme_files))
     for project in config.PROJECT_GROUPS:
         project_readme_file = list(filter(lambda x: x.split('.')[0] in project, readme_files))[0]
-        with open(_README_DIR + project_readme_file, 'r') as f:
+        with open(_README_DIR + project_readme_file, 'r', encoding='utf-8') as f:
             project_readme_cache[project] = f.read()
 
-    assert len(config.PROJECT_GROUPS) == len(project_readme_cache)
+    # read the two generic readme files - home locations info and visitation info
+    with open(_README_DIR + 'visitation_info.md', 'r', encoding='utf-8') as f:
+        project_readme_cache['VISITATION_INFO'] = f.read()
+
+    with open(_README_DIR + 'homelocations_info.md', 'r', encoding='utf-8') as f:
+        project_readme_cache['HOMELOCATIONS_INFO'] = f.read()
+
     return project_readme_cache
 
 
