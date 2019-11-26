@@ -101,7 +101,7 @@
         self.weightedSVI = self._nDecimalPlaces(svi / totalVisitDays, 3);
       },
       _makeHistogram: function (y, htmlElemId, decimalPlaces, title) {
-        let nBins = 20;
+        let nBins = 5;
         y = y.sort((a, b) => a === b ? 0 : a < b ? -1: 1);
         let n = y.length;
 
@@ -142,7 +142,6 @@
               type: 'category',
               categories: bins,
               tick: {
-                rotate: 60,
                 multiline: false
               },
               height: 40
