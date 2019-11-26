@@ -10,7 +10,8 @@
 <script>
   import L from "leaflet";
   import axios from "axios";
-  import {store} from "../store";
+  import {MAPBOX_CONSTS} from "../store/constants";
+  import {MARKER} from "../store/vectors";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -27,11 +28,10 @@
   L.Icon.Default.prototype.options.iconSize = [13, 20];
   L.Icon.Default.prototype.options.shadowSize = [20, 20];
 
-  const MAPBOX_TOKEN = "pk.eyJ1Ijoid29vZHNwIiwiYSI6ImNrMjEwY3oycTFlcnEzbXFvbzR4bmNqNjgifQ.pM7-As9W2Ce9xXMv3W-NNg";
-  const MAPBOX_TILES_API = "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}";
-  const MAPBOX_ATTRIBUTION = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
-    '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-    '<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>';
+  // Update icon URL to use the SVG
+  let IconSuper = L.Icon.extend({
+    options: L.Icon.Default.prototype.options
+  });
 
   const defaultStyle = {
     color: "#ff0000",
@@ -59,7 +59,8 @@
       return {
         dismissSecs: 5,
         dismissCountDown: 0,
-        visibleLayers : []
+        visibleLayers : [],
+        lastYearEstimates: undefined
       }
     },
     mounted() {
@@ -68,25 +69,25 @@
         zoom: 5
       });
 
-      const outdoorLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const outdoorLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.outdoors",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
-      const streetsLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const streetsLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.streets",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
-      const satelliteLayer = L.tileLayer(MAPBOX_TILES_API, {
-        attribution: MAPBOX_ATTRIBUTION,
+      const satelliteLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+        attribution: MAPBOX_CONSTS.ATTRIBUTION,
         maxZoom: 18,
         id: "mapbox.satellite",
-        accessToken: MAPBOX_TOKEN
+        accessToken: MAPBOX_CONSTS.TOKEN
       });
 
       L.control.layers({"outdoor": outdoorLayer, "streets": streetsLayer, "satellite": satelliteLayer}).addTo(mapDiv);
@@ -95,6 +96,36 @@
       this.mapDiv = mapDiv
     },
     methods: {
+      _pointToMarker: function(feature, latlng) {
+        let self = this;
+        let siteid = feature['properties']['siteid'];
+        let estimate = self.lastYearEstimates[siteid];
+
+        let getColor = function (value) {
+          if (value > 50000) {
+            return '#253494';
+          }
+          if (value > 10000) {
+            return '#2c7fb8';
+          }
+          if (value > 5000) {
+            return '#41b6c4';
+          }
+          if (value > 1000) {
+            return '#7fcdbb';
+          }
+          if (value > 500) {
+            return '#c7e9b4';
+          }
+          if (value >= 0) {
+            return '#ffffcc';
+          }
+        };
+
+        let iconUrl = 'data:image/svg+xml;base64,' + btoa(MARKER.replace('{fillMe}', getColor(estimate)));
+        let icon = new IconSuper({iconUrl: iconUrl});
+        return L.marker(latlng, {icon: icon});
+      },
       renderProjectSites: function () {
         let self = this;
         let projectSites = {};
@@ -102,11 +133,17 @@
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
-        axios
-          .get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + store.selectedProject)
-          .then(response => {
+        axios.all([
+          axios.get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + self.$store.getters.getSelectedProject),
+          axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProject + '/lastYearEstimates')
+          ]).then(axios.spread((geoJsonRes, estimatesRes) => {
+            let allSitesGeoJson = geoJsonRes.data;
+            let lastYearEstimates = {};
             let siteGroupsGeoJson = {};
-            let allSitesGeoJson = response.data;
+
+            estimatesRes.data.forEach(x => lastYearEstimates[x.trail] = x.estimate);
+            self.lastYearEstimates = lastYearEstimates;
+
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
 
             for (let feature of allSitesGeoJson["features"]) {
@@ -121,17 +158,17 @@
             }
 
             Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-              let siteLayer = L.geoJSON(site, {style: defaultStyle})
+              let siteLayer = L.geoJSON(site, {style: defaultStyle, pointToLayer: self._pointToMarker})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
-                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                  if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
                     // do nothing
                   } else {
                     event.target.setStyle(hoverStyle);
                   }
                 })
                 .on('mouseout', function (event) {
-                  if (event.target === store.selectedSite || event.target === store.comparingSite) {
+                  if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
                     // don't change the style
                   } else {
                     event.target.setStyle(defaultStyle);
@@ -139,13 +176,13 @@
                 })
                 .on('click', function (event) {
                   if (event.originalEvent.ctrlKey) {
-                    if (store.comparingSite && store.selectedSite) {
+                    if (self.$store.getters.getComparingSite && self.$store.getters.getSelectedSite) {
                       self.showAlert();
                     }
-                    else if(store.selectedSite) {
-                      store.setComparingSite(event.target);
-                      store.selectedSite.setStyle(compareStyle);
-                      store.comparingSite.setStyle(compareStyle);
+                    else if(self.$store.getters.getSelectedSite) {
+                      self.$store.dispatch('setComparingSite', event.target);
+                      self.$store.getters.getSelectedSite.setStyle(compareStyle);
+                      self.$store.getters.getComparingSite.setStyle(compareStyle);
                       self.$emit('compare-activated');
                     }
                   } else {
@@ -161,20 +198,21 @@
               projectSites[siteLayer.trailName] = siteLayer;
               siteLayer.addTo(this.mapDiv);
             });
-            store.setProjectSites(projectSites);
-        })
+            self.$store.dispatch('setProjectSites', projectSites);
+        }))
       },
       selectSite: function (trailName) {
-        if (store.comparingSite) {
-          store.comparingSite.setStyle(defaultStyle);
-          store.setComparingSite('');
+        let self = this;
+        if (self.$store.getters.getComparingSite) {
+          self.$store.getters.getComparingSite.setStyle(defaultStyle);
+          self.$store.dispatch('setComparingSite', '');
         }
-        if (store.selectedSite) {
-          store.selectedSite.setStyle(defaultStyle);
+        if (self.$store.getters.getSelectedSite) {
+          self.$store.getters.getSelectedSite.setStyle(defaultStyle);
         }
-        let site = store.projectSites[trailName];
+        let site = self.$store.getters.getProjectSites[trailName];
         site.setStyle(selectedStyle);
-        store.setSelectedSite(site);
+        self.$store.dispatch('setSelectedSite', site);
         this.$emit('site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
       },
@@ -191,6 +229,6 @@
 <style scoped>
   @import "~leaflet/dist/leaflet.css";
   .map-div {
-    height: 640px;
+    height: 85vh;
   }
 </style>

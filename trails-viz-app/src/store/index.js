@@ -1,93 +1,111 @@
-export const constants = {
-  COLORS: {
-    MODELLED: '#1c3dc8',
-    FLICKR: '#d8021f',
-    INSTA: '#9620e5',
-    TWITTER: '#2b7782',
-    WTA: '#0ab652',
-    ON_SITE: '#640b00',
-    COMPARE_MODELLED: '#fb9205',
-    COMPARE_FLICKR: '#c9c9c4',
-    COMPARE_INSTA: '#f90dc3',
-    COMPARE_TWITTER: '#12fbf2',
-    COMPARE_WTA: '#ff0000',
-    COMPARE_ON_SITE: '#ff6400',
-  }
-};
+import Vue from 'vue'
+import Vuex from 'vuex'
 
-export const store = {
+Vue.use(Vuex);
+
+const state = {
   allProjects: [],
   selectedProject: '',
   projectSites: {},
   selectedSite: '',
-
-  annualEstimates: [],
-  monthlyEstimates: [],
-
-  monthlyVisitation: [],
-  weeklyVisitation: [],
-
+  vizMode: '',
+  censusTract: '',
   comparingSite: '',
-  comparingSiteAnnualEstimates: [],
-  comparingSiteMonthlyEstimates: [],
-  comparingSiteMonthlyVisitation: [],
-  comparingSiteWeeklyVisitation: [],
+};
 
-  homeLocations: [],
+const mutations = {
+  setAllProjects(state, allProjects) {
+    state.allProjects = allProjects;
+  },
+  setSelectedProject(state, project) {
+    state.selectedProject = project
+  },
+  setProjectSites(state, projectSites) {
+    state.projectSites = projectSites
+  },
+  setSelectedSite(state, site) {
+    state.selectedSite = site
+  },
+  setVizMode(state, vizMode) {
+    state.vizMode = vizMode
+  },
+  setCensusTract(state, censusTract) {
+    state.censusTract = censusTract
+  },
+  setComparingSite(state, comparingSite) {
+    state.comparingSite = comparingSite;
+  },
+  clearSelectedProjectData(state) {
+    state.selectedProject = '';
+    state.projectSites = {};
+    state.selectedSite = '';
 
-  setAllProjects(allProjects) {
-    this.allProjects = allProjects;
-  },
-  setSelectedProject(project) {
-    this.selectedProject = project
-  },
-  setProjectSites(projectSites) {
-    this.projectSites = projectSites
-  },
-  setSelectedSite(site) {
-    this.selectedSite = site
-  },
-  setAnnualEstimates(annualEstimates) {
-    this.annualEstimates = annualEstimates;
-  },
-  setMonthlyEstimates(monthlyEstimates) {
-    this.monthlyEstimates = monthlyEstimates;
-  },
-  setMonthlyVisitation(monthlyVisitation) {
-    this.monthlyVisitation = monthlyVisitation;
-  },
-  setWeeklyVisitation(weeklyVisitation) {
-    this.weeklyVisitation = weeklyVisitation;
-  },
-  setComparingSite(comparingSite) {
-    this.comparingSite = comparingSite;
-  },
-  setComparingSiteAnnualEstimates(comparingSiteAnnualEstimates) {
-    this.comparingSiteAnnualEstimates = comparingSiteAnnualEstimates;
-  },
-  setComparingSiteMonthlyEstimates(comparingSiteMonthlyEstimates) {
-    this.comparingSiteMonthlyEstimates = comparingSiteMonthlyEstimates;
-  },
-  setComparingSiteMonthlyVisitation(comparingSiteMonthlyVisitation) {
-    this.comparingSiteMonthlyVisitation = comparingSiteMonthlyVisitation;
-  },
-  setComparingSiteWeeklyVisitation(comparingSiteWeeklyVisitation) {
-    this.comparingSiteWeeklyVisitation = comparingSiteWeeklyVisitation;
-  },
-  setHomeLocations(homeLocations) {
-    this.homeLocations = homeLocations;
-  },
-  clearSelectedProjectData() {
-    this.selectedProject = '';
-    this.projectSites = {};
-    this.selectedSite = '';
+    state.annualEstimates = [];
+    state.monthlyEstimates = [];
 
-    this.annualEstimates = [];
-    this.monthlyEstimates = [];
+    state.monthlyVisitation = [];
+    state.weeklyVisitation = [];
 
-    this.monthlyVisitation = [];
-    this.weeklyVisitation = [];
-
-    this.homeLocations = [];
+    state.homeLocations = [];
   }
 };
+
+const actions = {
+  setAllProjects(context, allProjects) {
+    context.commit('setAllProjects', allProjects)
+  },
+  setSelectedProject(context, project) {
+    context.commit('setSelectedProject', project)
+  },
+  setProjectSites(context, projectSites) {
+    context.commit('setProjectSites', projectSites)
+  },
+  setSelectedSite(context, site) {
+    context.commit('setSelectedSite', site)
+  },
+  setVizMode(context, vizMode) {
+    context.commit('setVizMode', vizMode)
+  },
+  setCensusTract(context, censusTract) {
+    context.commit('setCensusTract', censusTract)
+  },
+  setComparingSite(context, comparingSite) {
+    context.commit('setComparingSite', comparingSite)
+  },
+  clearSelectedProjectData(context) {
+    context.commit('clearSelectedProjectData')
+  }
+};
+
+const getters = {
+  getAllProjects(state) {
+    return state.allProjects
+  },
+  getSelectedProject(state) {
+    return state.selectedProject
+  },
+  getProjectSites(state) {
+    return state.projectSites
+  },
+  getSelectedSite(state) {
+    return state.selectedSite
+  },
+  getVizMode(state) {
+    return state.vizMode
+  },
+  getCensusTract(state) {
+    return state.censusTract
+  },
+  getComparingSite(state) {
+    return state.comparingSite
+  }
+};
+
+const store = new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters
+});
+
+export default store;

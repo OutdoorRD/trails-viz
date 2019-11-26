@@ -1,5 +1,5 @@
 <template>
-  <div v-show="selectedSite">
+  <div>
     <b-row no-gutters>
       <b-col class="text-right">
         <b-form-group>
@@ -19,7 +19,8 @@
 </template>
 
 <script>
-  import {store, constants} from '../store'
+  import {COLORS, VIZ_MODES} from '../store/constants'
+  import axios from 'axios'
   import c3 from 'c3'
 
   Number.prototype.pad = function (size) {
@@ -32,10 +33,15 @@
     name: "TimeSeries",
     data: function() {
       return {
+        project: null,
         siteid: null,
         trailName: null,
         selectedSite: null,
         monthlyVisitation: null,
+        weeklyVisitation: null,
+        comparingSite: null,
+        comparingSiteMonthlyVisitation: null,
+        comparingSiteWeeklyVisitation: null,
         dataRange: '',
         chart: null,
         domain: null,
@@ -60,12 +66,12 @@
       },
       _getColors: function(trailName, comparing=false) {
         let colors = {};
-        colors[trailName + ' - Modelled'] = comparing ? constants.COLORS.COMPARE_MODELLED : constants.COLORS.MODELLED;
-        colors[trailName + ' - On Site'] = comparing ? constants.COLORS.COMPARE_ON_SITE : constants.COLORS.ON_SITE;
-        colors[trailName + ' - Flickr'] =  comparing ? constants.COLORS.COMPARE_FLICKR : constants.COLORS.FLICKR;
-        colors[trailName + ' - Instagram'] =  comparing ? constants.COLORS.COMPARE_INSTA : constants.COLORS.INSTA;
-        colors[trailName + ' - Twitter'] =  comparing ? constants.COLORS.COMPARE_TWITTER : constants.COLORS.TWITTER;
-        colors[trailName + ' - WTA'] =  comparing ? constants.COLORS.COMPARE_WTA : constants.COLORS.WTA;
+        colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
+        colors[trailName + ' - On Site'] = comparing ? COLORS.COMPARE_ON_SITE : COLORS.ON_SITE;
+        colors[trailName + ' - Flickr'] =  comparing ? COLORS.COMPARE_FLICKR : COLORS.FLICKR;
+        colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
+        colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
+        colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
@@ -120,20 +126,55 @@
       },
       renderTimeSeries: function () {
         let self = this;
-        this.selectedSite = store.selectedSite;
-        this.trailName = store.selectedSite['trailName'];
-        this.siteid = store.selectedSite['siteid'];
-        this.monthlyVisitation = store.monthlyVisitation;
-        this.weeklyVisitation = store.weeklyVisitation;
 
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let comparingSiteId = self.$store.getters.getComparingSite['siteid'];
+          self.comparingSite = self.$store.getters.getComparingSite;
+          axios.all([
+            axios.get(this.$apiEndpoint + '/sites/' + comparingSiteId + '/monthlyVisitation'),
+            axios.get(this.$apiEndpoint + '/sites/' + comparingSiteId + '/weeklyVisitation')
+          ]).then(axios.spread((monthlyVisitationRes, weeklyVisitationRes) => {
+            self.comparingSiteMonthlyVisitation = monthlyVisitationRes.data;
+            self.comparingSiteWeeklyVisitation = weeklyVisitationRes.data;
+            self._renderTimeSeries();
+          }));
+          return
+        }
+
+        self.clearTimeSeries();
+        this.project = self.$store.getters.getSelectedProject;
+        this.selectedSite = self.$store.getters.getSelectedSite;
+        this.trailName = self.$store.getters.getSelectedSite['trailName'];
+        this.siteid = self.$store.getters.getSelectedSite['siteid'];
+
+        let monthlyVisitationUrl, weeklyVisitationUrl;
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          monthlyVisitationUrl = self.$apiEndpoint + '/projects/' + self.project + '/monthlyVisitation';
+          weeklyVisitationUrl = self.$apiEndpoint + '/projects/' + self.project + '/weeklyVisitation';
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          monthlyVisitationUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/monthlyVisitation';
+          weeklyVisitationUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/weeklyVisitation';
+        }
+
+        axios.all([
+          axios.get(monthlyVisitationUrl),
+          axios.get(weeklyVisitationUrl)
+        ]).then(axios.spread((monthlyVisitationRes, weeklyVisitationRes) => {
+          self.monthlyVisitation = monthlyVisitationRes.data;
+          self.weeklyVisitation = weeklyVisitationRes.data;
+          self._renderTimeSeries();
+        }));
+      },
+      _renderTimeSeries: function() {
+        let self = this;
         self.timeseriesMonthlyData = self._prepareMonthlyData(this.trailName, this.monthlyVisitation);
         self.timeseriesWeeklyData = self._prepareWeeklyData(this.trailName, this.weeklyVisitation);
 
         let colors = self._getColors(self.trailName);
 
-        if (store.comparingSite) {
-          let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(store.comparingSite['trailName'], store.comparingSiteMonthlyVisitation, true));
-          let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(store.comparingSite['trailName'], store.comparingSiteWeeklyVisitation, true));
+        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(self.comparingSite['trailName'], self.comparingSiteMonthlyVisitation, true));
+          let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(self.comparingSite['trailName'], self.comparingSiteWeeklyVisitation, true));
 
           // filter out social media data to remove the clutter
           joinedMonthlyData.splice(3, 4);
@@ -145,8 +186,14 @@
           self.timeseriesMonthlyData = joinedMonthlyData;
           self.timeseriesWeeklyData = joinedWeeklyData;
 
-          let compareColors = self._getColors(store.comparingSite['trailName'], true);
+          let compareColors = self._getColors(self.$store.getters.getComparingSite['trailName'], true);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
+        }
+
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          // drop on site when viz is project wide.
+          self.timeseriesMonthlyData.splice(2, 1);
+          self.timeseriesWeeklyData.splice(2, 1);
         }
 
         let data;
@@ -212,10 +259,15 @@
         self.chart.zoom(self.domain);
       },
       clearTimeSeries: function () {
+        this.project = null;
         this.siteid = null;
         this.trailName = null;
         this.selectedSite = null;
         this.monthlyVisitation = null;
+        this.weeklyVisitation = null;
+        this.comparingSite = null;
+        this.comparingSiteMonthlyVisitation = null;
+        this.comparingSiteWeeklyVisitation = null;
         this.dataRange = '';
       }
     }

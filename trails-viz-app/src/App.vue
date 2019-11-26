@@ -1,7 +1,8 @@
 <template>
   <b-container fluid id="app">
-    <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap"></top-bar>
-    <b-row no-gutters>
+    <top-bar v-on:project-selected="sendProjectSelectedEventToMap" v-on:site-selected="sendSiteSelectedEventToMap" class="top-bar"></top-bar>
+    <landing-page id="landing-page" class="landing-page" v-on:project-selected="sendProjectSelectedEventToMap"/>
+    <b-row no-gutters class="app-container" id="visualization-zone">
       <b-col sm="6" class="map-col">
         <map-div ref="map-div" id="mapDiv" v-on:site-selected="sendRenderPlotEvents" v-on:compare-activated="sendCompareSites"></map-div>
       </b-col>
@@ -14,23 +15,41 @@
         <b-row no-gutters v-show="trailName">
           <b-col sm="12">
             <b-tabs content-class="mt-3" nav-item-class="text info" fill>
-              <b-tab title="Bar Graph" active>
-                <bar-graph ref="bar-graph"></bar-graph>
+              <b-tab title="Info" active>
+                <info-viewer ref="project-info"></info-viewer>
               </b-tab>
-              <b-tab title="Time Series">
-                <time-series ref="time-series"></time-series>
+              <b-tab title="Visitation">
+                <b-tabs content-class="mt-3" nav-item-class="text info" fill>
+                  <b-tab title="Info" active>
+                    <info-viewer ref="visitation-info"></info-viewer>
+                  </b-tab>
+                  <b-tab title="Bar Graph">
+                    <bar-graph ref="bar-graph"></bar-graph>
+                  </b-tab>
+                  <b-tab title="Time Series">
+                    <time-series ref="time-series"></time-series>
+                  </b-tab>
+                </b-tabs>
               </b-tab>
               <b-tab title="Home Locations">
-                <home-locations ref="home-locations"></home-locations>
+                <b-tabs content-class="mt-3" nav-item-class="text info" fill>
+                  <b-tab title="Info" active>
+                    <info-viewer ref="home-locations-info"></info-viewer>
+                  </b-tab>
+                  <b-tab title="Tree Map">
+                    <home-locations ref="home-locations"></home-locations>
+                  </b-tab>
+                  <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
+                    <home-locations-map ref="home-locations-map"></home-locations-map>
+                  </b-tab>
+                  <b-tab title="Demographics">
+                    <demographics-summary ref="demographics-summary"></demographics-summary>
+                  </b-tab>
+                </b-tabs>
               </b-tab>
             </b-tabs>
           </b-col>
         </b-row>
-      </b-col>
-    </b-row>
-    <b-row no-gutters>
-      <b-col sm="12">
-        <footer-bar></footer-bar>
       </b-col>
     </b-row>
   </b-container>
@@ -41,11 +60,14 @@ import MapDiv from "@/components/MapDiv";
 import TopBar from "@/components/TopBar";
 import BarGraph from "@/components/BarGraph";
 import TimeSeries from "@/components/TimeSeries";
-import FooterBar from "@/components/FooterBar";
-
-import {store} from "./store";
-import axios from "axios";
 import HomeLocations from "@/components/HomeLocations";
+import HomeLocationsMap from "@/components/HomeLocationsMap";
+import InfoViewer from "@/components/InfoViewer";
+import LandingPage from "./components/LandingPage";
+import DemographicsSummary from "./components/DemographicsSummary";
+
+import axios from "axios";
+import {VIZ_MODES} from "./store/constants";
 
 export default {
   name: 'app',
@@ -56,66 +78,72 @@ export default {
     }
   },
   components: {
+    InfoViewer,
+    DemographicsSummary,
+    LandingPage,
+    HomeLocationsMap,
     HomeLocations,
-    FooterBar,
     TimeSeries,
     BarGraph,
     TopBar,
     MapDiv
   },
   mounted() {
-    axios.get(this.$apiEndpoint + '/projects')
-      .then(response => store.setAllProjects(response.data));
+    let self = this;
+    axios.get(self.$apiEndpoint + '/projects')
+      .then(response => self.$store.dispatch('setAllProjects', response.data));
+    axios.get(self.$apiEndpoint + '/sites/censusTract')
+      .then(response => self.$store.dispatch('setCensusTract', response.data));
   },
   methods: {
     sendProjectSelectedEventToMap: function () {
+      let store = this.$store;
+      let project = store.getters.getSelectedProject;
+
+      this.trailName = 'All Sites in ' + project;
+      store.dispatch('setSelectedProject', project);
+      store.dispatch('setSelectedSite', {'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
+
+      store.dispatch('setVizMode', VIZ_MODES.PROJECT);
       this.$refs['map-div'].renderProjectSites();
-      this.$refs['bar-graph'].clearBarGraph();
-      this.$refs['time-series'].clearTimeSeries();
-      this.$refs['home-locations'].clear();
-      store.clearSelectedProjectData();
+
+      // render plots on project level
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
+      this.$refs['home-locations-map'].renderHomeLocationsMap();
+      this.$refs['project-info'].renderInfo('project');
+      this.$refs['visitation-info'].renderInfo('visitation');
+      this.$refs['home-locations-info'].renderInfo('homeLocations');
+      this.$refs['demographics-summary'].renderDemographicsSummary();
     },
     sendSiteSelectedEventToMap: function(trailName) {
       this.$refs['map-div'].selectSite(trailName)
     },
     sendRenderPlotEvents: function () {
-      // populate the estimates in global store to be used in bar graph and time series
-      let siteid = store.selectedSite['siteid'];
-      this.trailName = store.selectedSite['trailName'];
+      this.trailName = this.$store.getters.getSelectedSite['trailName'];
       this.comparingTrailName = '';
-      axios.all([
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/homeLocations'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes, homeLocationsRes) => {
-        store.setAnnualEstimates(annualEstimateRes.data);
-        store.setMonthlyEstimates(monthlyEstimateRes.data);
-        store.setMonthlyVisitation(monthlyVisitationRes.data);
-        store.setWeeklyVisitation(weeklyVisitationRes.data);
-        store.setHomeLocations(homeLocationsRes.data);
-        this.$refs['bar-graph'].renderDefaultGraph();
-        this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
-      }))
+
+      this.$store.dispatch('setVizMode', VIZ_MODES.SITE);
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
+      this.$refs['home-locations-map'].renderHomeLocationsMap();
+      this.$refs['demographics-summary'].renderDemographicsSummary();
     },
     sendCompareSites: function () {
-      let siteid = store.comparingSite['siteid'];
-      this.comparingTrailName = store.comparingSite['trailName'];
-      axios.all([
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/annualEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyEstimates'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/monthlyVisitation'),
-        axios.get(this.$apiEndpoint + '/sites/' + siteid + '/weeklyVisitation'),
-      ]).then(axios.spread((annualEstimateRes, monthlyEstimateRes, monthlyVisitationRes, weeklyVisitationRes) => {
-        store.setComparingSiteAnnualEstimates(annualEstimateRes.data);
-        store.setComparingSiteMonthlyEstimates(monthlyEstimateRes.data);
-        store.setComparingSiteMonthlyVisitation(monthlyVisitationRes.data);
-        store.setComparingSiteWeeklyVisitation(weeklyVisitationRes.data);
-        this.$refs['bar-graph'].renderSelectedGraph();
-        this.$refs['time-series'].renderTimeSeries();
-      }))
+      this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
+      this.comparingTrailName = this.$store.getters.getComparingSite['trailName'];
+      this.$refs['bar-graph'].renderDefaultGraph();
+      this.$refs['time-series'].renderTimeSeries();
+      this.$refs['home-locations'].renderTreeMap();
+    },
+    activateHomeLocationsMap: function (event) {
+      // The event here is a boolean variable which tell if the
+      // tab was activated (true) or deactivated (false)
+      if (event) {
+        this.$refs['home-locations-map'].activateHomeLocationsMap()
+      }
     }
   }
 }
@@ -127,6 +155,19 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding: 0;
+    height: 100vh;
+  }
+
+  .top-bar {
+    height: 60px;
+  }
+
+  .landing-page {
+    height: calc(100vh - 60px);
+  }
+
+  .app-container {
+    height: calc(100vh - 60px);
   }
 
   .map-col {
