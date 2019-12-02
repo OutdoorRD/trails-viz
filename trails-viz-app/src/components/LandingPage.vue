@@ -24,9 +24,6 @@
 
       <b-form-datalist id="landing-project-list" :options="filteredProjects"></b-form-datalist>
     </p>
-    <p class="form-para">
-      <small>*Currently supported projects are <i>MBS_PIL</i>, <i>MBS_SARL</i>, and <i>DOI</i></small>.
-    </p>
 
   </div>
 </template>
