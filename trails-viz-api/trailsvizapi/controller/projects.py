@@ -6,7 +6,7 @@ from trailsvizapi.repository import projects_and_sites
 
 @app.route('/api/projects')
 def get_all_projects():
-    return jsonify(app_config.PROJECT_GROUPS)
+    return jsonify(app_config.PROJECT_NAMES)
 
 
 @app.route('/api/sites/geojson')

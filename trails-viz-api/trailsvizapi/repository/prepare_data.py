@@ -199,7 +199,7 @@ def _prepare_project_readme():
     project_readme_cache = dict()
     readme_files = os.listdir(_README_DIR)
     readme_files = list(filter(lambda x: x.endswith('.md'), readme_files))
-    for project in config.PROJECT_GROUPS:
+    for project in config.PROJECT_NAMES.values():
         project_readme_file = list(filter(lambda x: x.split('.')[0] in project, readme_files))[0]
         with open(_README_DIR + project_readme_file, 'r', encoding='utf-8') as f:
             project_readme_cache[project] = f.read()
