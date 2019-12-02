@@ -26,7 +26,8 @@
     name: "DemographicsSummary",
     data: function () {
       return {
-        project: null,
+        projectName: null,
+        projectCode: null,
         siteid: null,
         demographicData: null,
         totalPopulation: null,
@@ -53,12 +54,13 @@
         let self = this;
         let vizMode = self.$store.getters.getVizMode;
 
-        self.project = self.$store.getters.getSelectedProject;
+        self.projectName = self.$store.getters.getSelectedProjectName;
+        self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
 
         let url;
         if (vizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.project + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsDemographics';
         } else if (vizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsDemographics';
         }

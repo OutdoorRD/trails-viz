@@ -20,8 +20,8 @@
         let self = this;
         let url;
         if (type === 'project') {
-          let project = self.$store.getters.getSelectedProject;
-          url = self.$apiEndpoint + '/projects/' + project + '/readme'
+          let projectCode = self.$store.getters.getSelectedProjectCode;
+          url = self.$apiEndpoint + '/projects/' + projectCode + '/readme'
         } else if (type === 'visitation') {
           url = self.$apiEndpoint + '/readme?type=VISITATION_INFO'
         } else if (type === 'homeLocations') {

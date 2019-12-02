@@ -62,8 +62,8 @@
         let self = this;
         let url;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          let project = self.$store.getters.getSelectedProject;
-          url = self.$apiEndpoint + '/projects/' + project + '/homeLocationsCensusTract';
+          let projectCode = self.$store.getters.getSelectedProjectCode;
+          url = self.$apiEndpoint + '/projects/' + projectCode + '/homeLocationsCensusTract';
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           let siteid = self.$store.getters.getSelectedSite['siteid'];
           url = self.$apiEndpoint + '/sites/' + siteid + '/homeLocationsCensusTract';
