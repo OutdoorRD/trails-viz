@@ -1,10 +1,14 @@
 <template>
   <div>
     <b-row no-gutters>
-      <b-col>
+      <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Total Population <span>{{totalPopulation}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Total Visit Days <span>{{totalVisitDays}}</span></b-list-group-item>
           <b-list-group-item class="list-group-item">Weighted Median Income <span>${{weightedMedianIncome}}</span></b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <b-col sm="6">
+        <b-list-group>
           <b-list-group-item class="list-group-item">Weighted Minority Percentage <span>{{weightedMinorityPercentage}}</span></b-list-group-item>
           <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span>{{weightedSVI}}</span></b-list-group-item>
         </b-list-group>
@@ -31,6 +35,7 @@
         siteid: null,
         demographicData: null,
         totalPopulation: null,
+        totalVisitDays: null,
         weightedMedianIncome: null,
         weightedMinorityPercentage: null,
         weightedSVI: null
@@ -98,6 +103,7 @@
           totalVisitDays = 1
         }
         self.totalPopulation = population;
+        self.totalVisitDays = totalVisitDays;
         self.weightedMedianIncome = self._nDecimalPlaces(income / totalVisitDays, 0);
         self.weightedMinorityPercentage = self._nDecimalPlaces(minorityPercentage / totalVisitDays, 2);
         self.weightedSVI = self._nDecimalPlaces(svi / totalVisitDays, 3);
@@ -174,7 +180,7 @@
   }
   .list-group-item span {
     float: right;
-    padding-right: 30px;
+    padding-right: 15px;
     font-weight: bold;
     opacity: 0.7;
   }
