@@ -14,10 +14,14 @@
         </b-list-group>
       </b-col>
     </b-row>
-    <b-row no-gutters><h5>Median Income</h5></b-row>
-    <b-row no-gutters id="income-chart"></b-row>
-    <b-row no-gutters><h5>Social Vulnerability Index</h5></b-row>
-    <b-row no-gutters id="svi-chart"></b-row>
+    <b-row no-gutters>
+      <b-col sm="6">
+        <div id="income-chart"></div>
+      </b-col>
+      <b-col sm="6">
+        <div id="svi-chart"></div>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -131,8 +135,8 @@
           }
         }
 
-        this._makeBarChart(incomeVisitDays, '#income-chart');
-        this._makeBarChart(sviVisitDays, '#svi-chart');
+        this._makeBarChart(incomeVisitDays, '#income-chart', 'Income');
+        this._makeBarChart(sviVisitDays, '#svi-chart', 'Social Vulnerability Index');
 
       },
       _calculateValues: function () {
@@ -156,7 +160,7 @@
         self.weightedMinorityPercentage = self._nDecimalPlaces(minorityPercentage / totalVisitDays, 2);
         self.weightedSVI = self._nDecimalPlaces(svi / totalVisitDays, 3);
       },
-      _makeBarChart: function (data, htmlElemId) {
+      _makeBarChart: function (data, htmlElemId, title) {
         let categories = Object.keys(data);
         let values = Object.values(data);
         values.unshift('Visit Days');
@@ -165,12 +169,16 @@
         c3.generate({
           bindto: htmlElemId,
           size: {
-            height: 240
+            height: 200
           },
           axis: {
             x: {
               type: 'category',
               categories: categories,
+              label: {
+                text: title,
+                position: 'outer-center'
+              },
               tick: {
                 multiline: false
               },
