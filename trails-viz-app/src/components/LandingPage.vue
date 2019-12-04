@@ -1,6 +1,6 @@
 <template>
   <div class="landing-page">
-    <h1>SocialTrails</h1)
+    <h1>SocialTrails</h1>
     <h2>Monitoring Recreation with Social Media and Volunteered Data</h2>
 
     <p class="form-para">
