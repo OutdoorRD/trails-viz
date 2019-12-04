@@ -31,12 +31,12 @@
                   </b-tab>
                 </b-tabs>
               </b-tab>
-              <b-tab title="Home Locations">
+              <b-tab title="Visitor Characteristics">
                 <b-tabs content-class="mt-3" nav-item-class="text info" fill>
                   <b-tab title="Info" active>
                     <info-viewer ref="home-locations-info"></info-viewer>
                   </b-tab>
-                  <b-tab title="Tree Map">
+                  <b-tab title="Home Counties">
                     <home-locations ref="home-locations"></home-locations>
                   </b-tab>
                   <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">

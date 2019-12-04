@@ -161,7 +161,7 @@
         let parents = [];
         let values = [];
         let colors = [];
-        let worldLabel = 'World (' + data['visit_days'] + ' - Visit Days)';
+        let worldLabel = 'World (' + data['visit_days'] + ' Visit Days)';
         labels.push(worldLabel);
         values.push(data['visit_days']);
         parents.push('');
