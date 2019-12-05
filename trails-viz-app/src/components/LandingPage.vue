@@ -35,21 +35,25 @@
         document.getElementById("explore").scrollIntoView({behavior: "smooth"});
       },
       autoCompleteProject: function () {
-        let store = this.$store;
-        if (store.getters.getAllProjects.includes(this.projectSearchText.toUpperCase())) {
+        let allProjects = this.$store.getters.getAllProjects;
+        let projectNames = Object.keys(allProjects);
+        let projectNamesUpperCase = projectNames.map(name => name.toUpperCase());
+
+        if (projectNamesUpperCase.includes(this.projectSearchText.toUpperCase())) {
           // don't show suggestions when a valid project is selected
           return
         }
         if (this.projectSearchText.length >= 1) {
-          this.filteredProjects = store.getters.getAllProjects.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
+          this.filteredProjects = projectNames.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
         } else {
           this.filteredProjects = []
         }
       },
       emitProjectNameEvent: function () {
-        if (this.filteredProjects.includes(this.projectSearchText.toUpperCase())) {
+        if (this.filteredProjects.includes(this.projectSearchText)) {
           this.$store.dispatch('clearSelectedProjectData');
-          this.$store.dispatch('setSelectedProject', this.projectSearchText.toUpperCase());
+          this.$store.dispatch('setSelectedProjectName', this.projectSearchText);
+          this.$store.dispatch('setSelectedProjectCode', this.$store.getters.getAllProjects[this.projectSearchText]);
           this.$emit('project-selected');
           this.projectSearchText = '';
           document.getElementById('visualization-zone').scrollIntoView({behavior: "smooth"})

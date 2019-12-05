@@ -1,19 +1,27 @@
 <template>
   <div>
     <b-row no-gutters>
-      <b-col>
+      <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Total Population <span>{{totalPopulation}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Total Visit Days <span>{{totalVisitDays}}</span></b-list-group-item>
           <b-list-group-item class="list-group-item">Weighted Median Income <span>${{weightedMedianIncome}}</span></b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <b-col sm="6">
+        <b-list-group>
           <b-list-group-item class="list-group-item">Weighted Minority Percentage <span>{{weightedMinorityPercentage}}</span></b-list-group-item>
           <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span>{{weightedSVI}}</span></b-list-group-item>
         </b-list-group>
       </b-col>
     </b-row>
-    <b-row no-gutters><h5>Median Income</h5></b-row>
-    <b-row no-gutters id="income-chart"></b-row>
-    <b-row no-gutters><h5>Social Vulnerability Index</h5></b-row>
-    <b-row no-gutters id="svi-chart"></b-row>
+    <b-row no-gutters>
+      <b-col sm="12">
+        <div id="income-chart"></div>
+      </b-col>
+      <b-col sm="12">
+        <div id="svi-chart"></div>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -26,10 +34,12 @@
     name: "DemographicsSummary",
     data: function () {
       return {
-        project: null,
+        projectName: null,
+        projectCode: null,
         siteid: null,
         demographicData: null,
         totalPopulation: null,
+        totalVisitDays: null,
         weightedMedianIncome: null,
         weightedMinorityPercentage: null,
         weightedSVI: null
@@ -53,12 +63,13 @@
         let self = this;
         let vizMode = self.$store.getters.getVizMode;
 
-        self.project = self.$store.getters.getSelectedProject;
+        self.projectName = self.$store.getters.getSelectedProjectName;
+        self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
 
         let url;
         if (vizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.project + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsDemographics';
         } else if (vizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsDemographics';
         }
@@ -69,16 +80,64 @@
 
             // There is a weired bug in either axios or Vue which changes the last element of the array
             // Thus using toString to make a copy of the array
-            let income = self.demographicData.map(o => this._nanToZero(o['median_income'])).filter(x => x > 0);
-            let svi = self.demographicData.map(o => this._nanToZero(o['svi'])).filter(x => x > 0);
+            let income = self.demographicData.filter(o => this._nanToZero(o['median_income']) > 0);
+            let svi = self.demographicData.filter(o => this._nanToZero(o['svi']) > 0);
 
             self._calculateValues();
             self._makeCharts(income, svi);
           });
       },
       _makeCharts: function (income, svi) {
-        this._makeHistogram(income, '#income-chart', 0, 'Median Income');
-        this._makeHistogram(svi, '#svi-chart', 3, 'Social Vulnerability Index');
+        let incomeVisitDays = {
+          '> 0': 0,
+          '> 20000': 0,
+          '> 40000': 0,
+          '> 60000': 0,
+          '> 80000': 0,
+          '> 100000': 0
+        };
+
+        for (const x of income) {
+          if (x['median_income'] > 100000) {
+            incomeVisitDays['> 100000'] += x['visit_days']
+          } else if (x['median_income'] > 80000) {
+            incomeVisitDays['> 80000'] += x['visit_days']
+          } else if (x['median_income'] > 60000) {
+            incomeVisitDays['> 60000'] += x['visit_days']
+          } else if (x['median_income'] > 40000) {
+            incomeVisitDays['> 40000'] += x['visit_days']
+          } else if (x['median_income'] > 20000) {
+            incomeVisitDays['> 20000'] += x['visit_days']
+          } else {
+            incomeVisitDays['> 0'] += x['visit_days']
+          }
+        }
+
+        let sviVisitDays = {
+          '> 0': 0,
+          '> 0.2': 0,
+          '> 0.4': 0,
+          '> 0.6': 0,
+          '> 0.8': 0
+        };
+
+        for (const x of svi) {
+          if (x['svi'] > 0.8) {
+            sviVisitDays['> 0.8'] += x['visit_days']
+          } else if (x['svi'] > 0.6) {
+            sviVisitDays['> 0.6'] += x['visit_days']
+          } else if (x['svi'] > 0.4) {
+            sviVisitDays['> 0.4'] += x['visit_days']
+          } else if (x['svi'] > 0.2) {
+            sviVisitDays['> 0.2'] += x['visit_days']
+          } else {
+            sviVisitDays['> 0'] += x['visit_days']
+          }
+        }
+
+        this._makeBarChart(incomeVisitDays, '#income-chart', 'Income');
+        this._makeBarChart(sviVisitDays, '#svi-chart', 'Social Vulnerability Index');
+
       },
       _calculateValues: function () {
         let self = this;
@@ -96,51 +155,30 @@
           totalVisitDays = 1
         }
         self.totalPopulation = population;
+        self.totalVisitDays = totalVisitDays;
         self.weightedMedianIncome = self._nDecimalPlaces(income / totalVisitDays, 0);
         self.weightedMinorityPercentage = self._nDecimalPlaces(minorityPercentage / totalVisitDays, 2);
         self.weightedSVI = self._nDecimalPlaces(svi / totalVisitDays, 3);
       },
-      _makeHistogram: function (y, htmlElemId, decimalPlaces, title) {
-        let nBins = 5;
-        y = y.sort((a, b) => a === b ? 0 : a < b ? -1: 1);
-        let n = y.length;
-
-        if (n < nBins) {
-          nBins = n;
-        }
-
-        let step = (y[n - 1] - y[0]) / nBins;
-        let bins = [y[0]];
-        for (let i = 0; i < nBins - 1; i += 1) {
-          bins.push(bins[i] + step)
-        }
-
-        function getBin(x) {
-          for (let i = 19; i >= 0; i -= 1) {
-            if (x >= bins[i]) {
-              return i;
-            }
-          }
-        }
-
-        let counts = new Uint16Array(nBins);
-        for (let i = 0; i < n; i += 1) {
-          counts[getBin(y[i])] += 1
-        }
-        let data = ['data'];
-        counts.forEach(x => data.push(x));
-        bins = bins.map(x => this._nDecimalPlaces(x, decimalPlaces));
+      _makeBarChart: function (data, htmlElemId, title) {
+        let categories = Object.keys(data);
+        let values = Object.values(data);
+        values.unshift('Visit Days');
 
         // now create a bar chart using the data
         c3.generate({
           bindto: htmlElemId,
           size: {
-            height: 240
+            height: 200
           },
           axis: {
             x: {
               type: 'category',
-              categories: bins,
+              categories: categories,
+              label: {
+                text: title,
+                position: 'outer-center'
+              },
               tick: {
                 multiline: false
               },
@@ -148,7 +186,7 @@
             },
             y: {
               label: {
-                text: 'Number of Census Tracts',
+                text: 'Visit Days',
                 position: 'outer-middle'
               }
             }
@@ -157,7 +195,7 @@
             show: false
           },
           data: {
-            columns: [data],
+            columns: [values],
             type: 'bar'
           }
         })
@@ -172,7 +210,7 @@
   }
   .list-group-item span {
     float: right;
-    padding-right: 30px;
+    padding-right: 15px;
     font-weight: bold;
     opacity: 0.7;
   }

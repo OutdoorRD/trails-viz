@@ -28,7 +28,8 @@
     name: "BarGraph",
     data: function() {
       return {
-        project: null,
+        projectName: null,
+        projectCode: null,
         siteid: null,
         trailName: null,
         selectedSite: null,
@@ -74,15 +75,16 @@
         }
 
         self.clearBarGraph();
-        self.project = self.$store.getters.getSelectedProject;
+        self.projectName = self.$store.getters.getSelectedProjectName;
+        self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.selectedSite = self.$store.getters.getSelectedSite;
         self.trailName = self.$store.getters.getSelectedSite['trailName'];
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
 
         let annualEstimatesUrl, monthlyEstimatesUrl;
         if (vizMode === VIZ_MODES.PROJECT) {
-          annualEstimatesUrl = self.$apiEndpoint + '/projects/' + self.project + '/annualEstimates';
-          monthlyEstimatesUrl = self.$apiEndpoint + '/projects/' + self.project + '/monthlyEstimates';
+          annualEstimatesUrl = self.$apiEndpoint + '/projects/' + self.projectCode + '/annualEstimates';
+          monthlyEstimatesUrl = self.$apiEndpoint + '/projects/' + self.projectCode + '/monthlyEstimates';
         } else if (vizMode === VIZ_MODES.SITE) {
           annualEstimatesUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/annualEstimates';
           monthlyEstimatesUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/monthlyEstimates'
@@ -275,7 +277,8 @@
         }
       },
       clearBarGraph: function () {
-        this.project = null;
+        this.projectName = null;
+        this.projectCode = null;
         this.siteid = null;
         this.trailName = null;
         this.selectedSite = null;

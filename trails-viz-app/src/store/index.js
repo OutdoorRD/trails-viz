@@ -4,8 +4,9 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 const state = {
-  allProjects: [],
-  selectedProject: '',
+  allProjects: {},
+  selectedProjectName: '',
+  selectedProjectCode: '',
   projectSites: {},
   selectedSite: '',
   vizMode: '',
@@ -17,8 +18,11 @@ const mutations = {
   setAllProjects(state, allProjects) {
     state.allProjects = allProjects;
   },
-  setSelectedProject(state, project) {
-    state.selectedProject = project
+  setSelectedProjectName(state, projectName) {
+    state.selectedProjectName = projectName
+  },
+  setSelectedProjectCode(state, projectCode) {
+    state.selectedProjectCode = projectCode
   },
   setProjectSites(state, projectSites) {
     state.projectSites = projectSites
@@ -36,7 +40,8 @@ const mutations = {
     state.comparingSite = comparingSite;
   },
   clearSelectedProjectData(state) {
-    state.selectedProject = '';
+    state.selectedProjectName = '';
+    state.selectedProjectCode = '';
     state.projectSites = {};
     state.selectedSite = '';
 
@@ -54,8 +59,11 @@ const actions = {
   setAllProjects(context, allProjects) {
     context.commit('setAllProjects', allProjects)
   },
-  setSelectedProject(context, project) {
-    context.commit('setSelectedProject', project)
+  setSelectedProjectName(context, projectName) {
+    context.commit('setSelectedProjectName', projectName)
+  },
+  setSelectedProjectCode(context, projectCode) {
+    context.commit('setSelectedProjectCode', projectCode)
   },
   setProjectSites(context, projectSites) {
     context.commit('setProjectSites', projectSites)
@@ -81,8 +89,11 @@ const getters = {
   getAllProjects(state) {
     return state.allProjects
   },
-  getSelectedProject(state) {
-    return state.selectedProject
+  getSelectedProjectName(state) {
+    return state.selectedProjectName
+  },
+  getSelectedProjectCode(state) {
+    return state.selectedProjectCode
   },
   getProjectSites(state) {
     return state.projectSites

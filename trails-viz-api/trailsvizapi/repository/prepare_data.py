@@ -199,15 +199,19 @@ def _prepare_project_readme():
     project_readme_cache = dict()
     readme_files = os.listdir(_README_DIR)
     readme_files = list(filter(lambda x: x.endswith('.md'), readme_files))
-    for project in config.PROJECT_GROUPS:
+    for project in config.PROJECT_NAMES.values():
         project_readme_file = list(filter(lambda x: x.split('.')[0] in project, readme_files))[0]
         with open(_README_DIR + project_readme_file, 'r', encoding='utf-8') as f:
             project_readme_cache[project] = f.read()
 
-    # read the two generic readme files - home locations info and visitation info
-    with open(_README_DIR + 'visitation_info.md', 'r', encoding='utf-8') as f:
-        project_readme_cache['VISITATION_INFO'] = f.read()
+    # read the visitation info file
+    visit_readme_files = list(filter(lambda x: x.endswith('_visits.md'), readme_files))
+    for project in config.PROJECT_NAMES.values():
+        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project, readme_files))[0]
+        with open(_README_DIR + visit_readme, 'r', encoding='utf-8') as f:
+            project_readme_cache[project + '_VISITS'] = f.read()
 
+    # read the generic home locations info readme
     with open(_README_DIR + 'homelocations_info.md', 'r', encoding='utf-8') as f:
         project_readme_cache['HOMELOCATIONS_INFO'] = f.read()
 

@@ -31,12 +31,12 @@
                   </b-tab>
                 </b-tabs>
               </b-tab>
-              <b-tab title="Home Locations">
+              <b-tab title="Visitor Characteristics">
                 <b-tabs content-class="mt-3" nav-item-class="text info" fill>
                   <b-tab title="Info" active>
                     <info-viewer ref="home-locations-info"></info-viewer>
                   </b-tab>
-                  <b-tab title="Tree Map">
+                  <b-tab title="Home Counties">
                     <home-locations ref="home-locations"></home-locations>
                   </b-tab>
                   <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
@@ -98,11 +98,13 @@ export default {
   methods: {
     sendProjectSelectedEventToMap: function () {
       let store = this.$store;
-      let project = store.getters.getSelectedProject;
+      let projectName = store.getters.getSelectedProjectName;
+      let projectCode = store.getters.getSelectedProjectCode;
 
-      this.trailName = 'All Sites in ' + project;
-      store.dispatch('setSelectedProject', project);
-      store.dispatch('setSelectedSite', {'trailName': project, setStyle: x => x}); // a dummy set style method which does nothing
+      this.trailName = 'All Sites in ' + projectName;
+      store.dispatch('setSelectedProjectName', projectName);
+      store.dispatch('setSelectedProjectCode', projectCode);
+      store.dispatch('setSelectedSite', {'trailName': projectName, setStyle: x => x}); // a dummy set style method which does nothing
 
       store.dispatch('setVizMode', VIZ_MODES.PROJECT);
       this.$refs['map-div'].renderProjectSites();

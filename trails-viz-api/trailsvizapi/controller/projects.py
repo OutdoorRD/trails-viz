@@ -6,7 +6,7 @@ from trailsvizapi.repository import projects_and_sites
 
 @app.route('/api/projects')
 def get_all_projects():
-    return jsonify(app_config.PROJECT_GROUPS)
+    return jsonify(app_config.PROJECT_NAMES)
 
 
 @app.route('/api/sites/geojson')
@@ -18,7 +18,8 @@ def get_geojson_data():
 
 @app.route('/api/projects/<string:project>/readme')
 def get_project_readme(project):
-    data = projects_and_sites.get_project_readme(project)
+    readme_type = request.args.get('type')
+    data = projects_and_sites.get_project_readme(readme_type, project)
     return Response(data, mimetype='text/markdown')
 
 

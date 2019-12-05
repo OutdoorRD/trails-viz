@@ -37,6 +37,7 @@
           let div = L.DomUtil.create('div', 'info legend');
           let grades = [1, 5, 10, 20, 50, 75, 100];
           // loop through our density intervals and generate a label with a colored square for each interval
+          div.innerHTML += '<div>Visit Days</div>';
           for (let i = 0; i < grades.length; i++) {
             div.innerHTML +=
               '<i style="background:' + self._getColors(grades[i] + 1) + '"></i> ' +
@@ -62,8 +63,8 @@
         let self = this;
         let url;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          let project = self.$store.getters.getSelectedProject;
-          url = self.$apiEndpoint + '/projects/' + project + '/homeLocationsCensusTract';
+          let projectCode = self.$store.getters.getSelectedProjectCode;
+          url = self.$apiEndpoint + '/projects/' + projectCode + '/homeLocationsCensusTract';
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           let siteid = self.$store.getters.getSelectedSite['siteid'];
           url = self.$apiEndpoint + '/sites/' + siteid + '/homeLocationsCensusTract';

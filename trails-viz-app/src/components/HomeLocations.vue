@@ -11,7 +11,8 @@
     name: "HomeLocations",
     data: function () {
       return {
-        project: null,
+        projectName: null,
+        projectCode: null,
         siteid: null,
         homeLocations: null,
         comparingSite: null,
@@ -133,12 +134,13 @@
 
         self.clear();
 
-        self.project = self.$store.getters.getSelectedProject;
+        self.projectName = self.$store.getters.getSelectedProjectName;
+        self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
 
         let homeLocationsUrl;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.project + '/homeLocations'
+          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocations'
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           homeLocationsUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocations'
         }
@@ -159,7 +161,7 @@
         let parents = [];
         let values = [];
         let colors = [];
-        let worldLabel = 'World (' + data['visit_days'] + ')';
+        let worldLabel = 'World (' + data['visit_days'] + ' Visit Days)';
         labels.push(worldLabel);
         values.push(data['visit_days']);
         parents.push('');

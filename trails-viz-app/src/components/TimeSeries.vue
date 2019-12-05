@@ -33,7 +33,8 @@
     name: "TimeSeries",
     data: function() {
       return {
-        project: null,
+        projectName: null,
+        projectCode: null,
         siteid: null,
         trailName: null,
         selectedSite: null,
@@ -142,15 +143,16 @@
         }
 
         self.clearTimeSeries();
-        this.project = self.$store.getters.getSelectedProject;
+        this.projectName = self.$store.getters.getSelectedProjectName;
+        this.projectCode = self.$store.getters.getSelectedProjectCode;
         this.selectedSite = self.$store.getters.getSelectedSite;
         this.trailName = self.$store.getters.getSelectedSite['trailName'];
         this.siteid = self.$store.getters.getSelectedSite['siteid'];
 
         let monthlyVisitationUrl, weeklyVisitationUrl;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          monthlyVisitationUrl = self.$apiEndpoint + '/projects/' + self.project + '/monthlyVisitation';
-          weeklyVisitationUrl = self.$apiEndpoint + '/projects/' + self.project + '/weeklyVisitation';
+          monthlyVisitationUrl = self.$apiEndpoint + '/projects/' + self.projectCode + '/monthlyVisitation';
+          weeklyVisitationUrl = self.$apiEndpoint + '/projects/' + self.projectCode + '/weeklyVisitation';
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           monthlyVisitationUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/monthlyVisitation';
           weeklyVisitationUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/weeklyVisitation';
@@ -259,7 +261,8 @@
         self.chart.zoom(self.domain);
       },
       clearTimeSeries: function () {
-        this.project = null;
+        this.projectName = null;
+        this.projectCode = null;
         this.siteid = null;
         this.trailName = null;
         this.selectedSite = null;
