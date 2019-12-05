@@ -73,15 +73,15 @@
     font-weight: 700;
     font-size: 75px;
     text-align: center;
-    padding: 7.5vh 20vh 7.5vh 20vh;
+    padding: 7.5vh 20vh 4vh 20vh;
     color: #292f30;
   }
 
   h2 {
-    font-weight: 600;
-    font-size: 55px;
+    font-weight: 500;
+    font-size: 40px;
     text-align: center;
-    padding: 7.5vh 20vh 7.5vh 20vh;
+    padding: 4vh 12vh 4vh 12vh;
     color: #292f30;
   }
 
