@@ -15,10 +15,10 @@
       </b-col>
     </b-row>
     <b-row no-gutters>
-      <b-col sm="6">
+      <b-col sm="12">
         <div id="income-chart"></div>
       </b-col>
-      <b-col sm="6">
+      <b-col sm="12">
         <div id="svi-chart"></div>
       </b-col>
     </b-row>
