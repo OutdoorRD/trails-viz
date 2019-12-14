@@ -1,6 +1,7 @@
 from flask import request, Response, jsonify
 
-from trailsvizapi import app, app_config
+from trailsvizapi import app
+from trailsvizapi.config import app_config
 from trailsvizapi.repository import projects_and_sites
 
 

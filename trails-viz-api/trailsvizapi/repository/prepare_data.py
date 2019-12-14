@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 
-import trailsvizapi.app_config as config
+import trailsvizapi.config.app_config as config
 
 _PROJECT_FILES_ROOT = config.DATA_FILES_ROOT + 'projects/'
 _ALLSITES_POLYGONS_FILE = 'allsites.geojson'
