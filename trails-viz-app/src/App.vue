@@ -92,8 +92,6 @@ export default {
     let self = this;
     axios.get(self.$apiEndpoint + '/projects')
       .then(response => self.$store.dispatch('setAllProjects', response.data));
-    axios.get(self.$apiEndpoint + '/sites/censusTract')
-      .then(response => self.$store.dispatch('setCensusTract', response.data));
   },
   methods: {
     sendProjectSelectedEventToMap: function () {
