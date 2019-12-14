@@ -12,6 +12,7 @@
   import axios from "axios";
   import {MAPBOX_CONSTS} from "../store/constants";
   import {MARKER} from "../store/vectors";
+  import {EventBus} from "../event-bus";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -64,7 +65,9 @@
       }
     },
     mounted() {
-      const mapDiv = L.map(this.$refs["mapDiv"], {
+      let self = this;
+
+      const mapDiv = L.map(self.$refs["mapDiv"], {
         center: [40.53, -99.1],
         zoom: 5
       });
@@ -93,7 +96,11 @@
       L.control.layers({"outdoor": outdoorLayer, "streets": streetsLayer, "satellite": satelliteLayer}).addTo(mapDiv);
       outdoorLayer.addTo(mapDiv);
 
-      this.mapDiv = mapDiv
+      self.mapDiv = mapDiv;
+
+      EventBus.$on('top-bar:site-selected', function(trailName) {
+        self.selectSite(trailName)
+      })
     },
     methods: {
       _pointToMarker: function(feature, latlng) {
@@ -183,7 +190,7 @@
                       self.$store.dispatch('setComparingSite', event.target);
                       self.$store.getters.getSelectedSite.setStyle(compareStyle);
                       self.$store.getters.getComparingSite.setStyle(compareStyle);
-                      self.$emit('compare-activated');
+                      EventBus.$emit('map-div:compare-activated');
                     }
                   } else {
                     self.selectSite(event.target["trailName"])
@@ -213,7 +220,7 @@
         let site = self.$store.getters.getProjectSites[trailName];
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
-        this.$emit('site-selected');
+        EventBus.$emit('map-div:site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
       },
       countDownChanged(dismissCountDown) {

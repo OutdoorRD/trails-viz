@@ -1,6 +1,6 @@
 <template>
   <b-container fluid id="app">
-    <top-bar v-on:site-selected="sendSiteSelectedEventToMap" class="top-bar"></top-bar>
+    <top-bar class="top-bar"></top-bar>
     <vue-page-transition>
       <router-view></router-view>
     </vue-page-transition>
@@ -29,11 +29,6 @@ export default {
         self.$store.dispatch('setAllProjects', allProjects);
         self.$store.dispatch('setProjectCodeToName', projectCodeToName);
       });
-  },
-  methods: {
-    sendSiteSelectedEventToMap: function(trailName) {
-      this.$refs['map-div'].selectSite(trailName)
-    }
   }
 }
 </script>

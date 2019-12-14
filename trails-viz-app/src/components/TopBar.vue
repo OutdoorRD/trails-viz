@@ -21,12 +21,12 @@
 
 <script>
 
+  import {EventBus} from '../event-bus'
+
   export default {
     name: "TopBar",
     data: function () {
       return {
-        projectSearchText: '',
-        filteredProjects: [],
         siteSearchText: '',
         filteredSites: []
       };
@@ -45,7 +45,7 @@
         }
       },
       emitSiteNameEvent: function() {
-        this.$emit('site-selected', this.siteSearchText);
+        EventBus.$emit('top-bar:site-selected', this.siteSearchText);
         this.siteSearchText = '';
       },
       doNothing: function(event) {

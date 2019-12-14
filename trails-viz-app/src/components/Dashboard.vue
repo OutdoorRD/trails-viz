@@ -1,7 +1,7 @@
 <template>
   <b-row no-gutters class="app-container">
     <b-col sm="6" class="map-col">
-      <map-div ref="map-div" id="mapDiv" v-on:site-selected="renderSiteLevelPlots" v-on:compare-activated="renderComparisionPlots"></map-div>
+      <map-div ref="map-div" id="mapDiv"></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
       <b-row no-gutters>
@@ -63,6 +63,7 @@
   import DemographicsSummary from "../components/DemographicsSummary";
 
   import {VIZ_MODES} from "../store/constants";
+  import {EventBus} from "../event-bus";
 
   export default {
     name: "Dashboard",
@@ -93,6 +94,9 @@
       } else {
         this.renderProjectLevelPlots();
       }
+
+      EventBus.$on('map-div:site-selected', self.renderSiteLevelPlots);
+      EventBus.$on('map-div:compare-activated', self.renderComparisionPlots);
     },
     components: {
       InfoViewer,
