@@ -4,8 +4,8 @@
     <h2>Monitoring Recreation with Social Media and Volunteered Data</h2>
 
     <p class="form-para">
-      <b-form-input list="landing-project-list" placeholder="Type a project name to get started..."
-                    v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
+      <b-form-input list="landing-project-list" placeholder="Type a project name to get started..." autocomplete="off"
+                    v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="routeToDashboard"></b-form-input>
 
       <b-form-datalist id="landing-project-list" :options="filteredProjects"></b-form-datalist>
     </p>
@@ -31,9 +31,6 @@
       }
     },
     methods: {
-      scrollToMap: function () {
-        document.getElementById("explore").scrollIntoView({behavior: "smooth"});
-      },
       autoCompleteProject: function () {
         let allProjects = this.$store.getters.getAllProjects;
         let projectNames = Object.keys(allProjects);
@@ -43,20 +40,20 @@
           // don't show suggestions when a valid project is selected
           return
         }
-        if (this.projectSearchText.length >= 1) {
+        if (this.projectSearchText.length >= 2) {
           this.filteredProjects = projectNames.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
         } else {
           this.filteredProjects = []
         }
       },
-      emitProjectNameEvent: function () {
+      routeToDashboard: function () {
         if (this.filteredProjects.includes(this.projectSearchText)) {
           this.$store.dispatch('clearSelectedProjectData');
-          this.$store.dispatch('setSelectedProjectName', this.projectSearchText);
-          this.$store.dispatch('setSelectedProjectCode', this.$store.getters.getAllProjects[this.projectSearchText]);
-          this.$emit('project-selected');
+
+          let selectedProjectCode = this.$store.getters.getAllProjects[this.projectSearchText];
+
           this.projectSearchText = '';
-          document.getElementById('visualization-zone').scrollIntoView({behavior: "smooth"})
+          this.$router.push({name: 'dashboard', params: {project: selectedProjectCode}});
         }
       }
     }
@@ -65,6 +62,7 @@
 
 <style scoped>
   .landing-page {
+    height: calc(100vh - 60px);
     /*background-image: linear-gradient(#17a2b8, #e1f9fc);*/
     background-image: linear-gradient(#cce3e3, #ffffff);
     align-content: center !important;

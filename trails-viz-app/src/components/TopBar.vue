@@ -1,6 +1,6 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info" sticky>
-    <b-navbar-brand href="javascript:void()" v-on:click="moveToTop">SocialTrails</b-navbar-brand>
+    <b-navbar-brand to="/">SocialTrails</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -10,9 +10,6 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-form v-on:submit="doNothing" v-show="this.$store.getters.getSelectedProjectCode">
-          <b-form-input class="form-input" size="sm" list="project-list" placeholder="Search Project" v-model="projectSearchText" v-on:keyup="autoCompleteProject" v-on:change="emitProjectNameEvent"></b-form-input>
-          <b-form-datalist id="project-list" :options="filteredProjects"></b-form-datalist>
-
           <b-form-input class="form-input" size="sm" list="project-sites-list" placeholder="Search Trail" v-model="siteSearchText" v-on:keyup="autoCompleteSite" v-on:change="emitSiteNameEvent"></b-form-input>
           <b-form-datalist id="project-sites-list" :options="filteredSites"></b-form-datalist>
         </b-nav-form>
@@ -35,30 +32,6 @@
       };
     },
     methods: {
-      autoCompleteProject: function () {
-        let allProjects = this.$store.getters.getAllProjects;
-        let projectNames = Object.keys(allProjects);
-        let projectNamesUpperCase = projectNames.map(name => name.toUpperCase());
-
-        if (projectNamesUpperCase.includes(this.projectSearchText.toUpperCase())) {
-          // don't show suggestions when a valid project is selected
-          return
-        }
-        if (this.projectSearchText.length >= 1) {
-          this.filteredProjects = projectNames.filter(name => name.toUpperCase().includes(this.projectSearchText.toUpperCase()));
-        } else {
-          this.filteredProjects = []
-        }
-      },
-      emitProjectNameEvent: function () {
-        if (this.filteredProjects.includes(this.projectSearchText)) {
-          this.$store.dispatch('clearSelectedProjectData');
-          this.$store.dispatch('setSelectedProjectName', this.projectSearchText);
-          this.$store.dispatch('setSelectedProjectCode', this.$store.getters.getAllProjects[this.projectSearchText]);
-          this.$emit('project-selected');
-          this.projectSearchText = '';
-        }
-      },
       autoCompleteSite:  function() {
         let trailNames = Object.keys(this.$store.getters.getProjectSites);
 
@@ -77,9 +50,6 @@
       },
       doNothing: function(event) {
         event.preventDefault()
-      },
-      moveToTop: function () {
-        document.getElementById("landing-page").scrollIntoView({behavior: "smooth", block: "end"})
       }
     }
   }

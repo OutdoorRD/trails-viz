@@ -4,7 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 const state = {
-  allProjects: {},
+  allProjects: undefined,
+  projectCodeToName: undefined,
   selectedProjectName: '',
   selectedProjectCode: '',
   projectSites: {},
@@ -17,6 +18,9 @@ const state = {
 const mutations = {
   setAllProjects(state, allProjects) {
     state.allProjects = allProjects;
+  },
+  setProjectCodeToName(state, projectCodeToName) {
+    state.projectCodeToName = projectCodeToName;
   },
   setSelectedProjectName(state, projectName) {
     state.selectedProjectName = projectName
@@ -59,6 +63,9 @@ const actions = {
   setAllProjects(context, allProjects) {
     context.commit('setAllProjects', allProjects)
   },
+  setProjectCodeToName(context, projectCodeToName) {
+    context.commit('setProjectCodeToName', projectCodeToName)
+  },
   setSelectedProjectName(context, projectName) {
     context.commit('setSelectedProjectName', projectName)
   },
@@ -88,6 +95,9 @@ const actions = {
 const getters = {
   getAllProjects(state) {
     return state.allProjects
+  },
+  getProjectCodeToName(state) {
+    return state.projectCodeToName
   },
   getSelectedProjectName(state) {
     return state.selectedProjectName
