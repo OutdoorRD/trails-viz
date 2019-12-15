@@ -98,9 +98,11 @@
 
       self.mapDiv = mapDiv;
 
-      EventBus.$on('top-bar:site-selected', function(trailName) {
-        self.selectSite(trailName)
-      })
+      EventBus.$on('top-bar:site-selected', self.selectSite);
+    },
+    beforeDestroy() {
+      let self = this;
+      EventBus.$off('top-bar:site-selected', self.selectSite);
     },
     methods: {
       _pointToMarker: function(feature, latlng) {

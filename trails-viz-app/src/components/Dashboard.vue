@@ -5,46 +5,48 @@
     </b-col>
     <b-col sm="6" class="charts-col">
       <b-row no-gutters>
-        <b-col sm="12">
-          <h3>{{trailName}} <span v-show="comparingTrailName">vs {{comparingTrailName}}</span></h3>
+        <b-col sm="6">
+          <b-breadcrumb :items="breadcrumbItems" class="app-breadcrumb"></b-breadcrumb>
+        </b-col>
+        <b-col sm="6">
+          <b-button-group class="app-button-group d-flex">
+            <b-button v-on:click="showSelectedTab('visitation')" class="app-button"
+                      v-bind:class="{active: visibleTabGroup === 'visitation'}">Visitation</b-button>
+            <b-button v-on:click="showSelectedTab('visitorCharacteristics')" class="app-button"
+                      v-bind:class="{active: visibleTabGroup === 'visitorCharacteristics'}">Visitor Characteristics</b-button>
+          </b-button-group>
         </b-col>
       </b-row>
-      <b-row no-gutters v-show="trailName">
+      <b-row no-gutters>
         <b-col sm="12">
-          <b-tabs content-class="mt-3" nav-item-class="text info" fill>
-            <b-tab title="Info" active>
-              <info-viewer ref="project-info"></info-viewer>
+          <info-viewer ref="project-info" v-show="visibleTabGroup === 'project-info'"></info-viewer>
+          <b-tabs v-show="visibleTabGroup === 'visitation'">
+            <b-tab title="Methods">
+              <info-viewer ref="visitation-info"></info-viewer>
             </b-tab>
-            <b-tab title="Visitation">
-              <b-tabs content-class="mt-3" nav-item-class="text info" fill>
-                <b-tab title="Info" active>
-                  <info-viewer ref="visitation-info"></info-viewer>
-                </b-tab>
-                <b-tab title="Bar Graph">
-                  <bar-graph ref="bar-graph"></bar-graph>
-                </b-tab>
-                <b-tab title="Time Series">
-                  <time-series ref="time-series"></time-series>
-                </b-tab>
-              </b-tabs>
+            <b-tab title="Bar Graph">
+              <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
-            <b-tab title="Visitor Characteristics">
-              <b-tabs content-class="mt-3" nav-item-class="text info" fill>
-                <b-tab title="Info" active>
-                  <info-viewer ref="home-locations-info"></info-viewer>
-                </b-tab>
-                <b-tab title="Home Counties">
-                  <home-locations ref="home-locations"></home-locations>
-                </b-tab>
-                <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
-                  <home-locations-map ref="home-locations-map"></home-locations-map>
-                </b-tab>
-                <b-tab title="Demographics">
-                  <demographics-summary ref="demographics-summary"></demographics-summary>
-                </b-tab>
-              </b-tabs>
+            <b-tab title="Time Series">
+              <time-series ref="time-series"></time-series>
             </b-tab>
           </b-tabs>
+
+          <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'">
+            <b-tab title="Methods">
+              <info-viewer ref="home-locations-info"></info-viewer>
+            </b-tab>
+            <b-tab title="Home Locations">
+              <home-locations ref="home-locations"></home-locations>
+            </b-tab>
+            <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
+              <home-locations-map ref="home-locations-map"></home-locations-map>
+            </b-tab>
+            <b-tab title="Demographics">
+              <demographics-summary ref="demographics-summary"></demographics-summary>
+            </b-tab>
+          </b-tabs>
+
         </b-col>
       </b-row>
     </b-col>
@@ -69,8 +71,10 @@
     name: "Dashboard",
     data: function() {
       return {
+        breadcrumbItems: [],
         trailName: '',
-        comparingTrailName: ''
+        comparingTrailName: '',
+        visibleTabGroup: 'project-info'
       }
     },
     mounted() {
@@ -98,6 +102,11 @@
       EventBus.$on('map-div:site-selected', self.renderSiteLevelPlots);
       EventBus.$on('map-div:compare-activated', self.renderComparisionPlots);
     },
+    beforeDestroy() {
+      let self = this;
+      EventBus.$off('map-div:site-selected', self.renderSiteLevelPlots);
+      EventBus.$off('map-div:compare-activated', self.renderComparisionPlots);
+    },
     components: {
       InfoViewer,
       DemographicsSummary,
@@ -111,14 +120,18 @@
       renderProjectLevelPlots: function() {
         this.$store.dispatch('setVizMode', VIZ_MODES.PROJECT);
 
-        let store = this.$store;
         let projectCode = this.$route.params.project;
-        let projectName = store.getters.getProjectCodeToName[projectCode];
+        let projectName = this.$store.getters.getProjectCodeToName[projectCode];
         this.$store.dispatch('setSelectedProjectCode', projectCode);
         this.$store.dispatch('setSelectedProjectName', projectName);
 
+        this.breadcrumbItems.push({
+          text: projectName,
+          href: '/dashboard/' + projectCode
+        });
+
         this.trailName = 'All Sites in ' + projectName;
-        store.dispatch('setSelectedSite', {'trailName': projectName, setStyle: x => x}); // a dummy set style method which does nothing
+        this.$store.dispatch('setSelectedSite', {'trailName': projectName, setStyle: x => x}); // a dummy set style method which does nothing
 
         this.$refs['map-div'].renderProjectSites();
 
@@ -137,6 +150,14 @@
         this.trailName = this.$store.getters.getSelectedSite['trailName'];
         this.comparingTrailName = '';
 
+        if (this.breadcrumbItems.length > 1) {
+          this.breadcrumbItems.pop()
+        }
+        this.breadcrumbItems.push({
+          text: this.trailName,
+          href: 'javascript:void()'
+        });
+
         this.$store.dispatch('setVizMode', VIZ_MODES.SITE);
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
@@ -150,6 +171,9 @@
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
         this.$refs['home-locations'].renderTreeMap();
+      },
+      showSelectedTab: function(tab) {
+        this.visibleTabGroup = tab;
       },
       activateHomeLocationsMap: function (event) {
         // The event here is a boolean variable which tell if the
@@ -175,4 +199,19 @@
   .charts-col {
     padding: 4px 4px 4px 4px !important;
   }
+
+  .app-breadcrumb {
+    height: 38px;
+    padding: 8px 8px 8px 8px;
+  }
+
+  .app-button-group {
+    margin-left: 8px;
+  }
+
+  .app-button {
+    color: #6c757d;
+    background-color: #e9ecef;
+  }
+
 </style>

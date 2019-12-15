@@ -40,7 +40,7 @@
 
 <style scoped>
   p {
-    height: 66vh;
+    height: 75vh;
     overflow: auto;
   }
 </style>

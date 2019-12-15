@@ -134,6 +134,6 @@
   @import "../assets/styles/home-locations-map.css";
 
   #mapHomeLocations {
-    height: 66vh;
+    height: 72vh;
   }
 </style>
