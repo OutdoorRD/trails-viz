@@ -30,6 +30,10 @@
         filteredProjects: []
       }
     },
+    mounted() {
+      // clear the selected project info
+      this.$store.dispatch('clearSelectedProjectData');
+    },
     methods: {
       autoCompleteProject: function () {
         let allProjects = this.$store.getters.getAllProjects;

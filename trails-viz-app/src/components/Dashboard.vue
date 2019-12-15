@@ -168,6 +168,15 @@
       renderComparisionPlots: function () {
         this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
         this.comparingTrailName = this.$store.getters.getComparingSite['trailName'];
+
+        if (this.breadcrumbItems.length > 1) {
+          this.breadcrumbItems.pop()
+        }
+        this.breadcrumbItems.push({
+          text: this.trailName + ' vs ' + this.comparingTrailName,
+          href: 'javascript:void()'
+        });
+
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
         this.$refs['home-locations'].renderTreeMap();
