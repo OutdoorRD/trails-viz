@@ -15,8 +15,6 @@
         projectCode: null,
         siteid: null,
         homeLocations: null,
-        comparingSite: null,
-        comparingSiteHomeLocations: null,
         randomSeed: null
       }
     },
@@ -121,17 +119,6 @@
         this.randomSeed = 12;
         let self = this;
 
-        if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
-          let comparingSiteId = self.$store.getters.getComparingSite['siteid'];
-          self.comparingSite = self.$store.getters.getComparingSite;
-          axios.get(self.$apiEndpoint + '/sites/' + comparingSiteId + '/homeLocations')
-            .then(response => {
-              self.comparingSiteHomeLocations = response.data;
-              self._renderTreeMap();
-            });
-          return
-        }
-
         self.clear();
 
         self.projectName = self.$store.getters.getSelectedProjectName;
@@ -154,9 +141,6 @@
       _renderTreeMap: function() {
         let self = this;
         let data = self.homeLocations;
-        if (self.$store.getters.getComparingSite) {
-          data = self._mergeTrees(self.homeLocations, self.$store.getters.getComparingHomeLocations)
-        }
         let labels = [];
         let parents = [];
         let values = [];
@@ -189,9 +173,12 @@
             }
           }
         }
+        const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        const hw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         let layout = {
           autosize: false,
-          height: 400,
+          height: Math.floor(0.72 * vh),
+          width: Math.floor(0.48 * hw),
           margin: {
             l: 10,
             r: 0,
@@ -223,9 +210,8 @@
 
 <style scoped>
   #chart {
-    height: 500px;
+    height: 72vh;
     width: 100%;
     max-width: 100%;
-    overflow:auto;
   }
 </style>
