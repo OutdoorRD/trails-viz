@@ -5,15 +5,16 @@
     </b-col>
     <b-col sm="6" class="charts-col">
       <b-row no-gutters>
-        <b-col sm="6">
+        <b-col sm="7">
           <b-breadcrumb :items="breadcrumbItems" class="app-breadcrumb"></b-breadcrumb>
         </b-col>
-        <b-col sm="6">
+        <b-col sm="5">
           <b-button-group class="app-button-group d-flex">
             <b-button v-on:click="showSelectedTab('visitation')" class="app-button"
                       v-bind:class="{active: visibleTabGroup === 'visitation'}">Visitation</b-button>
             <b-button v-on:click="showSelectedTab('visitorCharacteristics')" class="app-button"
-                      v-bind:class="{active: visibleTabGroup === 'visitorCharacteristics'}">Visitor Characteristics</b-button>
+                      v-bind:class="{active: visibleTabGroup === 'visitorCharacteristics'}"
+                      :disabled="this.$store.getters.getVizMode === 'compare'">Visitor Characteristics</b-button>
           </b-button-group>
         </b-col>
       </b-row>
@@ -169,6 +170,9 @@
         this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
         this.comparingTrailName = this.$store.getters.getComparingSite['trailName'];
 
+        // hide the visitor characteristics tab group when comparing
+        this.visibleTabGroup = 'visitation';
+
         if (this.breadcrumbItems.length > 1) {
           this.breadcrumbItems.pop()
         }
@@ -179,7 +183,6 @@
 
         this.$refs['bar-graph'].renderDefaultGraph();
         this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
       },
       showSelectedTab: function(tab) {
         this.visibleTabGroup = tab;
