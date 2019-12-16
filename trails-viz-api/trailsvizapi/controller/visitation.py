@@ -16,13 +16,13 @@ def get_project_weekly_visitation(project):
     return Response(data.to_json(orient='records'), mimetype='application/json')
 
 
-@app.route('/api/sites/<int:siteid>/monthlyVisitation')
+@app.route('/api/sites/<string:siteid>/monthlyVisitation')
 def get_monthly_visitation(siteid):
     data = visitation.get_monthly_visitation(siteid)
     return Response(data.to_json(orient='records'), mimetype='application/json')
 
 
-@app.route('/api/sites/<int:siteid>/weeklyVisitation')
+@app.route('/api/sites/<string:siteid>/weeklyVisitation')
 def get_weekly_visitation(siteid):
     data = visitation.get_weekly_visitation(siteid)
     return Response(data.to_json(orient='records'), mimetype='application/json')

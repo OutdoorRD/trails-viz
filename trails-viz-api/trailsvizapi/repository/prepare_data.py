@@ -207,7 +207,7 @@ def _prepare_project_readme():
     # read the visitation info file
     visit_readme_files = list(filter(lambda x: x.endswith('_visits.md'), readme_files))
     for project in config.PROJECT_NAMES.values():
-        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project, readme_files))[0]
+        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project.upper(), visit_readme_files))[0]
         with open(_README_DIR + visit_readme, 'r', encoding='utf-8') as f:
             project_readme_cache[project + '_VISITS'] = f.read()
 

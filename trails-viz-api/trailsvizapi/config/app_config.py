@@ -5,5 +5,6 @@ DATA_FILES_ROOT = os.getenv('DATA_FILES_ROOT', 'data-files/')
 PROJECT_NAMES = {
     'Western Washington': 'MBS_PIL',
     'Middle Fork': 'MBS_SARL',
-    'Northern New Mexico': 'DOI'
+    'Northern New Mexico': 'DOI',
+    'King County Parks': 'KingCo'
 }
