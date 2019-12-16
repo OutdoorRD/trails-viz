@@ -1,9 +1,7 @@
 <template>
   <b-container fluid id="app">
     <top-bar class="top-bar"></top-bar>
-    <vue-page-transition>
-      <router-view></router-view>
-    </vue-page-transition>
+    <router-view></router-view>
   </b-container>
 </template>
 
