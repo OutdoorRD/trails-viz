@@ -223,7 +223,7 @@
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
         EventBus.$emit('map-div:site-selected');
-        this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 10});
+        this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 11});
       },
       countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
