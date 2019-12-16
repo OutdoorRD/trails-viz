@@ -59,9 +59,10 @@ def _prepare_geo_dfs():
     lines = lines[['siteid', 'geometry']]
     access_points = access_points[['siteid', 'geometry']]
 
-    # convert siteid from lines and access points to numeric
-    lines['siteid'] = pd.to_numeric(lines['siteid'])
-    access_points['siteid'] = pd.to_numeric(access_points['siteid'])
+    # convert all site ids to string
+    polygons['siteid'] = polygons['siteid'].astype(str)
+    lines['siteid'] = lines['siteid'].astype(str)
+    access_points['siteid'] = access_points['siteid'].astype(str)
 
     # drop columns if required fields are null
     polygons.dropna(subset=['siteid', 'Prjct_code', 'geometry'], inplace=True)
@@ -116,6 +117,10 @@ def _prepare_estimates_and_visitation_df(period):
     estimates_df.drop(columns='d2p', inplace=True)
     estimates_onsite.drop(columns='d2p', inplace=True)
 
+    # convert site id to string, would be helpful later
+    estimates_df['trail'] = estimates_df['trail'].astype(str)
+    estimates_onsite['trail'] = estimates_onsite['trail'].astype(str)
+
     return pd.merge(estimates_df, estimates_onsite, on=id_cols, how='outer')
 
 
@@ -137,6 +142,9 @@ def _prepare_home_locations_df():
                     home_locations = home_locations.append(pd.read_csv(home_locations_file), sort=False)
                 else:
                     home_locations = pd.read_csv(home_locations_file)
+
+    # convert siteid to string
+    home_locations['siteid'] = home_locations['siteid'].astype(str)
 
     assert home_locations is not None
     return home_locations
@@ -165,6 +173,7 @@ def _prepare_home_locations_census_tract_df():
     data = data.dropna(subset=['tract'])
     data['tract'] = data['tract'].astype(np.int64)
     data['tract'] = data['tract'].astype(str)
+    data['siteid'] = data['siteid'].astype(str)
 
     # read the SVI data and merge to it
     svi_df = None
