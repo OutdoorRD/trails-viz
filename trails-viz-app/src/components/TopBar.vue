@@ -34,6 +34,7 @@
 <script>
 
   import {EventBus} from '../event-bus'
+  import {Cookie} from "../cookie";
 
   export default {
     name: "TopBar",
@@ -69,7 +70,10 @@
       },
       logout: function () {
         this.$store.dispatch('setLoggedInUser', 'anon');
-        this.$router.push('/')
+        Cookie.delete('userName');
+        if (this.$route.path !== '/') {
+          this.$router.push({path: '/'})
+        }
       }
     }
   }

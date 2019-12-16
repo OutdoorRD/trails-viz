@@ -9,6 +9,7 @@
 import TopBar from "./components/TopBar";
 
 import axios from "axios";
+import {Cookie} from "./cookie";
 
 export default {
   name: 'app',
@@ -27,6 +28,12 @@ export default {
         self.$store.dispatch('setAllProjects', allProjects);
         self.$store.dispatch('setProjectCodeToName', projectCodeToName);
       });
+
+    // Check cookies if user is logged in
+    let userName = Cookie.get('userName');
+    if (userName !== undefined) {
+      self.$store.dispatch('setLoggedInUser', userName);
+    }
   }
 }
 </script>

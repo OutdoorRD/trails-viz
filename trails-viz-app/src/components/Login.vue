@@ -23,6 +23,9 @@
 </template>
 
 <script>
+
+  import {Cookie} from '../cookie'
+
   export default {
     name: "Login",
     data() {
@@ -42,6 +45,7 @@
         event.preventDefault();
         // authentication code will go here
         this.$store.dispatch('setLoggedInUser', this.userName);
+        Cookie.set('userName', this.userName, 1);
         this.$router.push(this.prevRoute);
       },
       clear(event) {
