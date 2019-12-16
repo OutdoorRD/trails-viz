@@ -9,9 +9,21 @@
         <b-nav-text>Monitoring Recreation with Social Media</b-nav-text>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-form v-on:submit="doNothing" v-show="this.$store.getters.getSelectedProjectCode">
-          <b-form-input class="form-input" size="sm" list="project-sites-list" placeholder="Search Trail" v-model="siteSearchText" v-on:keyup="autoCompleteSite" v-on:change="emitSiteNameEvent"></b-form-input>
+        <b-nav-form v-on:submit="doNothing">
+          <b-form-input class="form-input" size="sm" list="project-sites-list" placeholder="Search Trail"
+                        v-model="siteSearchText" v-on:keyup="autoCompleteSite" v-on:change="emitSiteNameEvent"
+                        v-show="this.$store.getters.getSelectedProjectCode"></b-form-input>
           <b-form-datalist id="project-sites-list" :options="filteredSites"></b-form-datalist>
+
+          <b-button size="sm" class="my-2 my-sm-0" variant="info" to="/login"
+                    v-show="this.$store.getters.getLoggedInUser === 'anon'">Login</b-button>
+
+          <b-nav-item-dropdown v-bind:text="this.$store.getters.getLoggedInUser"
+                               v-show="this.$store.getters.getLoggedInUser !== 'anon'" right>
+            <b-dropdown-item>Profile</b-dropdown-item>
+            <b-dropdown-item>Logout</b-dropdown-item>
+          </b-nav-item-dropdown>
+
         </b-nav-form>
       </b-navbar-nav>
     </b-collapse>

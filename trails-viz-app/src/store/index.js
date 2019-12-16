@@ -13,6 +13,7 @@ const state = {
   vizMode: '',
   censusTract: '',
   comparingSite: '',
+  loggedInUser: 'anon',
 };
 
 const mutations = {
@@ -42,6 +43,9 @@ const mutations = {
   },
   setComparingSite(state, comparingSite) {
     state.comparingSite = comparingSite;
+  },
+  setLoggedInUser(state, loggedInUser) {
+    state.loggedInUser = loggedInUser;
   },
   clearSelectedProjectData(state) {
     state.selectedProjectName = '';
@@ -87,6 +91,9 @@ const actions = {
   setComparingSite(context, comparingSite) {
     context.commit('setComparingSite', comparingSite)
   },
+  setLoggedInUser(context, loggedInUser) {
+    context.commit('setLoggedInUser', loggedInUser)
+  },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
   }
@@ -119,6 +126,9 @@ const getters = {
   },
   getComparingSite(state) {
     return state.comparingSite
+  },
+  getLoggedInUser(state) {
+    return state.loggedInUser
   }
 };
 
