@@ -16,7 +16,9 @@ _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
-_CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract/'
+_STATE_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/state/'
+_COUNTY_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/county/'
+_CENSUS_TRACT_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/census-tract/'
 _README_DIR = config.DATA_FILES_ROOT + 'readme/'
 _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 
@@ -149,20 +151,49 @@ def _prepare_home_locations_df():
     return home_locations
 
 
-def _prepare_census_tract_df():
-    census_tract_df = None
-    for item in os.listdir(_CENSUS_TRACT_FILES_DIR):
+def _prepare_geographies_df(root):
+    geographies_df = None
+    for item in os.listdir(root):
         if item.endswith('.geojson'):
-            geojson_file = _CENSUS_TRACT_FILES_DIR + item
-            if census_tract_df is None:
-                census_tract_df = gpd.read_file(geojson_file)
+            geojson_file = root + item
+            if geographies_df is None:
+                geographies_df = gpd.read_file(geojson_file)
             else:
-                census_tract_df = census_tract_df.append(gpd.read_file(geojson_file), sort=False)
+                geographies_df = geographies_df.append(gpd.read_file(geojson_file), sort=False)
 
-    assert census_tract_df is not None
+    assert geographies_df is not None
+    return geographies_df
+
+
+def _prepare_state_boundaries_df():
+    state_boundaries_df = _prepare_geographies_df(_STATE_GEOGRAPHIES_DIR)
+    state_boundaries_df = state_boundaries_df[['STATEFP', 'NAME', 'geometry']]
+    state_boundaries_df.rename(columns={'STATEFP': 'state_code', 'NAME': 'state'}, inplace=True)
+    return state_boundaries_df
+
+
+def _prepare_counties_df():
+    counties_df = _prepare_geographies_df(_COUNTY_GEOGRAPHIES_DIR)
+    counties_df = counties_df[['STATEFP', 'COUNTYFP', 'NAME', 'geometry']]
+    state_codes = pd.read_csv(config.DATA_FILES_ROOT + 'geographies/state_codes.csv', dtype={'state_code': str})
+    counties_df = counties_df.merge(state_codes, left_on='STATEFP', right_on='state_code', how='left')
+    counties_df = counties_df.drop(columns='STATEFP')
+    counties_df.rename(columns={'COUNTYFP': 'county_code', 'NAME': 'county'}, inplace=True)
+    return counties_df
+
+
+def _prepare_census_tract_df():
+    census_tract_df = _prepare_geographies_df(_CENSUS_TRACT_GEOGRAPHIES_DIR)
 
     # keep only required columns
-    census_tract_df = census_tract_df[['GEOID', 'geometry']]
+    census_tract_df = census_tract_df[['STATEFP', 'COUNTYFP', 'GEOID', 'geometry']]
+    county_codes = pd.read_csv(config.DATA_FILES_ROOT + 'geographies/county_codes.csv',
+                               dtype={'state_code': str, 'county_codes': str})
+
+    census_tract_df = census_tract_df.merge(county_codes, left_on=['STATEFP', 'COUNTYFP'],
+                                            right_on=['state_code', 'county_code'], how='inner')
+
+    census_tract_df = census_tract_df.drop(columns=['STATEFP', 'COUNTYFP'])
     census_tract_df.rename(columns={'GEOID': 'tract'}, inplace=True)
     return census_tract_df
 
@@ -232,7 +263,9 @@ def get_from_data_source(key):
         DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
-        DATA_SOURCE['CENSUS_TRACT'] = _prepare_census_tract_df()
+        DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
+        DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
+        DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
         DATA_SOURCE['HOME_LOCATIONS_CENSUS_TRACT_DF'] = _prepare_home_locations_census_tract_df()
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
 

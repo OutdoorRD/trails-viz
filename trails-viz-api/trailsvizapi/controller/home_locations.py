@@ -10,21 +10,45 @@ def get_home_locations(siteid):
     return jsonify(data)
 
 
+@app.route('/api/sites/<string:siteid>/homeLocationsState')
+def get_home_locations_state(siteid):
+    data = home_locations.get_home_locations_by_state(siteid)
+    return Response(data.to_json(), mimetype='application/json')
+
+
+@app.route('/api/sites/<string:siteid>/homeLocationsCounty/<string:state>')
+def get_home_locations_county(siteid, state):
+    data = home_locations.get_home_locations_by_county(siteid, state)
+    return Response(data.to_json(), mimetype='application/json')
+
+
+@app.route('/api/sites/<string:siteid>/homeLocationsCensusTract/<string:state>/<string:county>')
+def get_home_locations_census_tract(siteid, state, county):
+    data = home_locations.get_home_locations_by_census_tract(siteid, state, county)
+    return Response(data.to_json(), mimetype='application/json')
+
+
 @app.route('/api/projects/<string:project>/homeLocations')
 def get_project_home_locations(project):
     data = home_locations.get_project_home_locations(project)
     return jsonify(data)
 
 
-@app.route('/api/sites/<string:siteid>/homeLocationsCensusTract')
-def get_home_locations_census_tract(siteid):
-    data = home_locations.get_home_locations_by_census_tract(siteid)
+@app.route('/api/projects/<string:project>/homeLocationsState')
+def get_project_home_locations_state(project):
+    data = home_locations.get_project_home_locations_by_state(project)
     return Response(data.to_json(), mimetype='application/json')
 
 
-@app.route('/api/projects/<string:project>/homeLocationsCensusTract')
-def get_project_home_locations_census_tract(project):
-    data = home_locations.get_project_home_locations_by_census_tract(project)
+@app.route('/api/projects/<string:project>/homeLocationsCounty/<string:state>')
+def get_home_project_locations_county(project, state):
+    data = home_locations.get_project_home_locations_by_county(project, state)
+    return Response(data.to_json(), mimetype='application/json')
+
+
+@app.route('/api/projects/<string:project>/homeLocationsCensusTract/<string:state>/<string:county>')
+def get_project_home_locations_census_tract(project, state, county):
+    data = home_locations.get_project_home_locations_by_census_tract(project, state, county)
     return Response(data.to_json(), mimetype='application/json')
 
 

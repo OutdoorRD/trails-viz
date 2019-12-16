@@ -58,13 +58,56 @@ def get_project_home_locations(project):
     return _treefy_home_locations(project, project_home_locations)
 
 
-def get_census_tract():
-    return get_from_data_source('CENSUS_TRACT')
+def get_home_locations_by_state(siteid):
+    state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    site_home_locations = site_home_locations[['state', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by='state', as_index=False).sum()
+
+    site_home_stated_data = state_boundaries.merge(site_home_locations, on='state', how='inner')
+    return site_home_stated_data
 
 
-def get_home_locations_by_census_tract(siteid):
+def get_project_home_locations_by_state(project):
+    state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    site_home_locations = site_home_locations[['state', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by='state', as_index=False).sum()
+
+    site_home_stated_data = state_boundaries.merge(site_home_locations, on='state', how='inner')
+    return site_home_stated_data
+
+
+def get_home_locations_by_county(siteid, state):
+    county_geographies = get_from_data_source('COUNTIES_DF')
+    county_geographies = county_geographies[county_geographies['state'] == state]
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    site_home_locations = site_home_locations[['state', 'county', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by=['state', 'county'], as_index=False).sum()
+
+    site_home_stated_data = county_geographies.merge(site_home_locations, on=['state', 'county'], how='inner')
+    return site_home_stated_data
+
+
+def get_project_home_locations_by_county(project, state):
+    county_geographies = get_from_data_source('COUNTIES_DF')
+    county_geographies = county_geographies[county_geographies['state'] == state]
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    site_home_locations = site_home_locations[['state', 'county', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by=['state', 'county'], as_index=False).sum()
+
+    site_home_stated_data = county_geographies.merge(site_home_locations, on=['state', 'county'], how='inner')
+    return site_home_stated_data
+
+
+def get_home_locations_by_census_tract(siteid, state, county):
     home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
-    census_tract = get_from_data_source('CENSUS_TRACT')
+    census_tract = get_from_data_source('CENSUS_TRACT_DF')
+
     site_home_locations = home_locations[home_locations['siteid'] == siteid]
     site_home_census_data = census_tract.merge(site_home_locations, on='tract', how='inner')
     return site_home_census_data
