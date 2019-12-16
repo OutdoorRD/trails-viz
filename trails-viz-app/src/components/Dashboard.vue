@@ -14,7 +14,8 @@
                       v-bind:class="{active: visibleTabGroup === 'visitation'}">Visitation</b-button>
             <b-button v-on:click="showSelectedTab('visitorCharacteristics')" class="app-button"
                       v-bind:class="{active: visibleTabGroup === 'visitorCharacteristics'}"
-                      :disabled="this.$store.getters.getVizMode === 'compare'">Visitor Characteristics</b-button>
+                      :disabled="this.$store.getters.getVizMode === 'compare'"
+                      v-show="this.$store.getters.getLoggedInUser !== 'anon'">Visitor Characteristics</b-button>
           </b-button-group>
         </b-col>
       </b-row>

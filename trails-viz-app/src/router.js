@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import LandingPage from './components/LandingPage'
 import Dashboard from './components/Dashboard'
 import Login from './components/Login'
+import UserProfile from "./components/UserProfile";
 
 Vue.use(VueRouter);
 
@@ -14,6 +15,11 @@ const routes = [
   {
     path: '/login',
     component: Login
+  },
+  {
+    path: '/user/:userName',
+    name: 'user',
+    component: UserProfile
   },
   {
     path: '/dashboard/:project',

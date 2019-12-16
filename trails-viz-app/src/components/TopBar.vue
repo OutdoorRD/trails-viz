@@ -20,8 +20,8 @@
 
           <b-nav-item-dropdown v-bind:text="this.$store.getters.getLoggedInUser"
                                v-show="this.$store.getters.getLoggedInUser !== 'anon'" right>
-            <b-dropdown-item>Profile</b-dropdown-item>
-            <b-dropdown-item>Logout</b-dropdown-item>
+            <b-dropdown-item v-on:click="gotoUserProfile">Profile</b-dropdown-item>
+            <b-dropdown-item v-on:click="logout">Logout</b-dropdown-item>
           </b-nav-item-dropdown>
 
         </b-nav-form>
@@ -62,6 +62,14 @@
       },
       doNothing: function(event) {
         event.preventDefault()
+      },
+      gotoUserProfile: function () {
+        let userName = this.$store.getters.getLoggedInUser;
+        this.$router.push({name: 'user', params: {userName: userName}});
+      },
+      logout: function () {
+        this.$store.dispatch('setLoggedInUser', 'anon');
+        this.$router.push('/')
       }
     }
   }

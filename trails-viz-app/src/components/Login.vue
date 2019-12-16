@@ -27,13 +27,22 @@
     name: "Login",
     data() {
       return {
+        prevRoute: null,
         userName: '',
         password: ''
       }
     },
+    beforeRouteEnter(to, from, next) {
+      next(self => {
+        self.prevRoute = from
+      })
+    },
     methods: {
       login(event) {
         event.preventDefault();
+        // authentication code will go here
+        this.$store.dispatch('setLoggedInUser', this.userName);
+        this.$router.push(this.prevRoute);
       },
       clear(event) {
         event.preventDefault();
