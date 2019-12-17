@@ -1,5 +1,5 @@
 <template>
-  <div v-html="compiledMarkdown"></div>
+  <p v-html="compiledMarkdown"></p>
 </template>
 
 <script>
@@ -39,5 +39,8 @@
 </script>
 
 <style scoped>
-
+  p {
+    height: 75vh;
+    overflow: auto;
+  }
 </style>

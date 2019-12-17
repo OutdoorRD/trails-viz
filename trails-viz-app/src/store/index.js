@@ -4,7 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 const state = {
-  allProjects: {},
+  allProjects: undefined,
+  projectCodeToName: undefined,
   selectedProjectName: '',
   selectedProjectCode: '',
   projectSites: {},
@@ -12,11 +13,15 @@ const state = {
   vizMode: '',
   censusTract: '',
   comparingSite: '',
+  loggedInUser: 'anon',
 };
 
 const mutations = {
   setAllProjects(state, allProjects) {
     state.allProjects = allProjects;
+  },
+  setProjectCodeToName(state, projectCodeToName) {
+    state.projectCodeToName = projectCodeToName;
   },
   setSelectedProjectName(state, projectName) {
     state.selectedProjectName = projectName
@@ -39,6 +44,9 @@ const mutations = {
   setComparingSite(state, comparingSite) {
     state.comparingSite = comparingSite;
   },
+  setLoggedInUser(state, loggedInUser) {
+    state.loggedInUser = loggedInUser;
+  },
   clearSelectedProjectData(state) {
     state.selectedProjectName = '';
     state.selectedProjectCode = '';
@@ -58,6 +66,9 @@ const mutations = {
 const actions = {
   setAllProjects(context, allProjects) {
     context.commit('setAllProjects', allProjects)
+  },
+  setProjectCodeToName(context, projectCodeToName) {
+    context.commit('setProjectCodeToName', projectCodeToName)
   },
   setSelectedProjectName(context, projectName) {
     context.commit('setSelectedProjectName', projectName)
@@ -80,6 +91,9 @@ const actions = {
   setComparingSite(context, comparingSite) {
     context.commit('setComparingSite', comparingSite)
   },
+  setLoggedInUser(context, loggedInUser) {
+    context.commit('setLoggedInUser', loggedInUser)
+  },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
   }
@@ -88,6 +102,9 @@ const actions = {
 const getters = {
   getAllProjects(state) {
     return state.allProjects
+  },
+  getProjectCodeToName(state) {
+    return state.projectCodeToName
   },
   getSelectedProjectName(state) {
     return state.selectedProjectName
@@ -109,6 +126,9 @@ const getters = {
   },
   getComparingSite(state) {
     return state.comparingSite
+  },
+  getLoggedInUser(state) {
+    return state.loggedInUser
   }
 };
 

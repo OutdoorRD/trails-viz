@@ -5,14 +5,13 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 
-import trailsvizapi.app_config as config
+import trailsvizapi.config.app_config as config
 
 _PROJECT_FILES_ROOT = config.DATA_FILES_ROOT + 'projects/'
 _ALLSITES_POLYGONS_FILE = 'allsites.geojson'
 _ALLSITES_LINES_FILE = 'allsites_lines.geojson'
 _ALLSITES_ACCESS_POINTS_FILE = 'allsites_access_points.geojson'
-_ALLSITES_HOME_LOCATIONS_FILE = 'allsites_homes_by_site.csv'
-_ALLSITES_HOME_LOCATIONS_CENSUS_TRACT_FILE = 'allsites_homes_by_site_census.csv'
+_ALLSITES_HOME_LOCATIONS_FILE = 'homes_by_site_census.csv'
 _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
@@ -59,9 +58,10 @@ def _prepare_geo_dfs():
     lines = lines[['siteid', 'geometry']]
     access_points = access_points[['siteid', 'geometry']]
 
-    # convert siteid from lines and access points to numeric
-    lines['siteid'] = pd.to_numeric(lines['siteid'])
-    access_points['siteid'] = pd.to_numeric(access_points['siteid'])
+    # convert all site ids to string
+    polygons['siteid'] = polygons['siteid'].astype(str)
+    lines['siteid'] = lines['siteid'].astype(str)
+    access_points['siteid'] = access_points['siteid'].astype(str)
 
     # drop columns if required fields are null
     polygons.dropna(subset=['siteid', 'Prjct_code', 'geometry'], inplace=True)
@@ -116,6 +116,10 @@ def _prepare_estimates_and_visitation_df(period):
     estimates_df.drop(columns='d2p', inplace=True)
     estimates_onsite.drop(columns='d2p', inplace=True)
 
+    # convert site id to string, would be helpful later
+    estimates_df['trail'] = estimates_df['trail'].astype(str)
+    estimates_onsite['trail'] = estimates_onsite['trail'].astype(str)
+
     return pd.merge(estimates_df, estimates_onsite, on=id_cols, how='outer')
 
 
@@ -137,6 +141,9 @@ def _prepare_home_locations_df():
                     home_locations = home_locations.append(pd.read_csv(home_locations_file), sort=False)
                 else:
                     home_locations = pd.read_csv(home_locations_file)
+
+    # convert siteid to string
+    home_locations['siteid'] = home_locations['siteid'].astype(str)
 
     assert home_locations is not None
     return home_locations
@@ -161,10 +168,11 @@ def _prepare_census_tract_df():
 
 
 def _prepare_home_locations_census_tract_df():
-    data = pd.read_csv(config.DATA_FILES_ROOT + 'allsites_homes_by_site_census.csv')
+    data = _prepare_home_locations_df()
     data = data.dropna(subset=['tract'])
     data['tract'] = data['tract'].astype(np.int64)
     data['tract'] = data['tract'].astype(str)
+    data['siteid'] = data['siteid'].astype(str)
 
     # read the SVI data and merge to it
     svi_df = None
@@ -207,7 +215,7 @@ def _prepare_project_readme():
     # read the visitation info file
     visit_readme_files = list(filter(lambda x: x.endswith('_visits.md'), readme_files))
     for project in config.PROJECT_NAMES.values():
-        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project, readme_files))[0]
+        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project.upper(), visit_readme_files))[0]
         with open(_README_DIR + visit_readme, 'r', encoding='utf-8') as f:
             project_readme_cache[project + '_VISITS'] = f.read()
 
