@@ -18,10 +18,12 @@ install:
 jobs:
   include:
     - stage: app-build
+      before_script:
+        - export NODE_OPTIONS=–max_old_space_size=4096
       script:
         - cd trails-viz-app
         - npm install
-        - npn run lint
+        - npm run lint
         - npm run build
         - cd ..
     - stage: api-build
