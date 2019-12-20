@@ -56,7 +56,7 @@ update_version() {
   new_version=$(echo "$new_version" | awk -Fv '{print $2}')
   cd ..
   cd trails-viz-api
-  sed -i "s/__version__.*/__version__ = '$new_version'/" api/__init__.py
+  sed -i "s/__version__.*/__version__ = '$new_version'/" trailsvizapi/__init__.py
   cd ..
   echo "local version bump successful $new_version"
 
@@ -76,13 +76,13 @@ deploy() {
   update_version
   docker build -t trails-viz:"$TRAVIS_COMMIT" .
 
-  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:"$TRAVIS_COMMIT"
-  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:"$new_version"
-  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:latest
+  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:"$TRAVIS_COMMIT"
+  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:"$new_version"
+  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:latest
 
-  docker push outdoorrd/trails-viz:"$TRAVIS_COMMIT"
-  docker push outdoorrd/trails-viz:"$new_version"
-  docker push outdoorrd/trails-viz:latest
+  docker push vivekkr12/trails-viz:"$TRAVIS_COMMIT"
+  docker push vivekkr12/trails-viz:"$new_version"
+  docker push vivekkr12/trails-viz:latest
 }
 
 if [ $# -eq 0 ]
