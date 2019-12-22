@@ -29,7 +29,8 @@ def _get_project_estimates(project, period):
     project_sites_data = df[df['trail'].isin(project_site_ids)]
 
     if period == 'monthly':
-        project_sites_data = project_sites_data.drop(columns='year').groupby(by=['trail', 'month'], as_index=False).mean()
+        project_sites_data = project_sites_data.drop(columns='year').groupby(by=['trail', 'month'],
+                                                                             as_index=False).mean()
         project_sites_data = project_sites_data.drop(columns='trail').groupby(by=['month']).sum()
     elif period == 'annual':
         project_sites_data = project_sites_data.drop(columns=['trail', 'month']).groupby(by=['year']).sum()

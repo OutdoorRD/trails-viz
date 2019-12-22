@@ -1,38 +1,23 @@
+if: commit_message !~ /travis build/
 language: python
+python:
+  - 3.7
+node_js:
+  - 10
 git:
   depth: 5
 services:
   - docker
-python:
-  - 3.6
 branches:
   only:
     - master
-before_install:
-  - node_js install 10
-
+env:
+  - NODE_OPTIONS="--max_old_space_size=4096"
 install:
-  - python -m pip install --upgrade pip
-  - pip install flake8
-  - pip install wheel
-
-jobs:
-  include:
-    - stage: app-build
-      script:
-        - cd trails-viz-app
-        - npm install
-        - npn run lint
-        - npm run build
-        - cd ..
-    - stage: api-build
-      script:
-        - cd trails-viz-api
-        - pip install -r requirements.txt
-        - flake8 . --count --max-line-length=119 --exclude trailsvizapi/__init__.py --show-source --statistics
-        - python setup.py bdist_wheel
-        - cd ..
-
-stages:
-  - app-build
-  - api-build
+  - bash build.sh install
+script:
+  - bash build.sh package
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash build.sh deploy

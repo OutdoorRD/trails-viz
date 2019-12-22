@@ -113,7 +113,9 @@ def _prepare_estimates_and_visitation_df(period):
     id_cols = ['trail', 'month', 'year'] if period == 'monthly' else ['trail', 'week', 'month', 'year']
 
     estimates_df.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
-    estimates_onsite.rename(columns={'resp.ss': 'onsite', 'resplg': 'log_onsite', 'resp.ll': 'data_days'}, inplace=True)
+    estimates_onsite.rename(columns={'resp.ss': 'onsite',
+                                     'resplg': 'log_onsite',
+                                     'resp.ll': 'data_days'}, inplace=True)
 
     estimates_df.drop(columns='d2p', inplace=True)
     estimates_onsite.drop(columns='d2p', inplace=True)
