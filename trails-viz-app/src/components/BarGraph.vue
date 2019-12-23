@@ -111,7 +111,7 @@
         arr.unshift(label);
         return arr;
       },
-      _renderBarGraph: function (data, categories, colors, showLegend=false) {
+      _renderBarGraph: function (data, categories, colors, yAxisLabel, showLegend=false) {
         c3.generate({
           bindto: '#chart-area',
           size: {
@@ -129,7 +129,7 @@
             },
             y: {
               label: {
-                text: 'Average Modeled Number of Visits',
+                text: yAxisLabel,
                 position: 'outer-middle'
               }
             }
@@ -216,9 +216,9 @@
           let [compareData, compareColors] = self._prepareMonthlyModelledData(self.comparingSite['trailName'], self.comparingSiteMonthlyEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
-          self._renderBarGraph(data, categories, colors, true);
+          self._renderBarGraph(data, categories, colors, 'Average Modeled Number of Visits', true);
         } else {
-          self._renderBarGraph(data, categories, colors);
+          self._renderBarGraph(data, categories, colors, 'Average Modeled Number of Visits');
         }
 
       },
@@ -235,7 +235,7 @@
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
-        self._renderBarGraph(data, categories, colors, true);
+        self._renderBarGraph(data, categories, colors, 'Average Social Media User-Days', true);
       },
       renderAnnualModelled: function () {
         let self = this;
@@ -249,9 +249,9 @@
           let [compareData, compareColors] = self._prepareAnnualModelledData(self.comparingSite['trailName'], self.comparingSiteAnnualEstimates, true);
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
-          self._renderBarGraph(data, categories, colors, true);
+          self._renderBarGraph(data, categories, colors, 'Total Modeled Number of Visits',true);
         } else {
-          self._renderBarGraph(data, categories, colors);
+          self._renderBarGraph(data, categories, colors, 'Total Modeled Number of Visits');
         }
       },
       renderAnnualSocialMedia: function () {
@@ -267,7 +267,7 @@
           data = data.concat(compareData);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
         }
-        self._renderBarGraph(data, categories, colors, true);
+        self._renderBarGraph(data, categories, colors, 'Total Social Media User-Days', true);
       },
       renderSelectedGraph: function () {
         if (this.timePeriod === 'monthly' && this.dataSource === 'modelled') {
