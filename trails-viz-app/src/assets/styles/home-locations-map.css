@@ -15,3 +15,11 @@
     margin: 0 auto;
     padding: 0;
 }
+
+.hl-switch-options {
+    padding-left: 10px;
+}
+
+.hl-hidden {
+    display: none;
+}

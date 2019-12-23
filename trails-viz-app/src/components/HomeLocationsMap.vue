@@ -17,6 +17,8 @@
         visibleLayer: '',
         projectCode: '',
         siteid: '',
+        clickedState: '',
+        clickedCounty: '',
         level: 'state',  // allowed values are ['state', 'county', 'censusTract']
         activated: false
       }
@@ -50,7 +52,23 @@
         };
         legend.addTo(mapDiv);
 
+        let switchOptions = L.control({position: 'topright'});
+
+        switchOptions.onAdd = function() {
+          let div = L.DomUtil.create('div');
+          div.innerHTML +=
+            "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden'>Back to State Level</a>" +
+            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>";
+
+          return div;
+        };
+
+        switchOptions.addTo(mapDiv);
         self.mapDiv = mapDiv;
+
+        // add event listeners to switch back to higher level
+        document.getElementById('backToState').addEventListener('click', () => self.renderHomeLocationsMap());
+        document.getElementById('backToCounty').addEventListener('click', () => self._renderCountyLevel(self.clickedState));
       },
       _getColors: function(d) {
         return d > 100 ? '#800026' :
@@ -127,6 +145,18 @@
           };
         }
 
+        // show hide go back buttons
+        if (self.level === 'state') {
+          document.getElementById('backToState').classList.add('hl-hidden');
+          document.getElementById('backToCounty').classList.add('hl-hidden');
+        } else if (self.level === 'county') {
+          document.getElementById('backToState').classList.remove('hl-hidden');
+          document.getElementById('backToCounty').classList.add('hl-hidden');
+        } else if (self.level === 'censusTract') {
+          document.getElementById('backToState').classList.add('hl-hidden');
+          document.getElementById('backToCounty').classList.remove('hl-hidden');
+        }
+
         function getTooltipHtml(layer) {
           let props = layer.feature.properties;
           let toolTip = '<table class="home-location-tooltip">';
@@ -169,6 +199,7 @@
             const stateCode = props['state_code'];
             if (self.level === 'state') {
               self._renderCountyLevel(stateCode);
+              self.clickedState = stateCode;
             } else if (self.level === 'county') {
               // Right now we only have census tract level info for NM and WA. change the array
               // if new states are added or remove altogether if complete info is available
@@ -178,6 +209,8 @@
               }
               const countyCode = props['county_code'];
               self._renderCensusTractLevel(stateCode, countyCode);
+              self.clickedState = stateCode;
+              self.clickedCounty = countyCode;
             }
           });
         self.visibleLayer.addTo(self.mapDiv);
