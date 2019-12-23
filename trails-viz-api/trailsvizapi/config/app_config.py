@@ -16,3 +16,10 @@ CENSUS_TRACT_STATES = {
     'DOI': ['35'],
     'KingCo': ['53']
 }
+
+DATA_COLUMNS = {
+    'MBS_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
+    'MBS_SARL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
+    'DOI': ['estimate', 'flickr', 'twitter', 'instag'],
+    'KingCo': ['estimate', 'flickr', 'twitter']
+}

@@ -29,3 +29,8 @@ def get_readme():
     readme_type = request.args.get('type')
     data = projects_and_sites.get_project_readme(readme_type)
     return Response(data, mimetype='text/markdown')
+
+
+@app.route('/api/projects/<string:project>/dataSources')
+def get_project_data_sources(project):
+    return jsonify(app_config.DATA_COLUMNS[project])
