@@ -8,6 +8,7 @@ const state = {
   projectCodeToName: undefined,
   selectedProjectName: '',
   selectedProjectCode: '',
+  selectedProjectDataSources: [],
   projectSites: {},
   selectedSite: '',
   vizMode: '',
@@ -28,6 +29,9 @@ const mutations = {
   },
   setSelectedProjectCode(state, projectCode) {
     state.selectedProjectCode = projectCode
+  },
+  setSelectedProjectDataSources(state, selectedProjectDataSources) {
+    state.selectedProjectDataSources = selectedProjectDataSources
   },
   setProjectSites(state, projectSites) {
     state.projectSites = projectSites
@@ -50,6 +54,7 @@ const mutations = {
   clearSelectedProjectData(state) {
     state.selectedProjectName = '';
     state.selectedProjectCode = '';
+    state.selectedProjectDataSources = [];
     state.projectSites = {};
     state.selectedSite = '';
 
@@ -75,6 +80,9 @@ const actions = {
   },
   setSelectedProjectCode(context, projectCode) {
     context.commit('setSelectedProjectCode', projectCode)
+  },
+  setSelectedProjectDataSources(context, selectedProjectDataSources) {
+    context.commit('setSelectedProjectDataSources', selectedProjectDataSources)
   },
   setProjectSites(context, projectSites) {
     context.commit('setProjectSites', projectSites)
@@ -111,6 +119,9 @@ const getters = {
   },
   getSelectedProjectCode(state) {
     return state.selectedProjectCode
+  },
+  getSelectedProjectDataSources(state) {
+    return state.selectedProjectDataSources
   },
   getProjectSites(state) {
     return state.projectSites

@@ -171,35 +171,39 @@
         return [[estimates], colors];
       },
       _prepareMonthlySocialMediaData: function(trailName, monthlyEstimates, comparing=false) {
-        let self = this;
-        let flickr = [trailName + ' - Flickr'];
-        let instag = [trailName + ' - Instagram'];
-        let twitter = [trailName + ' - Twitter'];
-        let wta = [trailName + ' - WTA'];
-
-        monthlyEstimates.forEach(x => {
-          flickr.push(Math.round(x.flickr));
-          instag.push(Math.round(x.instag));
-          twitter.push(Math.round(x.twitter));
-          wta.push(Math.round(x.wta));
-        });
-
-        return [[flickr, instag, twitter, wta], self._getSocialMediaColors(trailName, comparing)];
+        return this._prepareSocialMediaData(trailName, monthlyEstimates, comparing);
       },
       _prepareAnnualSocialMediaData: function(trailName, annualEstimates, comparing=false) {
+        return this._prepareSocialMediaData(trailName, annualEstimates, comparing);
+      },
+      _prepareSocialMediaData: function(trailName, estimates, comparing) {
         let self = this;
         let flickr = [trailName + ' - Flickr'];
         let instag = [trailName + ' - Instagram'];
         let twitter = [trailName + ' - Twitter'];
         let wta = [trailName + ' - WTA'];
 
-        annualEstimates.forEach(x => {
+        estimates.forEach(x => {
           flickr.push(Math.round(x.flickr));
           instag.push(Math.round(x.instag));
           twitter.push(Math.round(x.twitter));
           wta.push(Math.round(x.wta));
         });
-        return [[flickr, instag, twitter, wta], self._getSocialMediaColors(trailName, comparing)];
+        const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
+        let socialMediaSources = [];
+        if (projectDataSources.includes('flickr')) {
+          socialMediaSources.push(flickr);
+        }
+        if (projectDataSources.includes('instag')) {
+          socialMediaSources.push(instag);
+        }
+        if (projectDataSources.includes('twitter')) {
+          socialMediaSources.push(twitter);
+        }
+        if (projectDataSources.includes('wta')) {
+          socialMediaSources.push(wta);
+        }
+        return [socialMediaSources, self._getSocialMediaColors(trailName, comparing)];
       },
       renderMonthlyModelled: function() {
         let self = this;
