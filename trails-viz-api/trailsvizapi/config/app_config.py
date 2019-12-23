@@ -8,3 +8,11 @@ PROJECT_NAMES = {
     'Northern New Mexico': 'DOI',
     'King County Parks': 'KingCo'
 }
+
+CENSUS_TRACT_STATES = {
+    'MBS_PIL': ['53'],
+    'MBS_SARL': ['53'],
+    'MBS_PIL, MBS_SARL': ['53'],
+    'DOI': ['35'],
+    'KingCo': ['53']
+}
