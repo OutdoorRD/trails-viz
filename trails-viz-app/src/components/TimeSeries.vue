@@ -76,6 +76,7 @@
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
+        let self = this;
         let monthlyDates = ['date'];
         let monthlyModelled = [trailName + ' - Modelled'];
         let monthlyOnsite = [trailName + ' - On Site'];
@@ -93,7 +94,29 @@
           monthlyTwitter.push(x.twitter);
           monthlyWta.push(x.wta);
         });
-        let timeseriesMonthlyData = [monthlyDates, monthlyModelled, monthlyOnsite, monthlyFlickr, monthlyInstag, monthlyTwitter, monthlyWta];
+        const projectDataSources = this.$store.getters.getSelectedProjectDataSources;
+        const vizMode = self.$store.getters.getVizMode;
+
+        let timeseriesMonthlyData = [monthlyDates];
+
+        if (projectDataSources.includes('estimate')) {
+          timeseriesMonthlyData.push(monthlyModelled);
+        }
+        if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
+          timeseriesMonthlyData.push(monthlyOnsite);
+        }
+        if (projectDataSources.includes('flickr')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyFlickr);
+        }
+        if (projectDataSources.includes('twitter')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyTwitter);
+        }
+        if (projectDataSources.includes('instag')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyInstag);
+        }
+        if (projectDataSources.includes('wta')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyWta);
+        }
         if (skipDate) {
           timeseriesMonthlyData.splice(0, 1)
         }
@@ -119,7 +142,30 @@
           weeklyTwitter.push(x.twitter);
           weeklyWta.push(x.wta);
         });
-        let timeseriesWeeklyData = [weeklyDates, weeklyModelled, weeklyOnsite, weeklyFlickr, weeklyInstag, weeklyTwitter, weeklyWta];
+        const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
+        const vizMode = self.$store.getters.getVizMode;
+
+        let timeseriesWeeklyData = [weeklyDates];
+
+        if (projectDataSources.includes('estimate')) {
+          timeseriesWeeklyData.push(weeklyModelled);
+        }
+        if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
+          timeseriesWeeklyData.push(weeklyOnsite);
+        }
+        if (projectDataSources.includes('flickr')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyFlickr);
+        }
+        if (projectDataSources.includes('twitter') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyTwitter);
+        }
+        if (projectDataSources.includes('instag') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyInstag);
+        }
+        if (projectDataSources.includes('wta') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyWta);
+        }
+
         if (skipDate) {
           timeseriesWeeklyData.splice(0, 1)
         }
@@ -178,24 +224,11 @@
           let joinedMonthlyData = self.timeseriesMonthlyData.concat(self._prepareMonthlyData(self.comparingSite['trailName'], self.comparingSiteMonthlyVisitation, true));
           let joinedWeeklyData = self.timeseriesWeeklyData.concat(self._prepareWeeklyData(self.comparingSite['trailName'], self.comparingSiteWeeklyVisitation, true));
 
-          // filter out social media data to remove the clutter
-          joinedMonthlyData.splice(3, 4);
-          joinedMonthlyData.splice(5, 4);
-
-          joinedWeeklyData.splice(3, 4);
-          joinedWeeklyData.splice(5, 4);
-
           self.timeseriesMonthlyData = joinedMonthlyData;
           self.timeseriesWeeklyData = joinedWeeklyData;
 
           let compareColors = self._getColors(self.$store.getters.getComparingSite['trailName'], true);
           Object.keys(compareColors).forEach(key => colors[key] = compareColors[key]);
-        }
-
-        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          // drop on site when viz is project wide.
-          self.timeseriesMonthlyData.splice(2, 1);
-          self.timeseriesWeeklyData.splice(2, 1);
         }
 
         let data;
