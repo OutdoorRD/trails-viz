@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 
-import numpy as np
 import pandas as pd
 import geopandas as gpd
 
@@ -16,7 +15,9 @@ _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
-_CENSUS_TRACT_FILES_DIR = config.DATA_FILES_ROOT + 'census-tract/'
+_STATE_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/state/'
+_COUNTY_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/county/'
+_CENSUS_TRACT_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/census-tract/'
 _README_DIR = config.DATA_FILES_ROOT + 'readme/'
 _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 
@@ -140,54 +141,73 @@ def _prepare_home_locations_df():
             home_locations_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_HOME_LOCATIONS_FILE
             if Path(home_locations_file).exists():
                 if home_locations is not None:
-                    home_locations = home_locations.append(pd.read_csv(home_locations_file), sort=False)
+                    df = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
+                    home_locations = home_locations.append(df, sort=False)
                 else:
-                    home_locations = pd.read_csv(home_locations_file)
+                    home_locations = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
 
-    # convert siteid to string
-    home_locations['siteid'] = home_locations['siteid'].astype(str)
+    # the census tract id is in the format STATEFP COUNTFP TRACTCE. Thus the state code
+    # and county code can be extracted by doing a simple substring
+    home_locations['state_code'] = home_locations['tract'].str[:2]
+    home_locations['county_code'] = home_locations['tract'].str[2:5]
 
     assert home_locations is not None
     return home_locations
 
 
-def _prepare_census_tract_df():
-    census_tract_df = None
-    for item in os.listdir(_CENSUS_TRACT_FILES_DIR):
+def _prepare_geographies_df(root):
+    geographies_df = None
+    for item in os.listdir(root):
         if item.endswith('.geojson'):
-            geojson_file = _CENSUS_TRACT_FILES_DIR + item
-            if census_tract_df is None:
-                census_tract_df = gpd.read_file(geojson_file)
+            geojson_file = root + item
+            if geographies_df is None:
+                geographies_df = gpd.read_file(geojson_file)
             else:
-                census_tract_df = census_tract_df.append(gpd.read_file(geojson_file), sort=False)
+                geographies_df = geographies_df.append(gpd.read_file(geojson_file), sort=False)
 
-    assert census_tract_df is not None
+    assert geographies_df is not None
+    return geographies_df
+
+
+def _prepare_state_boundaries_df():
+    state_boundaries_df = _prepare_geographies_df(_STATE_GEOGRAPHIES_DIR)
+    state_boundaries_df = state_boundaries_df[['STATEFP', 'NAME', 'geometry']]
+    state_boundaries_df.rename(columns={'STATEFP': 'state_code', 'NAME': 'state'}, inplace=True)
+    return state_boundaries_df
+
+
+def _prepare_counties_df():
+    counties_df = _prepare_geographies_df(_COUNTY_GEOGRAPHIES_DIR)
+    counties_df = counties_df[['STATEFP', 'COUNTYFP', 'NAME', 'geometry']]
+    counties_df.rename(columns={'STATEFP': 'state_code', 'COUNTYFP': 'county_code', 'NAME': 'county'}, inplace=True)
+    return counties_df
+
+
+def _prepare_census_tract_df():
+    census_tract_df = _prepare_geographies_df(_CENSUS_TRACT_GEOGRAPHIES_DIR)
 
     # keep only required columns
-    census_tract_df = census_tract_df[['GEOID', 'geometry']]
-    census_tract_df.rename(columns={'GEOID': 'tract'}, inplace=True)
+    census_tract_df = census_tract_df[['STATEFP', 'COUNTYFP', 'GEOID', 'geometry']]
+    census_tract_df.rename(columns={'STATEFP': 'state_code',
+                                    'COUNTYFP': 'county_code',
+                                    'GEOID': 'tract'}, inplace=True)
     return census_tract_df
 
 
-def _prepare_home_locations_census_tract_df():
-    data = _prepare_home_locations_df()
-    data = data.dropna(subset=['tract'])
-    data['tract'] = data['tract'].astype(np.int64)
-    data['tract'] = data['tract'].astype(str)
-    data['siteid'] = data['siteid'].astype(str)
-
+def _prepare_svi_df():
     # read the SVI data and merge to it
     svi_df = None
     for item in os.listdir(_SVI_DIR):
         if item.endswith('.csv'):
             file = _SVI_DIR + item
             if svi_df is None:
-                svi_df = pd.read_csv(file)
+                svi_df = pd.read_csv(file, dtype={'ST': str, 'FIPS': str})
             else:
-                svi_df = svi_df.append(pd.read_csv(file), sort=False)
+                svi_df = svi_df.append(pd.read_csv(file, dtype={'ST': str, 'FIPS': str}), sort=False)
 
     # extract only required columns
     renamed_columns = {
+        'ST': 'state_code',
         'FIPS': 'tract',
         'E_TOTPOP': 'population',
         'EP_PCI': 'median_income',
@@ -196,13 +216,9 @@ def _prepare_home_locations_census_tract_df():
     }
     svi_df = svi_df[list(renamed_columns.keys())]
     svi_df.rename(columns=renamed_columns, inplace=True)
-    svi_df['tract'] = svi_df['tract'].astype(str)
 
     assert svi_df is not None
-
-    data = data.merge(svi_df, how='left', on='tract')
-
-    return data
+    return svi_df
 
 
 def _prepare_project_readme():
@@ -234,8 +250,10 @@ def get_from_data_source(key):
         DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
-        DATA_SOURCE['CENSUS_TRACT'] = _prepare_census_tract_df()
-        DATA_SOURCE['HOME_LOCATIONS_CENSUS_TRACT_DF'] = _prepare_home_locations_census_tract_df()
+        DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
+        DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
+        DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
+        DATA_SOURCE['SVI_DF'] = _prepare_svi_df()
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
 
     return DATA_SOURCE[key]

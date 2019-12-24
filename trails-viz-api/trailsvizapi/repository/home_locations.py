@@ -1,7 +1,6 @@
-import pandas as pd
-
+from trailsvizapi.config import app_config
 from trailsvizapi.repository.prepare_data import get_from_data_source
-from trailsvizapi.repository.projects_and_sites import get_project_sites
+from trailsvizapi.repository.projects_and_sites import get_project_sites, get_project_from_site
 
 
 def _treefy_home_locations(id_, home_locations):
@@ -58,49 +57,139 @@ def get_project_home_locations(project):
     return _treefy_home_locations(project, project_home_locations)
 
 
-def get_census_tract():
-    return get_from_data_source('CENSUS_TRACT')
-
-
-def get_home_locations_by_census_tract(siteid):
-    home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
-    census_tract = get_from_data_source('CENSUS_TRACT')
+def get_home_locations_by_state(siteid):
+    state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
     site_home_locations = home_locations[home_locations['siteid'] == siteid]
-    site_home_census_data = census_tract.merge(site_home_locations, on='tract', how='inner')
-    return site_home_census_data
+    site_home_locations = site_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
+    site_home_state_data = state_boundaries.merge(site_home_locations, on=['state_code', 'state'], how='inner')
+    return site_home_state_data
 
 
-def get_project_home_locations_by_census_tract(project):
-    home_locations = get_from_data_source('HOME_LOCATIONS_CENSUS_TRACT_DF')
+def get_project_home_locations_by_state(project):
+    state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+
     project_sites = get_project_sites(project)
     project_site_ids = project_sites['siteid'].drop_duplicates()
 
     project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
+    project_home_locations = project_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
+
+    project_home_locations = project_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
+    project_home_state_data = state_boundaries.merge(project_home_locations, on=['state_code', 'state'], how='inner')
+    return project_home_state_data
+
+
+def get_home_locations_by_county(siteid, state_code):
+    county_geographies = get_from_data_source('COUNTIES_DF')
+    county_geographies = county_geographies[county_geographies['state_code'] == state_code]
+
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[(home_locations['siteid'] == siteid)
+                                         & (home_locations['state_code'] == state_code)]
+
+    site_home_locations = site_home_locations[['county_code', 'county', 'visit_days', 'visitors_unq']]
+    site_home_locations = site_home_locations.groupby(by=['county_code', 'county'], as_index=False).sum()
+
+    site_home_county_data = county_geographies.merge(site_home_locations, on=['county_code', 'county'], how='inner')
+    return site_home_county_data
+
+
+def get_project_home_locations_by_county(project, state_code):
+    county_geographies = get_from_data_source('COUNTIES_DF')
+    county_geographies = county_geographies[county_geographies['state_code'] == state_code]
+
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    project_home_locations = home_locations[(home_locations['siteid'].isin(project_site_ids))
+                                            & (home_locations['state_code'] == state_code)]
+
+    project_home_locations = project_home_locations[['county_code', 'county', 'visit_days', 'visitors_unq']]
+    project_home_locations = project_home_locations.groupby(by=['county_code', 'county'], as_index=False).sum()
+
+    project_home_county_data = county_geographies.merge(project_home_locations,
+                                                        on=['county_code', 'county'], how='inner')
+    return project_home_county_data
+
+
+def get_home_locations_by_census_tract(siteid, state_code, county_code):
+    census_tract_geographies = get_from_data_source('CENSUS_TRACT_DF')
+    census_tract_geographies = census_tract_geographies[(census_tract_geographies['state_code'] == state_code)
+                                                        & (census_tract_geographies['county_code'] == county_code)]
+
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    site_home_locations = home_locations[(home_locations['siteid'] == siteid)
+                                         & (home_locations['state_code'] == state_code)
+                                         & (home_locations['county_code'] == county_code)]
+
+    site_home_locations = site_home_locations[['tract', 'visit_days', 'visitors_unq']]
+    site_home_census_data = census_tract_geographies.merge(site_home_locations, on='tract', how='inner')
+
+    svi_df = get_from_data_source('SVI_DF')
+    svi_df = svi_df[svi_df['state_code'] == state_code]
+    svi_df = svi_df.drop(columns=['state_code'])
+    site_home_census_data = site_home_census_data.merge(svi_df, on='tract', how='inner')
+
+    return site_home_census_data
+
+
+def get_project_home_locations_by_census_tract(project, state_code, county_code):
+    census_tract_geographies = get_from_data_source('CENSUS_TRACT_DF')
+    census_tract_geographies = census_tract_geographies[(census_tract_geographies['state_code'] == state_code)
+                                                        & (census_tract_geographies['county_code'] == county_code)]
+
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+    project_home_locations = home_locations[(home_locations['siteid'].isin(project_site_ids))
+                                            & (home_locations['state_code'] == state_code)
+                                            & (home_locations['county_code'] == county_code)]
 
     # for each tract, we need to sum visit days and visitors_unq
-    sum_visits = project_home_locations.groupby(by=['tract'], as_index=False)['visit_days', 'visitors_unq'].sum()
+    project_home_locations = project_home_locations.groupby(by=['tract'],
+                                                            as_index=False)['visit_days', 'visitors_unq'].sum()
+    project_home_census_data = census_tract_geographies.merge(project_home_locations, on='tract', how='inner')
 
-    # income, population, minority percentage are same across all rows so we can just drop duplicates
-    project_home_locations = project_home_locations.drop(['siteid', 'visit_days', 'visitors_unq'], axis=1)
-    project_home_locations = project_home_locations.drop_duplicates()
+    svi_df = get_from_data_source('SVI_DF')
+    svi_df = svi_df[svi_df['state_code'] == state_code]
+    svi_df = svi_df.drop(columns=['state_code'])
+    project_home_census_data = project_home_census_data.merge(svi_df, on='tract', how='inner')
 
-    assert sum_visits.shape[0] == project_home_locations.shape[0]
-
-    # now we can merge the two and find the project level data
-    project_home_locations = project_home_locations.merge(sum_visits, how='inner', on='tract')
-
-    census_tract = get_from_data_source('CENSUS_TRACT')
-    project_home_census_data = census_tract.merge(project_home_locations, on='tract', how='inner')
     return project_home_census_data
 
 
 def get_demographic_summary(siteid):
-    site_home_census_data = get_home_locations_by_census_tract(siteid)
-    site_home_census_data = pd.DataFrame(site_home_census_data.drop('geometry', axis=1))
-    return site_home_census_data
+    svi_df = get_from_data_source('SVI_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+
+    project = get_project_from_site(siteid)
+    census_tract_states = app_config.CENSUS_TRACT_STATES[project]
+    svi_df = svi_df[svi_df['state_code'].isin(census_tract_states)]
+    svi_df = svi_df.drop(columns=['state_code'])
+
+    site_home_locations = home_locations[home_locations['siteid'] == siteid]
+    demographics_data = site_home_locations.merge(svi_df, on='tract', how='inner')
+    return demographics_data
 
 
 def get_project_demographic_summary(project):
-    project_home_census_data = get_project_home_locations_by_census_tract(project)
-    project_home_census_data = pd.DataFrame(project_home_census_data.drop('geometry', axis=1))
-    return project_home_census_data
+    svi_df = get_from_data_source('SVI_DF')
+    home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+
+    project_sites = get_project_sites(project)
+    project_site_ids = project_sites['siteid'].drop_duplicates()
+
+    project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
+    project_home_locations = project_home_locations.groupby(by=['tract'], as_index=False).sum()
+
+    census_tract_states = app_config.CENSUS_TRACT_STATES[project]
+    svi_df = svi_df[svi_df['state_code'].isin(census_tract_states)]
+    svi_df = svi_df.drop(columns=['state_code'])
+    demographics_data = project_home_locations.merge(svi_df, on='tract', how='inner')
+    return demographics_data

@@ -23,21 +23,18 @@
         <b-col sm="12">
           <info-viewer ref="project-info" v-show="visibleTabGroup === 'project-info'"></info-viewer>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
-            <b-tab title="Methods">
-              <info-viewer ref="visitation-info"></info-viewer>
+            <b-tab title="Time Series">
+              <time-series ref="time-series"></time-series>
             </b-tab>
             <b-tab title="Bar Graph">
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
-            <b-tab title="Time Series">
-              <time-series ref="time-series"></time-series>
+            <b-tab title="Methods">
+              <info-viewer ref="visitation-info"></info-viewer>
             </b-tab>
           </b-tabs>
 
           <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'">
-            <b-tab title="Methods">
-              <info-viewer ref="home-locations-info"></info-viewer>
-            </b-tab>
             <b-tab title="Home Locations">
               <home-locations ref="home-locations"></home-locations>
             </b-tab>
@@ -46,6 +43,9 @@
             </b-tab>
             <b-tab title="Demographics">
               <demographics-summary ref="demographics-summary"></demographics-summary>
+            </b-tab>
+            <b-tab title="Methods">
+              <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
           </b-tabs>
 
@@ -135,18 +135,25 @@
         this.trailName = 'All Sites in ' + projectName;
         this.$store.dispatch('setSelectedSite', {'trailName': projectName, setStyle: x => x}); // a dummy set style method which does nothing
 
-        this.$refs['map-div'].renderProjectSites();
+        // before rendering plots, call the API to get data sources and
+        // set to global store
+        let self = this;
+        axios.get(self.$apiEndpoint + '/projects/' + projectCode + '/dataSources')
+          .then(response => {
+            self.$store.dispatch('setSelectedProjectDataSources', response.data);
 
-        // render plots on project level
-        this.$refs['bar-graph'].renderDefaultGraph();
-        this.$refs['time-series'].renderTimeSeries();
-        this.$refs['home-locations'].renderTreeMap();
-        this.$refs['home-locations-map'].renderHomeLocationsMap();
-        this.$refs['project-info'].renderInfo('project');
-        this.$refs['visitation-info'].renderInfo('visitation');
-        this.$refs['home-locations-info'].renderInfo('homeLocations');
-        this.$refs['demographics-summary'].renderDemographicsSummary();
+            self.$refs['map-div'].renderProjectSites();
 
+            // render plots on project level
+            self.$refs['bar-graph'].renderDefaultGraph();
+            self.$refs['time-series'].renderTimeSeries();
+            self.$refs['home-locations'].renderTreeMap();
+            self.$refs['home-locations-map'].renderHomeLocationsMap();
+            self.$refs['project-info'].renderInfo('project');
+            self.$refs['visitation-info'].renderInfo('visitation');
+            self.$refs['home-locations-info'].renderInfo('homeLocations');
+            self.$refs['demographics-summary'].renderDemographicsSummary();
+          });
       },
       renderSiteLevelPlots: function () {
         this.trailName = this.$store.getters.getSelectedSite['trailName'];

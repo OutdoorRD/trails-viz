@@ -15,6 +15,11 @@
         mapDiv: '',
         homeLocationsGeoJson: '',
         visibleLayer: '',
+        projectCode: '',
+        siteid: '',
+        clickedState: '',
+        clickedCounty: '',
+        level: 'state',  // allowed values are ['state', 'county', 'censusTract']
         activated: false
       }
     },
@@ -47,7 +52,23 @@
         };
         legend.addTo(mapDiv);
 
+        let switchOptions = L.control({position: 'topright'});
+
+        switchOptions.onAdd = function() {
+          let div = L.DomUtil.create('div');
+          div.innerHTML +=
+            "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden'>Back to State Level</a>" +
+            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>";
+
+          return div;
+        };
+
+        switchOptions.addTo(mapDiv);
         self.mapDiv = mapDiv;
+
+        // add event listeners to switch back to higher level
+        document.getElementById('backToState').addEventListener('click', () => self.renderHomeLocationsMap());
+        document.getElementById('backToCounty').addEventListener('click', () => self._renderCountyLevel(self.clickedState));
       },
       _getColors: function(d) {
         return d > 100 ? '#800026' :
@@ -62,12 +83,13 @@
       renderHomeLocationsMap: function () {
         let self = this;
         let url;
+        self.level = 'state';
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          let projectCode = self.$store.getters.getSelectedProjectCode;
-          url = self.$apiEndpoint + '/projects/' + projectCode + '/homeLocationsCensusTract';
+          self.projectCode = self.$store.getters.getSelectedProjectCode;
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsState';
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
-          let siteid = self.$store.getters.getSelectedSite['siteid'];
-          url = self.$apiEndpoint + '/sites/' + siteid + '/homeLocationsCensusTract';
+          self.siteid = self.$store.getters.getSelectedSite['siteid'];
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsState';
         }
 
         axios.get(url)
@@ -79,7 +101,36 @@
               self._mountMap();
             }
           })
-
+      },
+      _renderCountyLevel: function(stateCode) {
+        let self = this;
+        let url;
+        self.level = 'county';
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsCounty/' + stateCode;
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsCounty/' + stateCode;
+        }
+        axios.get(url)
+          .then(response => {
+            self.homeLocationsGeoJson = response.data;
+            self._addLayersToMap();
+          })
+      },
+      _renderCensusTractLevel: function(stateCode, countyCode) {
+        let self = this;
+        let url;
+        self.level = 'censusTract';
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode;
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode;
+        }
+        axios.get(url)
+          .then(response => {
+            self.homeLocationsGeoJson = response.data;
+            self._addLayersToMap();
+          })
       },
       _addLayersToMap: function () {
         let self = this;
@@ -94,15 +145,47 @@
           };
         }
 
+        // show hide go back buttons
+        if (self.level === 'state') {
+          document.getElementById('backToState').classList.add('hl-hidden');
+          document.getElementById('backToCounty').classList.add('hl-hidden');
+        } else if (self.level === 'county') {
+          document.getElementById('backToState').classList.remove('hl-hidden');
+          document.getElementById('backToCounty').classList.add('hl-hidden');
+        } else if (self.level === 'censusTract') {
+          document.getElementById('backToState').classList.add('hl-hidden');
+          document.getElementById('backToCounty').classList.remove('hl-hidden');
+        }
+
         function getTooltipHtml(layer) {
           let props = layer.feature.properties;
-          return '<table class="home-location-tooltip">' +
-            '<tr><td> Visit Days</td><td>' + props.visit_days + '</td></tr>' +
-            '<tr><td> Total Population</td><td>' + props.population + '</td></tr>' +
-            '<tr><td> Median Income</td><td>' + props.median_income + '</td></tr>' +
-            '<tr><td> Percent Minority</td><td>' + props.minority_percentage + '</td></tr>' +
-            '<tr><td> Social Vulnerability Index</td><td>' + parseFloat(Math.round(props.svi * 100)/ 100).toFixed(2) + '</td></tr>' +
-            '</table>';
+          let toolTip = '<table class="home-location-tooltip">';
+
+          if (props.state) {
+            toolTip += '<tr><td> State </td><td>' + props.state + '</td></tr>';
+          }
+          if (props.county) {
+            toolTip += '<tr><td> County</td><td>' + props.county + '</td></tr>';
+          }
+
+          toolTip += '<tr><td> Visit Days</td><td>' + props.visit_days + '</td></tr>' +
+            '<tr><td> Unique Visitors</td><td>' + props.visitors_unq + '</td></tr>';
+
+          if (props.population) {
+            toolTip += '<tr><td> Total Population</td><td>' + props.population + '</td></tr>';
+          }
+          if (props.median_income) {
+            toolTip += '<tr><td> Median Income</td><td>' + props.median_income + '</td></tr>';
+          }
+          if (props.minority_percentage) {
+            toolTip += '<tr><td> Percent Minority</td><td>' + props.minority_percentage + '</td></tr>';
+          }
+          if (props.svi) {
+            toolTip += '<tr><td> Social Vulnerability Index</td><td>' + parseFloat(Math.round(props.svi * 100)/ 100).toFixed(2) + '</td></tr>';
+          }
+
+          toolTip += '</table>';
+          return toolTip;
         }
 
         if (self.visibleLayer) {
@@ -110,9 +193,36 @@
         }
 
         self.visibleLayer = L.geoJSON(self.homeLocationsGeoJson, {style: layerStyle})
-          .bindTooltip(layer => getTooltipHtml(layer));
+          .bindTooltip(layer => getTooltipHtml(layer))
+          .on('click', event => {
+            const props = event.layer.feature.properties;
+            const stateCode = props['state_code'];
+            if (self.level === 'state') {
+              self._renderCountyLevel(stateCode);
+              self.clickedState = stateCode;
+            } else if (self.level === 'county') {
+              // Right now we only have census tract level info for NM and WA. change the array
+              // if new states are added or remove altogether if complete info is available
+              const statesWithCensusTractData = ['35', '53'];
+              if (!statesWithCensusTractData.includes(stateCode)) {
+                return
+              }
+              const countyCode = props['county_code'];
+              self._renderCensusTractLevel(stateCode, countyCode);
+              self.clickedState = stateCode;
+              self.clickedCounty = countyCode;
+            }
+          });
         self.visibleLayer.addTo(self.mapDiv);
-        self.mapDiv.fitBounds(self.visibleLayer.getBounds(), {maxZoom: 9});
+
+        // on state level we only want to show main land US i.e. exclude Alaska, Hawaii etc.
+        // But those states will be on map and users can navigate to that location
+        const excludedStateCodes = ['02', '15'];
+        let mainLandLocations = self.homeLocationsGeoJson.features.filter(x => !excludedStateCodes.includes(x['properties']['state_code']));
+        mainLandLocations = {'type': 'FeatureCollection', 'features': mainLandLocations};
+        let mainLandLayer = L.geoJSON(mainLandLocations);   // This layer will never be visible
+
+        self.mapDiv.fitBounds(mainLandLayer.getBounds());
       },
       activateHomeLocationsMap: function () {
         let self = this;

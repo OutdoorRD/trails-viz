@@ -7,6 +7,12 @@ def get_project_sites(project_group):
     return project_sites
 
 
+def get_project_from_site(siteid):
+    allsites = get_from_data_source('ALLSITES_DF')
+    site = allsites[allsites['siteid'] == siteid]
+    return site[['Prjct_code']].iat[0, 0]
+
+
 def get_project_readme(readme_type, project=None):
     project_readme_cache = get_from_data_source('PROJECT_README')
     if readme_type == 'VISITS':
