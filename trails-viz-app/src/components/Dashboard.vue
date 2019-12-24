@@ -23,21 +23,18 @@
         <b-col sm="12">
           <info-viewer ref="project-info" v-show="visibleTabGroup === 'project-info'"></info-viewer>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
-            <b-tab title="Methods">
-              <info-viewer ref="visitation-info"></info-viewer>
+            <b-tab title="Time Series">
+              <time-series ref="time-series"></time-series>
             </b-tab>
             <b-tab title="Bar Graph">
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
-            <b-tab title="Time Series">
-              <time-series ref="time-series"></time-series>
+            <b-tab title="Methods">
+              <info-viewer ref="visitation-info"></info-viewer>
             </b-tab>
           </b-tabs>
 
           <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'">
-            <b-tab title="Methods">
-              <info-viewer ref="home-locations-info"></info-viewer>
-            </b-tab>
             <b-tab title="Home Locations">
               <home-locations ref="home-locations"></home-locations>
             </b-tab>
@@ -46,6 +43,9 @@
             </b-tab>
             <b-tab title="Demographics">
               <demographics-summary ref="demographics-summary"></demographics-summary>
+            </b-tab>
+            <b-tab title="Methods">
+              <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
           </b-tabs>
 
