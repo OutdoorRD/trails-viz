@@ -12,7 +12,9 @@
               <b-form-input id="password" v-model="password" placeholder="Password" type="password"
                             autocomplete="off" required></b-form-input>
             </b-form-group>
-
+            <p class="text-danger">
+              {{errorMessage}}
+            </p>
             <b-button type="submit" class="pb-2 form-button" variant="info">Login</b-button>
             <b-button type="reset" class="pb-2 form-button" variant="danger">Reset</b-button>
           </b-form>
@@ -25,6 +27,7 @@
 <script>
 
   import {Cookie} from '../cookie'
+  import axios from 'axios';
 
   export default {
     name: "Login",
@@ -32,7 +35,8 @@
       return {
         prevRoute: null,
         userName: '',
-        password: ''
+        password: '',
+        errorMessage: ''
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -42,11 +46,25 @@
     },
     methods: {
       login(event) {
+        let self = this;
         event.preventDefault();
         // authentication code will go here
-        this.$store.dispatch('setLoggedInUser', this.userName);
-        Cookie.set('userName', this.userName, 1);
-        this.$router.push(this.prevRoute);
+        axios.post(self.$apiEndpoint + '/users/authenticate', {
+            username: self.userName,
+            password: self.password
+          }).then(response => {
+            if (response.status === 200) {
+              self.$store.dispatch('setLoggedInUser', self.userName);
+              Cookie.set('userName', self.userName, 1);
+              self.$router.push(self.prevRoute ? self.prevRoute : '/');
+            }
+        }).catch(error => {
+          if (error.response.status === 401) {
+            self.errorMessage = error.response.data['error'];
+          } else {
+            throw error
+          }
+        })
       },
       clear(event) {
         event.preventDefault();
