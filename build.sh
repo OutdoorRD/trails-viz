@@ -27,8 +27,8 @@ package() {
 
 setup_config() {
   # setup git
-  git config --global user.email "fake@travis-bot"
-  git config --global user.name "Travis CI Bot"
+  git config --global user.email "outdoorrd@uw.edu"
+  git config --global user.name "outdoorrd-bot"
 
   git remote set-url origin https://"$GITHUB_USER_NAME":"$GITHUB_ACCESS_TOKEN"@github.com/OutdoorRD/trails-viz
 
@@ -76,13 +76,13 @@ deploy() {
   update_version
   docker build -t trails-viz:"$TRAVIS_COMMIT" .
 
-  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:"$TRAVIS_COMMIT"
-  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:"$new_version"
-  docker tag trails-viz:"$TRAVIS_COMMIT" vivekkr12/trails-viz:latest
+  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:"$TRAVIS_COMMIT"
+  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:"$new_version"
+  docker tag trails-viz:"$TRAVIS_COMMIT" outdoorrd/trails-viz:latest
 
-  docker push vivekkr12/trails-viz:"$TRAVIS_COMMIT"
-  docker push vivekkr12/trails-viz:"$new_version"
-  docker push vivekkr12/trails-viz:latest
+  docker push outdoorrd/trails-viz:"$TRAVIS_COMMIT"
+  docker push outdoorrd/trails-viz:"$new_version"
+  docker push outdoorrd/trails-viz:latest
 }
 
 if [ $# -eq 0 ]

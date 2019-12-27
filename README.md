@@ -46,7 +46,7 @@ $ npm run serve
 This will start the server on port 8080. Navigate to http://localhost:8080.
 
 ## Build
-Front end and back end has must be built separately.Run the following commands form the root of the project - `trails-viz`
+Front end and back end has must be built separately. Run the following commands form the root of the project - `trails-viz`
 ```shell script
 # build front end
 $ cd trails-viz-app
@@ -73,7 +73,7 @@ if not using default.
 ```shell script
 docker run -v <host-path-to-data>:/app/data-files \
 -p 9000:80 \
--e DATA_FILES_ROOT=/app/data-files/ 
+-e DATA_FILES_ROOT=/app/data-files/ \
 vivekkr12/trails-viz:latest
 ``` 
 This will start the app on port 9000 on the host machine. If running behind a web server such as apache, the virtualhost 
