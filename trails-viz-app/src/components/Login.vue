@@ -5,7 +5,7 @@
         <b-card-body>
           <b-form v-on:submit="login" v-on:reset="clear">
             <b-form-group label-for="userName">
-              <b-form-input id="userName" v-model="userName" placeholder="User Name"
+              <b-form-input id="userName" v-model="username" placeholder="User Name"
                             autocomplete="off" required></b-form-input>
             </b-form-group>
             <b-form-group label-for="password">
@@ -34,7 +34,7 @@
     data() {
       return {
         prevRoute: null,
-        userName: '',
+        username: '',
         password: '',
         errorMessage: ''
       }
@@ -50,12 +50,25 @@
         event.preventDefault();
         self.errorMessage = '';
         axios.post(self.$apiEndpoint + '/users/authenticate', {
-            username: self.userName,
+            username: self.username,
             password: self.password
           }).then(response => {
             if (response.status === 200) {
-              self.$store.dispatch('setLoggedInUser', self.userName);
-              Cookie.set('userName', self.userName, 1);
+              let userJson = response.data;
+              let authHeader = 'TrailsVizToken:' + userJson['token'];
+              let userRole = userJson['role'];
+
+              self.$store.dispatch('setLoggedInUser', userJson['username']);
+              self.$store.dispatch('setAuthHeader', authHeader);
+              self.$store.dispatch('setUserRole', userRole);
+
+              // set axios auth header after new login
+              axios.defaults.headers.common['Authorization'] = self.$store.getters.getAuthHeader;
+
+              Cookie.set('username', self.username, 1);
+              Cookie.set('authHeader', authHeader, 1);
+              Cookie.set('userRole', userRole, 1);
+
               self.$router.push(self.prevRoute ? self.prevRoute : '/');
             }
         }).catch(error => {
@@ -68,7 +81,7 @@
       },
       clear(event) {
         event.preventDefault();
-        this.userName = '';
+        this.username = '';
         this.password = '';
       }
     }

@@ -4,7 +4,7 @@
       This page is work in progress
     </p>
     <p>
-      This is user profile for {{this.$route.params.userName}}
+      This is user profile for {{this.$route.params.username}}
     </p>
   </div>
 </template>

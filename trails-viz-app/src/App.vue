@@ -2,6 +2,12 @@
   <b-container fluid id="app">
     <top-bar class="top-bar"></top-bar>
     <router-view></router-view>
+    <div>
+      <b-modal id="unauthorizedModal" ref="unauthorizedModal" title="Unauthorized" centered ok-only
+               header-bg-variant="secondary" header-text-variant="light" ok-variant="danger">
+        <p>Your are not authorized to access this project!</p>
+      </b-modal>
+    </div>
   </b-container>
 </template>
 
@@ -18,6 +24,33 @@ export default {
   },
   mounted() {
     let self = this;
+
+    // Check cookies if user is logged in
+    let username = Cookie.get('username');
+    if (username !== undefined) {
+      self.$store.dispatch('setLoggedInUser', username);
+      self.$store.dispatch('setAuthHeader', Cookie.get('authHeader'));
+      self.$store.dispatch('setUserRole', Cookie.get('userRole'));
+    }
+
+    // set axios to send auth header in every request
+    axios.defaults.headers.common['Authorization'] = self.$store.getters.getAuthHeader;
+
+    // add interceptor to show modal when 403 response is received
+    axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (403 === error.response.status) {
+          let modal = self.$refs['unauthorizedModal'];
+          if (!modal.visible) {
+            self.$bvModal.show('unauthorizedModal');
+          }
+        } else {
+          return error
+        }
+      }
+    );
+
     axios.get(self.$apiEndpoint + '/projects')
       .then(response => {
         let allProjects = response.data;
@@ -28,12 +61,6 @@ export default {
         self.$store.dispatch('setAllProjects', allProjects);
         self.$store.dispatch('setProjectCodeToName', projectCodeToName);
       });
-
-    // Check cookies if user is logged in
-    let userName = Cookie.get('userName');
-    if (userName !== undefined) {
-      self.$store.dispatch('setLoggedInUser', userName);
-    }
   }
 }
 </script>

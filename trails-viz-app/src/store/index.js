@@ -15,6 +15,8 @@ const state = {
   censusTract: '',
   comparingSite: '',
   loggedInUser: 'anon',
+  authHeader: 'anon',
+  userRole: 'anon'
 };
 
 const mutations = {
@@ -50,6 +52,12 @@ const mutations = {
   },
   setLoggedInUser(state, loggedInUser) {
     state.loggedInUser = loggedInUser;
+  },
+  setAuthHeader(state, authHeader) {
+    state.authHeader = authHeader;
+  },
+  setUserRole(state, userRole) {
+    state.userRole = userRole;
   },
   clearSelectedProjectData(state) {
     state.selectedProjectName = '';
@@ -102,6 +110,12 @@ const actions = {
   setLoggedInUser(context, loggedInUser) {
     context.commit('setLoggedInUser', loggedInUser)
   },
+  setAuthHeader(context, authHeader) {
+    context.commit('setAuthHeader', authHeader)
+  },
+  setUserRole(context, userRole) {
+    context.commit('setUserRole', userRole)
+  },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
   }
@@ -140,6 +154,12 @@ const getters = {
   },
   getLoggedInUser(state) {
     return state.loggedInUser
+  },
+  getAuthHeader(state) {
+    return state.authHeader
+  },
+  getUserRole(state) {
+    return state.userRole
   }
 };
 
