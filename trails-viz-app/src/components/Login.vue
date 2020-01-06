@@ -48,7 +48,7 @@
       login(event) {
         let self = this;
         event.preventDefault();
-        // authentication code will go here
+        self.errorMessage = '';
         axios.post(self.$apiEndpoint + '/users/authenticate', {
             username: self.userName,
             password: self.password
