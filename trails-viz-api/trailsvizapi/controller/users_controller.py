@@ -1,6 +1,7 @@
 from flask import request, jsonify, Response
 
 from trailsvizapi import app, bcrypt
+from trailsvizapi.config import auth
 from trailsvizapi.repository import users_repository
 
 
@@ -28,6 +29,7 @@ def authenticate_user():
         authenticated = bcrypt.check_password_hash(password_hashed, password)
         if authenticated:
             del user_json['password']
+            user_json['token'] = auth.generate_auth_token(user_json)
             return jsonify(user_json)
 
         return Response('{"error": "invalid username or password"}', mimetype='application/json', status=401)
