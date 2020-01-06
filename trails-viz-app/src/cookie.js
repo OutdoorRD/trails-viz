@@ -3,20 +3,25 @@
 export const Cookie = {
   set: function (key, value, days=1) {
     let date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    // hack: intentionally expire the front end cookie 1 hour before auth token
+    date.setTime(date.getTime() + (days * 23 * 60 * 60 * 1000));
     let expires = date.toUTCString();
     document.cookie = key + '=' + value + '; expires=' + expires + '; path=/';
   },
-  getAll: function () {
-    let cookie = {};
-    document.cookie.split(';').forEach(el => {
-      let [k, v] = el.split('=');
-      cookie[k.trim()] = v;
-    });
-    return cookie;
-  },
   get: function (name) {
-    return this.getAll()[name];
+    name = name + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return undefined;
   },
   delete: function (name) {
     this.set(name, '', -1);
