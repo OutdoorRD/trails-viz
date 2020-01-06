@@ -5,7 +5,7 @@ DATA_FILES_ROOT = os.getenv('DATA_FILES_ROOT', 'data-files/')
 PROJECT_NAMES = {
     'Western Washington': 'MBS_PIL',
     'Middle Fork': 'MBS_SARL',
-    'Northern New Mexico': 'DOI',
+    'Northern New Mexico': 'DOI_PIL',
     'King County Parks': 'KingCo'
 }
 
@@ -13,13 +13,13 @@ CENSUS_TRACT_STATES = {
     'MBS_PIL': ['53'],
     'MBS_SARL': ['53'],
     'MBS_PIL, MBS_SARL': ['53'],
-    'DOI': ['35'],
+    'DOI_PIL': ['35'],
     'KingCo': ['53']
 }
 
 DATA_COLUMNS = {
     'MBS_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
     'MBS_SARL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
-    'DOI': ['estimate', 'flickr', 'twitter', 'instag'],
+    'DOI_PIL': ['estimate', 'flickr', 'twitter', 'instag'],
     'KingCo': ['estimate', 'flickr', 'twitter']
 }
