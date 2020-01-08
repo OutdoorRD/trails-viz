@@ -15,7 +15,6 @@
 import TopBar from "./components/TopBar";
 
 import axios from "axios";
-import {Cookie} from "./cookie";
 
 export default {
   name: 'app',
@@ -24,17 +23,6 @@ export default {
   },
   mounted() {
     let self = this;
-
-    // Check cookies if user is logged in
-    let username = Cookie.get('username');
-    if (username !== undefined) {
-      self.$store.dispatch('setLoggedInUser', username);
-      self.$store.dispatch('setAuthHeader', Cookie.get('authHeader'));
-      self.$store.dispatch('setUserRole', Cookie.get('userRole'));
-    }
-
-    // set axios to send auth header in every request
-    axios.defaults.headers.common['Authorization'] = self.$store.getters.getAuthHeader;
 
     // add interceptor to show modal when 403 response is received
     axios.interceptors.response.use(

@@ -6,12 +6,31 @@ from trailsvizapi.repository import users_repository
 
 
 @app.route('/api/users/<string:username>', methods=['POST'])
-def add_update_user(username):
+def add_user(username):
     user_json = request.get_json(silent=True)
     user_json['username'] = username
     password = user_json['password']
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     user_json['password'] = password_hash
+
+    users_repository.create_update_user(username, user_json)
+    del user_json['password']
+    return jsonify(user_json)
+
+
+@app.route('/api/users/<string:username>', methods=['PUT'])
+def update_user(username):
+    original_user_json = users_repository.get_user_json(username)
+
+    user_json = request.get_json(silent=True)
+    user_json['username'] = username
+
+    if 'password' in user_json and user_json['password']:
+        password = user_json['password']
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        user_json['password'] = password_hash
+    else:
+        user_json['password'] = original_user_json['password']
 
     users_repository.create_update_user(username, user_json)
     del user_json['password']

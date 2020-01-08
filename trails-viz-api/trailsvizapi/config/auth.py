@@ -39,7 +39,7 @@ _MANAGERS_ENDPOINTS = set(_ANON_AUTH_HEADER).update(
     'get_home_locations_demographics',
     'get_project_home_locations_demographics',
     'get_user',
-    'add_update_user'
+    'update_user'
 )
 
 _ROLE_ACCESS_MAPPING = {
@@ -106,7 +106,7 @@ def authenticate_request():
         return
 
     # if using the user's endpoint, make sure non admins only have access to their user info
-    if endpoint == 'get_user' or endpoint == 'add_update_user':
+    if endpoint == 'get_user' or endpoint == 'update_user':
         path_username = request_path.split('/')[-1]
         if path_username != username:
             return Response(_unauthorized_error_json(username, request_path), mimetype='application/json', status=403)
