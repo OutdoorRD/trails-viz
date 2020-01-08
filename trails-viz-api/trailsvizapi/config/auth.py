@@ -69,7 +69,7 @@ def generate_auth_token(user_json):
 
 
 def _parse_auth_header(auth_header):
-    auth_token = auth_header.split(':')[-1]
+    auth_token = auth_header
     auth_token = _FERNET.decrypt(auth_token.encode()).decode()
     username, role, _,  expiration = auth_token.split()
     return username, role, expiration

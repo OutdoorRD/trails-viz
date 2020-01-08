@@ -55,7 +55,7 @@
           }).then(response => {
             if (response.status === 200) {
               let userJson = response.data;
-              let authHeader = 'TrailsVizToken:' + userJson['token'];
+              let authHeader = userJson['token'];
               let userRole = userJson['role'];
 
               self.$store.dispatch('setLoggedInUser', userJson['username']);
