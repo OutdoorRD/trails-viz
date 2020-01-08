@@ -45,9 +45,8 @@ export default {
           if (!modal.visible) {
             self.$bvModal.show('unauthorizedModal');
           }
-        } else {
-          return error
         }
+        return Promise.reject(error);
       }
     );
 

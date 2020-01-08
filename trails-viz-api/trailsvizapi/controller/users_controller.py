@@ -5,10 +5,10 @@ from trailsvizapi.config import auth
 from trailsvizapi.repository import users_repository
 
 
-@app.route('/api/users', methods=['POST'])
-def add_update_user():
+@app.route('/api/users/<string:username>', methods=['POST'])
+def add_update_user(username):
     user_json = request.get_json(silent=True)
-    username = user_json['username']
+    user_json['username'] = username
     password = user_json['password']
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     user_json['password'] = password_hash
@@ -37,7 +37,7 @@ def authenticate_user():
         return Response('{"error": "invalid username or password"}', mimetype='application/json', status=401)
 
 
-@app.route('/api/users/<username>', methods=['GET'])
+@app.route('/api/users/<string:username>', methods=['GET'])
 def get_user(username):
     try:
         user_json = users_repository.get_user_json(username)
