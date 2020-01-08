@@ -143,7 +143,7 @@
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
 
         axios.all([
-          axios.get(self.$apiEndpoint + "/sites/geojson?projectGroup=" + self.$store.getters.getSelectedProjectCode),
+          axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/sites/geojson'),
           axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/lastYearEstimates')
           ]).then(axios.spread((geoJsonRes, estimatesRes) => {
             let allSitesGeoJson = geoJsonRes.data;

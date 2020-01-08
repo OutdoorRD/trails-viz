@@ -10,10 +10,9 @@ def get_all_projects():
     return jsonify(app_config.PROJECT_NAMES)
 
 
-@app.route('/api/sites/geojson')
-def get_geojson_data():
-    project_group = request.args.get('projectGroup')
-    data = projects_and_sites.get_project_sites(project_group)
+@app.route('/api/projects/<string:project>/sites/geojson')
+def get_geojson_data(project):
+    data = projects_and_sites.get_project_sites(project)
     return Response(data.to_json(), mimetype='application/json')
 
 
