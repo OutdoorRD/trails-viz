@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-__version__ = '2.3.1'
+__version__ = '2.3.2'
 
 app = Flask(__name__)
 CORS(app)
