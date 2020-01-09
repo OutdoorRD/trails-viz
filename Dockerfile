@@ -23,4 +23,6 @@ RUN cd /app && whl_file=`ls | grep whl` && pip3 install $whl_file && cd ..
 
 WORKDIR /app
 
+EXPOSE 80 443
+
 CMD ["/bin/bash", "./start.sh"]
