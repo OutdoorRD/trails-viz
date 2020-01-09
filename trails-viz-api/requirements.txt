@@ -4,4 +4,8 @@ pandas==0.25.1
 geopandas==0.4.1
 flask-cors==3.0.8
 Flask-Bcrypt==0.7.1
+google-api-core==1.15.0
+google-auth==1.10.0
+google-cloud-core==1.1.0
 google-cloud-storage==1.20.0
+cryptography==2.8
