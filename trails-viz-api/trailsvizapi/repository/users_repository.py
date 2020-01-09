@@ -3,7 +3,8 @@ import json
 from google.api_core.exceptions import NotFound
 from google.cloud import storage
 
-AUTH_BUCKET_NAME = 'trails-viz-auth-test'
+from trailsvizapi.config.app_config import AUTH_BUCKET_NAME
+
 BUCKET_SOURCE = {}
 
 

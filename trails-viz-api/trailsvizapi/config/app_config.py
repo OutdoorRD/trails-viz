@@ -3,6 +3,7 @@ import os
 DATA_FILES_ROOT = os.getenv('DATA_FILES_ROOT', 'data-files/')
 # Actual key must be set in the environment variable. This is just a placeholder
 AUTH_TOKEN_KEY = os.getenv('AUTH_TOKEN_KEY', 'Some+Se3ret+Key+Placeholder+TrailsViz+01234=')
+AUTH_BUCKET_NAME = 'recsetgo'
 
 # if the project code contains the project group keyword, then it belongs to that group
 PROJECT_NAMES = {
