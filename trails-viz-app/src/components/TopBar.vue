@@ -65,12 +65,15 @@
         event.preventDefault()
       },
       gotoUserProfile: function () {
-        let userName = this.$store.getters.getLoggedInUser;
-        this.$router.push({name: 'user', params: {userName: userName}});
+        let username = this.$store.getters.getLoggedInUser;
+        this.$router.push({name: 'user', params: {username: username}});
       },
       logout: function () {
         this.$store.dispatch('setLoggedInUser', 'anon');
-        Cookie.delete('userName');
+        Cookie.delete('username');
+        Cookie.delete('authHeader');
+        Cookie.delete('userRole');
+
         if (this.$route.path !== '/') {
           this.$router.push({path: '/'})
         }
