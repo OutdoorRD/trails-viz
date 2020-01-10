@@ -27,7 +27,8 @@ _ANON_ENDPOINTS = {
     'authenticate_user'
 }
 
-_MANAGERS_ENDPOINTS = set(_ANON_AUTH_HEADER).update(
+_MANAGERS_ENDPOINTS = set(_ANON_AUTH_HEADER)
+_MANAGERS_ENDPOINTS.update([
     'get_home_locations',
     'get_home_locations_state',
     'get_home_locations_county',
@@ -40,7 +41,7 @@ _MANAGERS_ENDPOINTS = set(_ANON_AUTH_HEADER).update(
     'get_project_home_locations_demographics',
     'get_user',
     'update_user'
-)
+])
 
 _ROLE_ACCESS_MAPPING = {
     'anon': _ANON_ENDPOINTS,
