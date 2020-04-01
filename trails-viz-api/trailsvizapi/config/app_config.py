@@ -25,5 +25,5 @@ DATA_COLUMNS = {
     'MBS_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
     'MBS_SARL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
     'DOI_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
-    'KingCo': ['estimate', 'flickr', 'twitter']
+    'KingCo': ['flickr', 'twitter', 'instag', 'wta']
 }
