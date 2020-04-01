@@ -8,7 +8,8 @@
       </b-col>
       <b-col sm="6">
         <b-form-group>
-          <b-radio-group v-model="dataSource" :options="dataSourceOptions" stacked v-on:input="renderSelectedGraph"></b-radio-group>
+          <b-radio-group v-model="dataSource" :options="dataSourceOptions" stacked
+                         v-on:input="renderSelectedGraph" :disabled="noEstimates"></b-radio-group>
         </b-form-group>
       </b-col>
     </b-row>
@@ -49,7 +50,8 @@
           {text: 'Social Media', value: 'socialMedia'}
         ],
         timePeriod: '',
-        dataSource: ''
+        dataSource: '',
+        noEstimates: false
       }
     },
     methods: {
@@ -102,7 +104,14 @@
             self.timePeriod = 'monthly';
           }
           if (!self.dataSource) {
-            self.dataSource = 'modelled';
+            // load estimate only when it is a valid data source
+            const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
+            if (projectDataSources.includes('estimate')) {
+              self.dataSource = 'modelled';
+            } else {
+              self.dataSource = 'socialMedia';
+              self.noEstimates = true
+            }
           }
           self.renderSelectedGraph();
         }));
