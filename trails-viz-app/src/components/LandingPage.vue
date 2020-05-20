@@ -1,7 +1,7 @@
 <template>
   <div class="landing-page">
-    <h1>SocialTrails</h1>
-    <h2>Monitoring Recreation with Social Media and Volunteered Data</h2>
+    <h1>TrailTrends</h1>
+    <h2>Data-driven approaches for mapping outdoor recreation on public lands</h2>
 
     <p class="form-para">
       <b-form-input list="landing-project-list" placeholder="Type a project name to get started..." autocomplete="off"
