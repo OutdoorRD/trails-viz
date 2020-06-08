@@ -21,6 +21,9 @@
           <b-nav-item-dropdown v-bind:text="this.$store.getters.getLoggedInUser"
                                v-show="this.$store.getters.getLoggedInUser !== 'anon'" right>
             <b-dropdown-item v-on:click="gotoUserProfile">Profile</b-dropdown-item>
+            <b-dropdown-item v-if="this.$store.getters.getUserRole === 'admin'"
+                             v-on:click="gotoAdministration">Administration</b-dropdown-item>
+
             <b-dropdown-item v-on:click="logout">Logout</b-dropdown-item>
           </b-nav-item-dropdown>
 
@@ -67,6 +70,9 @@
       gotoUserProfile: function () {
         let username = this.$store.getters.getLoggedInUser;
         this.$router.push({name: 'user', params: {username: username}});
+      },
+      gotoAdministration: function () {
+        this.$router.push({path: '/administration'});
       },
       logout: function () {
         this.$store.dispatch('setLoggedInUser', 'anon');
