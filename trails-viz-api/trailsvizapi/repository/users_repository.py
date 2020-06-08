@@ -34,6 +34,12 @@ def get_user_json(username):
         raise NameError('invalid username: {}'.format(username))
 
 
+def delete_user(username):
+    bucket = _bucket_reference()
+    blob = bucket.blob('users/' + username + '.json')
+    blob.delete()
+
+
 def list_users(prefix=None):
     prefix = 'users/' if prefix is None else 'users/' + prefix
     storage_client = storage.Client()
