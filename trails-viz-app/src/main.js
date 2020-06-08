@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import BootstrapVue from 'bootstrap-vue'
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue'
 import store from "./store"
 import router from "./router"
 
@@ -12,6 +12,7 @@ import axios from "axios";
 Vue.config.productionTip = false
 Vue.prototype.$apiEndpoint = process.env.VUE_APP_API_ENDPOINT
 Vue.use(BootstrapVue)
+Vue.use(BootstrapVueIcons)
 
 // Check cookies if user is logged in
 let username = Cookie.get('username');
