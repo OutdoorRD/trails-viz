@@ -266,7 +266,7 @@
             },
             y: {
               label: {
-                text: 'Number of Visits',
+                text: 'User-Days',
                 position: 'outer-middle'
               }
             }

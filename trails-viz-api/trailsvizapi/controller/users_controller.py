@@ -66,7 +66,14 @@ def get_user(username):
         return Response('{"error": "' + e.args[0] + '"}', mimetype='application/json', status=404)
 
 
-@app.route('/api/users/list/<string:prefix>', methods=['GET'])
-def list_users(prefix):
+@app.route('/api/users/<string:username>', methods=['DELETE'])
+def delete_user(username):
+    users_repository.delete_user(username)
+    return Response('{"msg": "' + username + ' deleted"}', mimetype='application/json', status=200)
+
+
+@app.route('/api/users/listAll', methods=['GET'])
+def list_users():
+    prefix = request.args.get('prefix')
     users_list = users_repository.list_users(prefix)
     return jsonify(users_list)

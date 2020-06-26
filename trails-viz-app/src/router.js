@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage'
 import Dashboard from './components/Dashboard'
 import Login from './components/Login'
 import UserProfile from "./components/UserProfile";
+import Administration from "./components/Administration";
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,10 @@ const routes = [
   {
     path: '/login',
     component: Login
+  },
+  {
+    path: '/administration',
+    component: Administration
   },
   {
     path: '/user/:username',

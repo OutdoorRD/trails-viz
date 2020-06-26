@@ -27,8 +27,8 @@ _ANON_ENDPOINTS = {
     'authenticate_user'
 }
 
-_MANAGERS_ENDPOINTS = set(_ANON_AUTH_HEADER)
-_MANAGERS_ENDPOINTS.update([
+_MANAGER_ENDPOINTS = set(_ANON_AUTH_HEADER)
+_MANAGER_ENDPOINTS.update([
     'get_home_locations',
     'get_home_locations_state',
     'get_home_locations_county',
@@ -45,7 +45,7 @@ _MANAGERS_ENDPOINTS.update([
 
 _ROLE_ACCESS_MAPPING = {
     'anon': _ANON_ENDPOINTS,
-    'managers': _MANAGERS_ENDPOINTS
+    'manager': _MANAGER_ENDPOINTS
 }
 
 # configure the Fernet objects and auth token cache
