@@ -86,3 +86,6 @@ ProxyPassReverse /trails_site/ http://localhost:9000/
 ProxyPass /api/ http://localhost:9000/api/
 ProxyPassReverse /api/ http://localhost:9000/api/
 ```
+
+## Adding a New Project
+The instructions for adding a new project to the dashboard are documented [here](https://github.com/OutdoorRD/trails-viz/wiki/Adding-New-Project). 
