@@ -159,6 +159,7 @@
         colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
         colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
         colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
+        colors[trailName + ' - AllTrails'] =  comparing ? COLORS.COMPARE_ALLTRAILS : COLORS.ALLTRAILS;
         return colors;
       },
       _prepareMonthlyModelledData: function(trailName, monthlyEstimates, comparing=false) {
@@ -191,12 +192,14 @@
         let instag = [trailName + ' - Instagram'];
         let twitter = [trailName + ' - Twitter'];
         let wta = [trailName + ' - WTA'];
+        let alltrails = [trailName + ' - AllTrails'];
 
         estimates.forEach(x => {
           flickr.push(Math.round(x.flickr));
           instag.push(Math.round(x.instag));
           twitter.push(Math.round(x.twitter));
           wta.push(Math.round(x.wta));
+          alltrails.push(Math.round(x.alltrails));
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
         let socialMediaSources = [];
@@ -211,6 +214,9 @@
         }
         if (projectDataSources.includes('wta')) {
           socialMediaSources.push(wta);
+        }
+        if (projectDataSources.includes('alltrails')) {
+          socialMediaSources.push(alltrails);
         }
         return [socialMediaSources, self._getSocialMediaColors(trailName, comparing)];
       },
