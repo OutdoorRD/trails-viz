@@ -74,22 +74,28 @@
 
       const outdoorLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
         attribution: MAPBOX_CONSTS.ATTRIBUTION,
+        tileSize:512,
         maxZoom: 18,
-        id: "mapbox.outdoors",
+        zoomOffset: -1,
+        id: "mapbox/outdoors-v11",
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
       const streetsLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
         attribution: MAPBOX_CONSTS.ATTRIBUTION,
+        tileSize:512,
         maxZoom: 18,
-        id: "mapbox.streets",
+        zoomOffset: -1,
+        id: "mapbox.streets-v11",
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
       const satelliteLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
         attribution: MAPBOX_CONSTS.ATTRIBUTION,
+        tileSize:512,
         maxZoom: 18,
-        id: "mapbox.satellite",
+        zoomOffset: -1,
+        id: "mapbox.satellite-v9",
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
