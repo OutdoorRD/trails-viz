@@ -86,7 +86,7 @@
         tileSize:512,
         maxZoom: 18,
         zoomOffset: -1,
-        id: "mapbox.streets-v11",
+        id: "mapbox/streets-v11",
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
@@ -95,7 +95,7 @@
         tileSize:512,
         maxZoom: 18,
         zoomOffset: -1,
-        id: "mapbox.satellite-v9",
+        id: "mapbox/satellite-v9",
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
