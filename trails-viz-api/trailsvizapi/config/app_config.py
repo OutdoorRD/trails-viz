@@ -13,7 +13,7 @@ PROJECT_NAMES = {
     'Okanogan-Wenatchee General Forest': 'OKW_GFA',
     'Northern New Mexico': 'DOI_PIL',
     'King County Parks': 'KingCo',
-    'Washington-Oregon Forests' : 'ForestScale'
+    'US National Forests Region 6' : 'ForestScale'
 }
 
 CENSUS_TRACT_STATES = {
@@ -33,5 +33,5 @@ DATA_COLUMNS = {
     'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
     'DOI_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
     'KingCo': ['flickr', 'twitter', 'instag', 'wta'], 
-    'ForestScale': ['flickr', 'twitter', 'instag']
+    'ForestScale': ['flickr', 'twitter', 'instag', 'alltrails']
 }

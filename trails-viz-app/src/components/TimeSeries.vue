@@ -73,6 +73,7 @@
         colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
         colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
         colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
+        colors[trailName + ' - AllTrails'] =  comparing ? COLORS.COMPARE_ALLTRAILS : COLORS.ALLTRAILS;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
@@ -84,6 +85,7 @@
         let monthlyInstag = [trailName + ' - Instagram'];
         let monthlyTwitter = [trailName + ' - Twitter'];
         let monthlyWta = [trailName + ' - WTA'];
+        let monthlyAllTrails = [trailName + ' - AllTrails'];
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
@@ -93,6 +95,7 @@
           monthlyInstag.push(x.instag);
           monthlyTwitter.push(x.twitter);
           monthlyWta.push(x.wta);
+          monthlyAllTrails.push(x.alltrails);
         });
         const projectDataSources = this.$store.getters.getSelectedProjectDataSources;
         const vizMode = self.$store.getters.getVizMode;
@@ -117,6 +120,10 @@
         if (projectDataSources.includes('wta')  && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesMonthlyData.push(monthlyWta);
         }
+        if (projectDataSources.includes('alltrails')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyAllTrails);
+        }
+        
         if (skipDate) {
           timeseriesMonthlyData.splice(0, 1)
         }
@@ -131,6 +138,7 @@
         let weeklyInstag = [trailName + ' - Instagram'];
         let weeklyTwitter = [trailName + ' - Twitter'];
         let weeklyWta = [trailName + ' - WTA'];
+        let weeklyAllTrails = [trailName + ' - AllTrails'];
 
         weeklyVisitation.forEach(x => {
           let sunday = self._getNthSunday(x.year, x.week);
@@ -141,6 +149,7 @@
           weeklyInstag.push(x.instag);
           weeklyTwitter.push(x.twitter);
           weeklyWta.push(x.wta);
+          weeklyAllTrails.push(x.alltrails);
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
         const vizMode = self.$store.getters.getVizMode;
@@ -164,6 +173,9 @@
         }
         if (projectDataSources.includes('wta') && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesWeeklyData.push(weeklyWta);
+        }
+        if (projectDataSources.includes('alltrails') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyAllTrails);
         }
 
         if (skipDate) {
