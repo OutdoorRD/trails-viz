@@ -27,8 +27,8 @@ CENSUS_TRACT_STATES = {
 }
 
 DATA_COLUMNS = {
-    'MBS_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
-    'MBS_SARL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'onsite'],
+    'MBS_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails', 'onsite'],
+    'MBS_SARL': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails', 'onsite'],
     'OKW_WILD': ['flickr', 'twitter', 'instag', 'wta'],
     'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
     'DOI_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
