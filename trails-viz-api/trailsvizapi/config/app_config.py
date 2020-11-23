@@ -13,7 +13,9 @@ PROJECT_NAMES = {
     'Okanogan-Wenatchee General Forest': 'OKW_GFA',
     'Northern New Mexico': 'DOI_PIL',
     'King County Parks': 'KingCo',
-    'US National Forests Region 6' : 'ForestScale'
+    'US National Forests Region 6' : 'ForestScale',
+    'Mount Baker-Snoqualmie Wilderness': 'MBS_WILD'#,
+    #'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
 }
 
 CENSUS_TRACT_STATES = {
@@ -23,7 +25,9 @@ CENSUS_TRACT_STATES = {
     'OKW_GFA': ['53'],
     'MBS_PIL, MBS_SARL': ['53'],
     'DOI_PIL': ['35'],
-    'KingCo': ['53']
+    'KingCo': ['53'],
+    'MBS_WILD': ['53']#,
+    #'MBS_GFA': ['53']
 }
 
 DATA_COLUMNS = {
@@ -33,5 +37,7 @@ DATA_COLUMNS = {
     'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
     'DOI_PIL': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
     'KingCo': ['flickr', 'twitter', 'instag', 'wta'], 
-    'ForestScale': ['flickr', 'twitter', 'instag', 'alltrails']
+    'ForestScale': ['flickr', 'twitter', 'instag', 'alltrails'],
+    'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails']#,
+    #'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
 }
