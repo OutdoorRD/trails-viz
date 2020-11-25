@@ -68,9 +68,9 @@
 </template>
 
 <script>
-  import axios from 'axios';
+import axios from 'axios';
 
-  export const MODE = {
+export const MODE = {
     VIEW: 'view',
     ADD: 'add',
     EDIT: 'edit'
@@ -163,7 +163,7 @@
         let self = this;
         axios.delete(self.$apiEndpoint + '/users/' + self.currentUser, self.userInfo)
           .then(response => {
-            self.successMessage = self.currentUser + ' deleted';
+            self.successMessage = response.data.msg;
             self.allUsers = self.allUsers.filter(user => user !== self.currentUser);
             setTimeout(() => self.successMessage = '', 5000);
             self.currentUser = '';
