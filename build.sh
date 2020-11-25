@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 install() {
+  set -e
   python -m pip install --upgrade pip
   pip install flake8
   pip install wheel
@@ -14,6 +15,7 @@ install() {
 }
 
 package() {
+  set -e
   cd trails-viz-app
   npm run lint
   npm run build
@@ -26,6 +28,7 @@ package() {
 }
 
 setup_config() {
+  set -e
   # setup git
   git config --global user.email "outdoorrd@uw.edu"
   git config --global user.name "outdoorrd-bot"
@@ -37,6 +40,7 @@ setup_config() {
 }
 
 update_version() {
+  set -e
   # get the version bump part from commit message
   echo "$TRAVIS_COMMIT_MESSAGE"
   if [[ "$TRAVIS_COMMIT_MESSAGE" == *"release=major"* ]]; then
@@ -72,6 +76,7 @@ update_version() {
 }
 
 deploy() {
+  set -e
   setup_config
   update_version
   docker build -t trails-viz:"$TRAVIS_COMMIT" .
