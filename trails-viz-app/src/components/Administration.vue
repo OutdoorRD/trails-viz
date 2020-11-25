@@ -68,9 +68,9 @@
 </template>
 
 <script>
-import axios from 'axios';
+  import axios from 'axios';
 
-export const MODE = {
+  export const MODE = {
     VIEW: 'view',
     ADD: 'add',
     EDIT: 'edit'
