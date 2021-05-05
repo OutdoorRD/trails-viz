@@ -15,7 +15,7 @@ trails-viz/
 `trails-viz-app` is the front end written in JavaScript using the [Vue](https://vuejs.org/) framework.
 `trails-viz-api` is the backend written in Python using [Flask](https://palletsprojects.com/p/flask/)
 
-Development requires nodejs >= 10.x.x and Python >= 3.6.x
+Development requires nodejs >= 10.x.x and Python == 3.7.x
 
 While opening the project in IDE, it's recommended to open the front end and backend as two separate projects. That way
 the IDE would be able to recognize the former as a JavaScript project and the later as a Python project.
