@@ -33,7 +33,7 @@
         L.tileLayer(MAPBOX_CONSTS.TILES_API, {
           attribution: MAPBOX_CONSTS.ATTRIBUTION,
           maxZoom: 18,
-          id: 'mapbox.light',
+          id: 'mapbox/light-v10',
           accessToken: MAPBOX_CONSTS.TOKEN
         }).addTo(mapDiv);
 

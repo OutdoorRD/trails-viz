@@ -17,10 +17,10 @@ export const COLORS = {
 
 export const MAPBOX_CONSTS = {
   TOKEN: 'pk.eyJ1Ijoid29vZHNwIiwiYSI6ImNrMjEwY3oycTFlcnEzbXFvbzR4bmNqNjgifQ.pM7-As9W2Ce9xXMv3W-NNg',
+  OUTDOOR_STYLE_TOKEN: 'pk.eyJ1Ijoid29vZHNwIiwiYSI6ImNrMjEwYjFyaDB2MHMzaW1mbWM0azVnbTMifQ.LE_loUCO3HjjZfyEayX5Sg',
   TILES_API: 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
   ATTRIBUTION: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © ' +
-    '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-    '<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>'
+    '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 };
 
 export const VIZ_MODES = {
