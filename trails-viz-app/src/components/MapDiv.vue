@@ -77,18 +77,18 @@
         tileSize:512,
         maxZoom: 18,
         zoomOffset: -1,
-        id: "mapbox/outdoors-v11",
-        accessToken: MAPBOX_CONSTS.TOKEN
+        id: "woodsp/ckoayirck08k618p28tlyok8j",
+        accessToken: MAPBOX_CONSTS.OUTDOOR_STYLE_TOKEN
       });
 
-      const streetsLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
-        attribution: MAPBOX_CONSTS.ATTRIBUTION,
-        tileSize:512,
-        maxZoom: 18,
-        zoomOffset: -1,
-        id: "mapbox/streets-v11",
-        accessToken: MAPBOX_CONSTS.TOKEN
-      });
+      // const streetsLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
+      //   attribution: MAPBOX_CONSTS.ATTRIBUTION,
+      //   tileSize:512,
+      //   maxZoom: 18,
+      //   zoomOffset: -1,
+      //   id: "mapbox/streets-v11",
+      //   accessToken: MAPBOX_CONSTS.TOKEN
+      // });
 
       const satelliteLayer = L.tileLayer(MAPBOX_CONSTS.TILES_API, {
         attribution: MAPBOX_CONSTS.ATTRIBUTION,
@@ -99,7 +99,7 @@
         accessToken: MAPBOX_CONSTS.TOKEN
       });
 
-      L.control.layers({"outdoor": outdoorLayer, "streets": streetsLayer, "satellite": satelliteLayer}).addTo(mapDiv);
+      L.control.layers({"outdoor": outdoorLayer, "satellite": satelliteLayer}).addTo(mapDiv);
       outdoorLayer.addTo(mapDiv);
 
       self.mapDiv = mapDiv;
