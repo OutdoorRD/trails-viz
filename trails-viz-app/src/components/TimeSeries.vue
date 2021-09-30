@@ -74,6 +74,7 @@
         colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
         colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
         colors[trailName + ' - AllTrails'] =  comparing ? COLORS.COMPARE_ALLTRAILS : COLORS.ALLTRAILS;
+        colors[trailName + ' - eBird'] =  comparing ? COLORS.COMPARE_EBIRD : COLORS.EBIRD;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
@@ -86,6 +87,7 @@
         let monthlyTwitter = [trailName + ' - Twitter'];
         let monthlyWta = [trailName + ' - WTA'];
         let monthlyAllTrails = [trailName + ' - AllTrails'];
+        let monthlyeBird = [trailName + ' - eBird'];
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
@@ -96,6 +98,7 @@
           monthlyTwitter.push(x.twitter);
           monthlyWta.push(x.wta);
           monthlyAllTrails.push(x.alltrails);
+          monthlyeBird.push(x.ebird);
         });
         const projectDataSources = this.$store.getters.getSelectedProjectDataSources;
         const vizMode = self.$store.getters.getVizMode;
@@ -123,6 +126,9 @@
         if (projectDataSources.includes('alltrails')  && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesMonthlyData.push(monthlyAllTrails);
         }
+        if (projectDataSources.includes('ebird')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyeBird);
+        }
         
         if (skipDate) {
           timeseriesMonthlyData.splice(0, 1)
@@ -139,6 +145,7 @@
         let weeklyTwitter = [trailName + ' - Twitter'];
         let weeklyWta = [trailName + ' - WTA'];
         let weeklyAllTrails = [trailName + ' - AllTrails'];
+        let weeklyeBird = [trailName + ' - eBird'];
 
         weeklyVisitation.forEach(x => {
           let sunday = self._getNthSunday(x.year, x.week);
@@ -150,6 +157,7 @@
           weeklyTwitter.push(x.twitter);
           weeklyWta.push(x.wta);
           weeklyAllTrails.push(x.alltrails);
+          weeklyeBird.push(x.ebird);
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
         const vizMode = self.$store.getters.getVizMode;
@@ -176,6 +184,9 @@
         }
         if (projectDataSources.includes('alltrails') && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesWeeklyData.push(weeklyAllTrails);
+        }
+        if (projectDataSources.includes('ebird') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyeBird);
         }
 
         if (skipDate) {
