@@ -5,6 +5,7 @@ export const COLORS = {
     TWITTER: '#2b7782',
     WTA: '#0ab652',
     ALLTRAILS: '#36E0BE',
+    EBIRD: '#f2e718',
     ON_SITE: '#640b00',
     COMPARE_MODELLED: '#fb9205',
     COMPARE_FLICKR: '#c9c9c4',
@@ -12,6 +13,7 @@ export const COLORS = {
     COMPARE_TWITTER: '#12fbf2',
     COMPARE_WTA: '#ff0000',
     COMPARE_ALLTRAILS: '#086351',
+    COMPARE_EBIRD: '#e3e84a',
     COMPARE_ON_SITE: '#ff6400',
 };
 

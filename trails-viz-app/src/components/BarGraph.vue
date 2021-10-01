@@ -160,6 +160,7 @@
         colors[trailName + ' - Twitter'] =  comparing ? COLORS.COMPARE_TWITTER : COLORS.TWITTER;
         colors[trailName + ' - WTA'] =  comparing ? COLORS.COMPARE_WTA : COLORS.WTA;
         colors[trailName + ' - AllTrails'] =  comparing ? COLORS.COMPARE_ALLTRAILS : COLORS.ALLTRAILS;
+        colors[trailName + ' - eBird'] =  comparing ? COLORS.COMPARE_EBIRD : COLORS.EBIRD;
         return colors;
       },
       _prepareMonthlyModelledData: function(trailName, monthlyEstimates, comparing=false) {
@@ -193,6 +194,7 @@
         let twitter = [trailName + ' - Twitter'];
         let wta = [trailName + ' - WTA'];
         let alltrails = [trailName + ' - AllTrails'];
+        let ebird = [trailName + ' - eBird'];
 
         estimates.forEach(x => {
           flickr.push(Math.round(x.flickr));
@@ -200,6 +202,7 @@
           twitter.push(Math.round(x.twitter));
           wta.push(Math.round(x.wta));
           alltrails.push(Math.round(x.alltrails));
+          ebird.push(Math.round(x.ebird));
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
         let socialMediaSources = [];
@@ -217,6 +220,9 @@
         }
         if (projectDataSources.includes('alltrails')) {
           socialMediaSources.push(alltrails);
+        }
+        if (projectDataSources.includes('ebird')) {
+          socialMediaSources.push(ebird);
         }
         return [socialMediaSources, self._getSocialMediaColors(trailName, comparing)];
       },

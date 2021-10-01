@@ -14,7 +14,8 @@ PROJECT_NAMES = {
     'Northern New Mexico': 'NNM',
     'King County Parks': 'KingCo',
     'US National Forests': 'NationalForests',
-    'Mount Baker-Snoqualmie Wilderness': 'MBS_WILD'
+    'Mount Baker-Snoqualmie Wilderness': 'MBS_WILD',
+    'Mountain Loop': 'WestCascades_MtnLoop'
     # 'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
 }
 
@@ -25,7 +26,8 @@ CENSUS_TRACT_STATES = {
     'OKW_GFA': ['53'],
     'NNM': ['35'],
     'KingCo': ['53'],
-    'MBS_WILD': ['53']
+    'MBS_WILD': ['53'],
+    'WestCascades_MtnLoop': ['53']
     # 'MBS_GFA': ['53']
 }
 
@@ -37,6 +39,7 @@ DATA_COLUMNS = {
     'NNM': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
     'KingCo': ['flickr', 'twitter', 'instag', 'wta'],
     'NationalForests': ['flickr', 'twitter', 'instag', 'alltrails'],
-    'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails']
+    'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
+    'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite']
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
 }

@@ -31,7 +31,7 @@ $ cd trails-viz-api
 $ pip install -r requirements.txt
 $ export FLASK_APP=trailsvizapi
 $ export FLASK_ENV=development
-$ export DATA_FILES_ROOT=<path/to/csv_and_shp>
+$ export DATA_FILES_ROOT=<path/to/trails-viz-data/>
 $ flask run
 ```
 This will start a localhost server on port `5000`
