@@ -40,6 +40,6 @@ DATA_COLUMNS = {
     'KingCo': ['flickr', 'twitter', 'instag', 'wta'],
     'NationalForests': ['flickr', 'twitter', 'instag', 'alltrails'],
     'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
-    'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite']
+    'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite']
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
 }
