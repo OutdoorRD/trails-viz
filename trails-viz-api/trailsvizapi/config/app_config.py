@@ -15,7 +15,8 @@ PROJECT_NAMES = {
     'King County Parks': 'KingCo',
     'US National Forests': 'NationalForests',
     'Mount Baker-Snoqualmie Wilderness': 'MBS_WILD',
-    'Mountain Loop': 'WestCascades_MtnLoop'
+    'Mountain Loop': 'WestCascades_MtnLoop',
+    'South Mountain Loop': 'WestCascades_SMtnLoop'
     # 'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
 }
 
@@ -27,7 +28,8 @@ CENSUS_TRACT_STATES = {
     'NNM': ['35'],
     'KingCo': ['53'],
     'MBS_WILD': ['53'],
-    'WestCascades_MtnLoop': ['53']
+    'WestCascades_MtnLoop': ['53'],
+    'WestCascades_SMtnLoop': ['53']
     # 'MBS_GFA': ['53']
 }
 
@@ -40,6 +42,7 @@ DATA_COLUMNS = {
     'KingCo': ['flickr', 'twitter', 'instag', 'wta'],
     'NationalForests': ['flickr', 'twitter', 'instag', 'alltrails'],
     'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
-    'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite']
+    'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
+    'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite']
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
 }
