@@ -9,15 +9,16 @@ AUTH_BUCKET_NAME = 'recsetgo'
 PROJECT_NAMES = {
     'West Cascades': 'WestCascades',
     'Middle Fork': 'WestCascades_MiddleFork',
-    'Okanogan-Wenatchee Wilderness': 'OKW_WILD',
-    'Okanogan-Wenatchee General Forest': 'OKW_GFA',
+    'Okanogan-Wenatchee Wilderness (Archived)': 'OKW_WILD',
+    'Okanogan-Wenatchee General Forest (Archived)': 'OKW_GFA',
     'Northern New Mexico': 'NNM',
     'King County Parks': 'KingCo',
     'US National Forests': 'NationalForests',
     'Mount Baker-Snoqualmie Wilderness': 'MBS_WILD',
     'Mountain Loop': 'WestCascades_MtnLoop',
-    'South Mountain Loop': 'WestCascades_SMtnLoop'
+    'South Mountain Loop': 'WestCascades_SMtnLoop',
     # 'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
+    'East Cascades': 'EastCascades'
 }
 
 CENSUS_TRACT_STATES = {
@@ -29,8 +30,9 @@ CENSUS_TRACT_STATES = {
     'KingCo': ['53'],
     'MBS_WILD': ['53'],
     'WestCascades_MtnLoop': ['53'],
-    'WestCascades_SMtnLoop': ['53']
+    'WestCascades_SMtnLoop': ['53'],
     # 'MBS_GFA': ['53']
+    'EastCascades': ['53']
 }
 
 DATA_COLUMNS = {
@@ -43,6 +45,7 @@ DATA_COLUMNS = {
     'NationalForests': ['flickr', 'twitter', 'instag', 'alltrails'],
     'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
     'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
-    'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite']
+    'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
+    'EastCascades': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite']
 }
