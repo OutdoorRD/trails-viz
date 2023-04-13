@@ -45,6 +45,8 @@ $ npm run serve
 ```
 This will start the server on port 8080. Navigate to http://localhost:8080.
 
+Note: If you encounter `CORS` policy issues when viewing the dashboard on the development server, try different browsers. Firefox works, but Chrome and Safari may result in bugs.
+
 ## Build
 Front end and back end has must be built separately. Run the following commands form the root of the project - `trails-viz`
 ```shell script
