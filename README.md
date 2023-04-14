@@ -4,7 +4,7 @@ A web-app to display model predictions of trail use.
 
 [![Build Status](https://travis-ci.com/OutdoorRD/trails-viz.svg?branch=master)](https://travis-ci.com/OutdoorRD/trails-viz)
 
-## Development
+## Development 
 
 The project is split into two separate apps for front end and back end:
 ```bash
