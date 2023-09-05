@@ -5,6 +5,13 @@ from trailsvizapi.config import app_config
 from trailsvizapi.repository import projects_and_sites
 
 
+# @app.after_request
+# def add_cors_headers(response):
+#     response.headers["Access-Control-Allow-Origin"] = "http://localhost:8080"
+#     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+#     return response
+
+
 @app.route('/api/projects')
 def get_all_projects():
     return jsonify(app_config.PROJECT_NAMES)
