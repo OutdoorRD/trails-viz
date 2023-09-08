@@ -6,6 +6,7 @@ export const COLORS = {
     WTA: '#0ab652',
     ALLTRAILS: '#36E0BE',
     EBIRD: '#f2e718',
+    GRAVY: '#ffa500',
     ON_SITE: '#640b00',
     COMPARE_MODELLED: '#fb9205',
     COMPARE_FLICKR: '#c9c9c4',
@@ -14,6 +15,7 @@ export const COLORS = {
     COMPARE_WTA: '#ff0000',
     COMPARE_ALLTRAILS: '#086351',
     COMPARE_EBIRD: '#e3e84a',
+    COMPARE_GRAVY: '#8a2be2',
     COMPARE_ON_SITE: '#ff6400',
 };
 
