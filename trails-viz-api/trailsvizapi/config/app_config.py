@@ -19,8 +19,8 @@ PROJECT_NAMES = {
     'South Mountain Loop': 'WestCascades_SMtnLoop',
     # 'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
     'East Cascades': 'EastCascades',
-    'Coronado': 'Coronado'
-    'Bridger Teton': 'BT'
+    'Coronado': 'Coronado',
+    'Bridger-Teton': 'BT'
 }
 
 CENSUS_TRACT_STATES = {
@@ -50,6 +50,6 @@ DATA_COLUMNS = {
     'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
     'EastCascades': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite'],
-    'Coronado': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite']
-    'BT':['flickr','twitter','alltrails','ebird','onsite']
+    'Coronado': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite'],
+    'BT':['flickr','twitter','alltrails','ebird','mobile','onsite']
 }
