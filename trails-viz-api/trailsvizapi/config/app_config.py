@@ -51,5 +51,5 @@ DATA_COLUMNS = {
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
     'EastCascades': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite'],
     'Coronado': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite'],
-    'BT': ['flickr', 'twitter', 'alltrails', 'ebird', 'mobile', 'onsite']
+    'BT': ['flickr', 'twitter', 'alltrails', 'ebird', 'gravy', 'onsite']
 }
