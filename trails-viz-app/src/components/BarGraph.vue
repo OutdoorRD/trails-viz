@@ -162,6 +162,7 @@
         colors[trailName + ' - AllTrails'] =  comparing ? COLORS.COMPARE_ALLTRAILS : COLORS.ALLTRAILS;
         colors[trailName + ' - eBird'] =  comparing ? COLORS.COMPARE_EBIRD : COLORS.EBIRD;
         colors[trailName + ' - Gravy Analytics'] =  comparing ? COLORS.COMPARE_GRAVY : COLORS.GRAVY;
+        colors[trailName + ' - Reveal'] =  comparing ? COLORS.COMPARE_REVEAL : COLORS.REVEAL;
 
         return colors;
       },
@@ -198,6 +199,7 @@
         let alltrails = [trailName + ' - AllTrails'];
         let ebird = [trailName + ' - eBird'];
         let gravy = [trailName + ' - Gravy Analytics'];
+        let reveal = [trailName + ' - Reveal'];
 
 
         estimates.forEach(x => {
@@ -208,6 +210,7 @@
           alltrails.push(Math.round(x.alltrails));
           ebird.push(Math.round(x.ebird));
           gravy.push(Math.round(x.gravy));
+          reveal.push(Math.round(x.reveal));
 
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
@@ -232,6 +235,9 @@
         }
         if (projectDataSources.includes('gravy')) {
           socialMediaSources.push(gravy);
+        }
+        if (projectDataSources.includes('reveal')) {
+          socialMediaSources.push(reveal);
         }
         return [socialMediaSources, self._getSocialMediaColors(trailName, comparing)];
       },

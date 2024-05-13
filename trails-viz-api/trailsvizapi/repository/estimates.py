@@ -9,8 +9,8 @@ def _get_estimates(siteid, period):
     site_data = monthly_df[monthly_df['trail'] == siteid]
     site_data = site_data.groupby(by=['month']).mean() if period == 'monthly' else site_data.groupby(by=['year']).sum()
     site_data = site_data[['estimate', 'log_estimate', 'flickr', 'twitter',
-                           'instag', 'wta', 'alltrails', 'ebird', 'gravy',
-                           'onsite', 'log_onsite', 'data_days']]
+                           'instag', 'wta', 'alltrails', 'ebird', 'gravy', 
+                           'reveal', 'onsite', 'log_onsite', 'data_days']]
     site_data.reset_index(inplace=True)
     return site_data
 
