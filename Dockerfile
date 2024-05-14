@@ -3,7 +3,7 @@ FROM nginx:1.17.4
 RUN apt-get update
 RUN apt-get -y install wget
 RUN apt-get -y install dos2unix
-RUN wget --no-dns-cache --debug https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN chmod 755 Miniconda3-latest-Linux-x86_64.sh
 RUN ./Miniconda3-latest-Linux-x86_64.sh -b -p /miniconda3
 RUN rm Miniconda3-latest-Linux-x86_64.sh
