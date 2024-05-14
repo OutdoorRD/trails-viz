@@ -20,7 +20,6 @@ RUN mkdir -p /app/logs
 COPY trails-viz-app/dist /usr/share/nginx/html
 COPY trails-viz-api/uwsgi-config.ini /app/uwsgi-config.ini
 COPY docker-conf/start.sh /app/start.sh
-
 COPY trails-viz-api/dist/trailsvizapi-*-py3-none-any.whl /app/
 
 RUN dos2unix /app/start.sh
