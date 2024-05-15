@@ -37,7 +37,8 @@ def _get_project_estimates(project, period):
         project_sites_data = project_sites_data.drop(columns=['trail', 'month']).groupby(by=['year']).sum()
 
     project_sites_data = project_sites_data[['estimate', 'log_estimate', 'flickr', 'twitter', 'instag', 'wta',
-                                             'alltrails', 'onsite', 'log_onsite', 'data_days']]
+                                             'alltrails', 'ebird', 'gravy', 'reveal', 'onsite', 'log_onsite',
+                                             'data_days']]
 
     project_sites_data['log_estimate'] = np.log(project_sites_data['estimate'] + 1)
     project_sites_data['log_onsite'] = np.log(project_sites_data['onsite'] + 1)
