@@ -29,7 +29,7 @@ CENSUS_TRACT_STATES = {
     # 'OKW_WILD': ['53'],
     # 'OKW_GFA': ['53'],
     'NNM': ['35'],
-    # 'KingCo': ['53'],
+    'KingCo': ['53'],
     'MBS_WILD': ['53'],
     'WestCascades_MtnLoop': ['53'],
     'WestCascades_SMtnLoop': ['53'],
