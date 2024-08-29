@@ -23,6 +23,7 @@ _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
+
 def _load_geo_df(geo_df_path, geo_df_list):
     '''Load a lines or access points file into a list of all geo dfs'''
     if Path(geo_df_path).exists():
@@ -65,7 +66,7 @@ def _prepare_geo_dfs():
 
             access_points_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_ACCESS_POINTS_FILE
             access_points = _load_geo_df(access_points_file, access_points)
-    
+
     # Ensure polygons exists; we may not have access points or lines
     assert polygons is not None
 
