@@ -24,63 +24,67 @@ _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
 
-def _prepare_geo_dfs():
+def _load_geo_df(geo_df_path, geo_df_list):
+    '''Load a lines or access points file into a list of all geo dfs'''
+    if Path(geo_df_path).exists():
+        if geo_df_list is not None:
+            geo_df_list = geo_df_list.append(gpd.read_file(geo_df_path), sort=False)
+        else:
+            geo_df_list = gpd.read_file(geo_df_path)
+    return geo_df_list
 
+
+def _prepare_geo_df(allsites, polygons, new_gdf):
+    '''Helper function to merge a new geo df (lines or access points) into the allsites geo df'''
+    # only keep required columns
+    new_gdf = new_gdf[['siteid', 'geometry']]
+    # convert all site ids to string
+    new_gdf['siteid'] = new_gdf['siteid'].astype(str)
+    # drop columns if required fields are null
+    new_gdf.dropna(inplace=True)
+    # trail name and project code is not present in the lines and access point files
+    # since, there will be always be a polygon for a site, this info can be extracted
+    # from the polygon data frame by doing a merge
+    new_gdf = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
+                       new_gdf, on='siteid', how='right')
+    new_gdf.dropna(inplace=True)
+    allsites = allsites.append(new_gdf, sort=False)
+    return allsites
+
+
+def _prepare_geo_dfs():
     polygons = None
     lines = None
     access_points = None
     for item in os.listdir(_PROJECT_FILES_ROOT):
         if Path(_PROJECT_FILES_ROOT + item).is_dir():
             polygons_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_POLYGONS_FILE
-            if Path(polygons_file).exists():
-                if polygons is not None:
-                    polygons = polygons.append(gpd.read_file(polygons_file), sort=False)
-                else:
-                    polygons = gpd.read_file(polygons_file)
+            polygons = _load_geo_df(polygons_file, polygons)
 
             lines_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_LINES_FILE
-            if Path(lines_file).exists():
-                if lines is not None:
-                    lines = lines.append(gpd.read_file(lines_file), sort=False)
-                else:
-                    lines = gpd.read_file(lines_file)
+            lines = _load_geo_df(lines_file, lines)
 
             access_points_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_ACCESS_POINTS_FILE
-            if Path(access_points_file).exists():
-                if access_points is not None:
-                    access_points = access_points.append(gpd.read_file(access_points_file), sort=False)
-                else:
-                    access_points = gpd.read_file(access_points_file)
+            access_points = _load_geo_df(access_points_file, access_points)
 
-    assert polygons is not None and lines is not None and access_points is not None
+    # Ensure polygons exists; we may not have access points or lines
+    assert polygons is not None
 
     # only keep required columns
     polygons = polygons[['siteid', 'Trail_name', 'Prjct_code', 'geometry']]
-    lines = lines[['siteid', 'geometry']]
-    access_points = access_points[['siteid', 'geometry']]
 
     # convert all site ids to string
     polygons['siteid'] = polygons['siteid'].astype(str)
-    lines['siteid'] = lines['siteid'].astype(str)
-    access_points['siteid'] = access_points['siteid'].astype(str)
 
     # drop columns if required fields are null
     polygons.dropna(subset=['siteid', 'Prjct_code', 'geometry'], inplace=True)
-    lines.dropna(inplace=True)
-    access_points.dropna(inplace=True)
 
-    # trail name and project code is not present in the lines and access point files
-    # since, there will be always be a polygon for a site, this info can be extracted
-    # from the polygon data frame by doing a merge
-    lines = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
-                     lines, on='siteid', how='right')
-    access_points = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
-                             access_points, on='siteid', how='right')
+    allsites = polygons.copy()
 
-    lines.dropna(inplace=True)
-    access_points.dropna(inplace=True)
-
-    allsites = polygons.append(lines, sort=False).append(access_points, sort=False)
+    # Add in lines and access points (if they exist)
+    for geo_df in [lines, access_points]:
+        if geo_df is not None:
+            allsites = _prepare_geo_df(allsites, polygons, geo_df)
     return allsites
 
 
