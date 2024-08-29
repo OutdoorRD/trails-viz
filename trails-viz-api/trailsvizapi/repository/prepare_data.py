@@ -45,14 +45,13 @@ def _prepare_geo_df(allsites, polygons, new_gdf):
     # since, there will be always be a polygon for a site, this info can be extracted
     # from the polygon data frame by doing a merge
     new_gdf = pd.merge(polygons[['siteid', 'Trail_name', 'Prjct_code']],
-                            new_gdf, on='siteid', how='right')
+                       new_gdf, on='siteid', how='right')
     new_gdf.dropna(inplace=True)
     allsites = allsites.append(new_gdf, sort=False)
     return allsites
 
 
 def _prepare_geo_dfs():
-
     polygons = None
     lines = None
     access_points = None
