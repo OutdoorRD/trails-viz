@@ -38,7 +38,7 @@ CENSUS_TRACT_STATES = {
 }
 
 DATA_COLUMNS = {
-    'WestCascades': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails', 'onsite'],
+    'WestCascades': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails', 'reveal', 'onsite'],
     'WestCascades_MiddleFork': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails', 'onsite'],
     # 'OKW_WILD': ['flickr', 'twitter', 'instag', 'wta'],
     # 'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
