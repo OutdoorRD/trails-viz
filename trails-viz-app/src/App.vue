@@ -23,7 +23,7 @@ export default {
   },
   mounted() {
     let self = this;
-
+    // leaving a comment to test out frontend CI/CD
     // add interceptor to show modal when 403 response is received
     axios.interceptors.response.use(
       response => response,
