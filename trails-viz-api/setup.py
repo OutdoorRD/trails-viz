@@ -5,7 +5,7 @@ import trailsvizapi
 with open('requirements.txt', 'r') as req:
     requirements = req.readlines()
 
-
+# comment to test CICD, delete later
 PACKAGE_NAME = 'trailsvizapi'
 VERSION = trailsvizapi.__version__
 
