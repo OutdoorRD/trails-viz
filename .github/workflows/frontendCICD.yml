@@ -92,7 +92,7 @@ jobs:
           echo "commited after version update"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin master
-          git tag v"$new_version"
+          git tag "app-v$new_version"
           git push origin --tags
           echo "pushed new version to master"
       
