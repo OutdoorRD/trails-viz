@@ -1,0 +1,116 @@
+name: API CI/CD
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'trails-viz-api/trailsvizapi/**'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'trails-viz-api/trailsvizapi/**'
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.7'
+
+    - name: Install dependencies
+      run: |
+        set -e
+        python -m pip install --upgrade pip
+        pip install flake8
+        pip install wheel
+        cd trails-viz-api
+        pip install -r requirements.txt
+
+    - name: Run flake8 and build project
+      run: |
+        set -e
+        cd trails-viz-api
+        flake8 . --count --max-line-length=119 --exclude trailsvizapi/__init__.py --show-source --statistics
+        python setup.py bdist_wheel
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # only deploy on push event
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install bump2version
+
+      - name: Setup git user identity
+        run: |
+          git config --global user.name "outdoorrd-bot"
+          git config --global user.email "outdoorrd@uw.edu"
+      
+      - name: Update app version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          commit_message=$(git log -1 --pretty=%B)  # Get commit message
+          git checkout master
+          # Pull latest changes before version bump
+          git pull origin master
+          cd trails-viz-api/
+          echo "Updating version..."
+          if [[ "$commit_message" == *"release=major"* ]]; then
+            bump2version major
+          elif [[ "$commit_message" == *"release=minor"* ]]; then
+            bump2version minor
+          elif [[ "$commit_message" == *"release=patch"* ]]; then
+            bump2version patch
+          else
+            bump2version patch
+          fi
+          new_version=$(sed -n "s/__version__ = '\(.*\)'/\1/p" trailsvizapi/__init__.py)
+          git add trailsvizapi/__init__.py .bumpversion.cfg
+          git commit -m "Auto update api version to $new_version"
+          echo "commited after version update"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin master
+          git tag "api-v$new_version"
+          git push origin --tags
+          echo "pushed new versioning update to master"
+      
+      - name: Deploy to Digital Ocean Droplet
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_HOSTNAME }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd trails-viz/
+            git fetch origin
+            git reset --hard origin/master
+            source /home/nginx/miniconda3/etc/profile.d/conda.sh
+            conda activate trails-viz-api
+            cd trails-viz-api/
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            cd ..
+            cd web-server-conf/
+            chmod +x ./start.sh
+            ./start.sh
