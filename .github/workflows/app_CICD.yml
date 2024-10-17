@@ -1,0 +1,106 @@
+name: APP CI/CD
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'trails-viz-app/**'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'trails-viz-app/**'
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '12'
+
+    - name: Install dependencies
+      run: |
+        cd trails-viz-app
+        npm install
+
+    - name: Run lint and build project
+      run: |
+        set -e
+        cd trails-viz-app
+        npm run lint
+        npm run build
+
+    - name: Upload build artifact # save the dist folder as an artifact
+      if: github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: trails-viz-app-dist
+        path: trails-viz-app/dist
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # only deploy on push event
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Download build artifact # download the dist folder from build
+        uses: actions/download-artifact@v4
+        with:
+          name: trails-viz-app-dist
+          path: trails-viz-app/dist
+      
+      - name: Setup git user identity
+        run: |
+          git config --global user.name "outdoorrd-bot"
+          git config --global user.email "outdoorrd@uw.edu"
+      
+      - name: Update app version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          commit_message=$(git log -1 --pretty=%B)  # Get commit message
+          echo "Updating version..."
+          if [[ "$commit_message" == *"release=major"* ]]; then
+            version_bump="major"
+          elif [[ "$commit_message" == *"release=minor"* ]]; then
+            version_bump="minor"
+          elif [[ "$commit_message" == *"release=patch"* ]]; then
+            version_bump="patch"
+          else
+            version_bump="patch"
+          fi
+          
+          # update the version in package.json as it's the easiest thing to do using npm
+          git checkout master
+          # Pull latest changes before version bump
+          git pull origin master
+          cd trails-viz-app
+          new_version=$(npm version $version_bump)  # this returns the new version number with 'v' as prefix
+          new_version_number=${new_version#v}  # Remove the 'v' prefix
+          cd ..
+
+          echo "local version bump successful $new_version"
+          git add trails-viz-app/package.json
+          git add trails-viz-app/package-lock.json
+          git commit -m "Auto update app version to $new_version_number"
+          echo "commited after version update"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin master
+          git tag "app-$new_version"
+          git push origin --tags
+          echo "pushed new versioning update to master"
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: trails-viz-app/dist
