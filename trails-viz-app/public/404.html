@@ -3,10 +3,12 @@
 <head>
   <meta http-equiv="refresh" content="0; URL=/trails-viz/">
   <script type="text/javascript">
-    // Redirect to the correct base path
+    // Redirect to the correct base path and preserve the original path
     var path = window.location.pathname;
+    var search = window.location.search; // Include any query parameters
+    var hash = window.location.hash; // Include any existing hash
     if (path.indexOf('/trails-viz/') !== 0) {
-      window.location.href = "/trails-viz" + path;
+      window.location.href = "/trails-viz" + path + search + hash;
     }
   </script>
 </head>
