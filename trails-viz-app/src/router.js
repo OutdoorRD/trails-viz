@@ -35,7 +35,8 @@ const routes = [
 
 const router = new VueRouter({
   routes,
-  mode: 'history'
+  mode: 'history',
+  base: process.env.NODE_ENV === 'production' ? '/trails-viz/' : '/'
 });
 
 export default router;
