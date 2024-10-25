@@ -113,4 +113,4 @@ jobs:
             cd ..
             cd web-server-conf/
             chmod +x ./start.sh
-            ./start.sh
+            sudo ./start.sh
