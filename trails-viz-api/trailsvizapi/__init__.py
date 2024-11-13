@@ -15,3 +15,4 @@ from trailsvizapi.controller.estimates import *
 from trailsvizapi.controller.home_locations import *
 from trailsvizapi.controller.visitation import *
 from trailsvizapi.controller.users_controller import *
+from trailsvizapi.controller.party_characteristics import *
