@@ -4,12 +4,14 @@ on:
     branches:
       - master
     paths:
-      - 'trails-viz-api/trailsvizapi/**'
+      - 'trails-viz-api/**'
+      - 'web-server-conf/**'
   pull_request:
     branches:
       - master
     paths:
-      - 'trails-viz-api/trailsvizapi/**'
+      - 'trails-viz-api/**'
+      - 'web-server-conf/**'
     
 jobs:
   build:
@@ -87,11 +89,13 @@ jobs:
           new_version=$(sed -n "s/__version__ = '\(.*\)'/\1/p" trailsvizapi/__init__.py)
           git add trailsvizapi/__init__.py .bumpversion.cfg
           git commit -m "Auto update api version to $new_version"
-          echo "commited after version update"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git push origin master
           git tag "api-v$new_version"
-          git push origin --tags
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          if ! git push origin "api-v$new_version"; then
+            echo "Tag push failed, likely due to an existing tag."
+            exit 1
+          fi
+          git push origin master         
           echo "pushed new versioning update to master"
       
       - name: Deploy to Digital Ocean Droplet
