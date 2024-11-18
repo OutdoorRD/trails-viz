@@ -41,7 +41,15 @@ _MANAGER_ENDPOINTS.update([
     'get_project_home_locations_demographics',
     'get_user',
     'update_user',
+    'get_project_party_people',
+    'get_project_party_vehicles',
+    'get_project_trail_visits',
     'get_project_party_characteristics',
+    'get_project_party_characteristics_yearly_statistics',
+    'get_party_characteristics_yearly_statistics',
+    'get_party_people',
+    'get_party_vehicles',
+    'get_trail_visits',
     'get_party_characteristics',
 ])
 
@@ -85,8 +93,6 @@ def authenticate_request():
     if request.method == 'OPTIONS':
         # return true for pre flight options requests by browser
         return
-    # print(app.url_map)
-    print(request.endpoint)
     endpoint = request.endpoint  # this would give the function name from the controller
 
     # if unprotected endpoint, allow execution without any auth header
@@ -117,8 +123,6 @@ def authenticate_request():
 
     role_authorized_endpoints = _ROLE_ACCESS_MAPPING[role]
     if endpoint not in role_authorized_endpoints:
-        print(endpoint)
-        print(role_authorized_endpoints)
         return Response(_unauthorized_error_json(username, request_path), mimetype='application/json', status=403)
 
 
