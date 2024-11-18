@@ -134,7 +134,7 @@
 
         this.breadcrumbItems.push({
           text: projectName,
-          to: { name: 'dashboard', params: { project: projectCode } }
+          href: '/dashboard/' + projectCode
         });
 
         this.trailName = 'All Sites in ' + projectName;
