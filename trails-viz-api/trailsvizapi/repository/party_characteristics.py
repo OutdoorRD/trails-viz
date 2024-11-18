@@ -15,7 +15,7 @@ def _get_project_party_characteristics_data(project):
 
 def _get_party_characteristics_data(siteid):
     party_characteristics_df = get_from_data_source('PARTY_CHARACTERISTICS_DF')
-    party_characteristics_df['trail'] = party_characteristics_df['SideID'].apply(lambda x: siteid if siteid in x else None)
+    party_characteristics_df['trail'] = party_characteristics_df['SiteID'].apply(lambda x: siteid if siteid in x else None)
     return party_characteristics_df.dropna(subset=['trail'])
 
 def get_project_party_characteristics(project):
