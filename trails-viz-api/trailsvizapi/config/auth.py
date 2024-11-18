@@ -41,12 +41,8 @@ _MANAGER_ENDPOINTS.update([
     'get_project_home_locations_demographics',
     'get_user',
     'update_user',
-    'get_project_party_people',
-    'get_project_party_vehicles',
-    'get_project_trail_visits',
-    'get_party_people',
-    'get_party_vehicles',
-    'get_trail_visits'
+    'get_project_party_characteristics',
+    'get_party_characteristics',
 ])
 
 _ROLE_ACCESS_MAPPING = {
