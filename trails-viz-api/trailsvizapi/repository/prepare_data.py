@@ -15,11 +15,13 @@ _MONTHLY_ESTIMATES_FILE = 'viz_model_mmm.csv'
 _MONTHLY_ONSITE_FILE = 'viz_model_mmmir.csv'
 _WEEKLY_ESTIMATES_FILE = 'viz_model_www.csv'
 _WEEKLY_ONSITE_FILE = 'viz_model_wwwir.csv'
+_PARTY_CHARACTERISTICS_FILE = 'party_characteristics.csv'
 _STATE_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/state/'
 _COUNTY_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/county/'
 _CENSUS_TRACT_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/census-tract/'
 _README_DIR = config.DATA_FILES_ROOT + 'readme/'
 _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
+_CHATBOT_DIR = config.DATA_FILES_ROOT + 'chatbot/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
@@ -86,6 +88,14 @@ def _prepare_geo_dfs():
         if geo_df is not None:
             allsites = _prepare_geo_df(allsites, polygons, geo_df)
     return allsites
+
+
+def _prepare_party_characteristics_df():
+    party_characteristics_df = None
+    if Path(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE):
+        party_characteristics_df = pd.read_csv(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE)
+    assert party_characteristics_df is not None
+    return party_characteristics_df
 
 
 def _prepare_estimates_and_visitation_df(period):
@@ -253,11 +263,11 @@ def get_from_data_source(key):
         DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
         DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
         DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
+        DATA_SOURCE['PARTY_CHARACTERISTICS_DF'] = _prepare_party_characteristics_df()
         DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
         DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
         DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
         DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
         DATA_SOURCE['SVI_DF'] = _prepare_svi_df()
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
-
     return DATA_SOURCE[key]

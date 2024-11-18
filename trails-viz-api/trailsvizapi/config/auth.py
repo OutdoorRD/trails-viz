@@ -40,7 +40,9 @@ _MANAGER_ENDPOINTS.update([
     'get_home_locations_demographics',
     'get_project_home_locations_demographics',
     'get_user',
-    'update_user'
+    'update_user',
+    'get_project_party_characteristics',
+    'get_party_characteristics'
 ])
 
 _ROLE_ACCESS_MAPPING = {
@@ -83,7 +85,6 @@ def authenticate_request():
     if request.method == 'OPTIONS':
         # return true for pre flight options requests by browser
         return
-
     endpoint = request.endpoint  # this would give the function name from the controller
 
     # if unprotected endpoint, allow execution without any auth header
