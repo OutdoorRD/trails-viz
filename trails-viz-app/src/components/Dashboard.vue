@@ -44,9 +44,6 @@
             <b-tab title="Demographics">
               <demographics-summary ref="demographics-summary"></demographics-summary>
             </b-tab>
-            <b-tab title="Party Characteristics">
-              <party-characteristics ref="party-characteristics"></party-characteristics>
-            </b-tab>
             <b-tab title="Methods">
               <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
@@ -68,7 +65,6 @@
   import HomeLocationsMap from "../components/HomeLocationsMap";
   import InfoViewer from "../components/InfoViewer";
   import DemographicsSummary from "../components/DemographicsSummary";
-  import PartyCharacteristics from "../components/PartyCharacteristics";
 
   import {VIZ_MODES} from "../store/constants";
   import {EventBus} from "../event-bus";
@@ -116,7 +112,6 @@
     components: {
       InfoViewer,
       DemographicsSummary,
-      PartyCharacteristics,
       HomeLocationsMap,
       HomeLocations,
       TimeSeries,
@@ -158,7 +153,6 @@
             self.$refs['visitation-info'].renderInfo('visitation');
             self.$refs['home-locations-info'].renderInfo('homeLocations');
             self.$refs['demographics-summary'].renderDemographicsSummary();
-            self.$refs['party-characteristics'].renderPartyCharacteristics();
           });
       },
       renderSiteLevelPlots: function () {
@@ -179,7 +173,6 @@
         this.$refs['home-locations'].renderTreeMap();
         this.$refs['home-locations-map'].renderHomeLocationsMap();
         this.$refs['demographics-summary'].renderDemographicsSummary();
-        this.$refs['party-characteristics'].renderPartyCharacteristics();
       },
       renderComparisionPlots: function () {
         this.$store.dispatch('setVizMode', VIZ_MODES.COMPARE);
