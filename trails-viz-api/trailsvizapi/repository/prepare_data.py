@@ -89,10 +89,11 @@ def _prepare_geo_dfs():
             allsites = _prepare_geo_df(allsites, polygons, geo_df)
     return allsites
 
+
 def _prepare_party_characteristics_df():
     party_characteristics_df = None
     if Path(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE):
-        party_characteristics_df = pd.read_csv(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE)  
+        party_characteristics_df = pd.read_csv(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE)
     assert party_characteristics_df is not None
     return party_characteristics_df
 

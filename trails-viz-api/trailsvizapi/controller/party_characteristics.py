@@ -1,5 +1,4 @@
 from flask import Response
-import json
 from trailsvizapi import app
 from trailsvizapi.repository import party_characteristics
 
