@@ -92,7 +92,7 @@ def _prepare_geo_dfs():
 def _prepare_party_characteristics_df():
     party_characteristics_df = None
     if Path(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE):
-        party_characteristics_df = pd.read_csv(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE)    
+        party_characteristics_df = pd.read_csv(_CHATBOT_DIR + '/' + _PARTY_CHARACTERISTICS_FILE)  
     assert party_characteristics_df is not None
     return party_characteristics_df
 
@@ -269,6 +269,4 @@ def get_from_data_source(key):
         DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
         DATA_SOURCE['SVI_DF'] = _prepare_svi_df()
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
-        
-
     return DATA_SOURCE[key]
