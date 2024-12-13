@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-
+import ast
 import pandas as pd
 import geopandas as gpd
 
@@ -41,7 +41,7 @@ def _prepare_geo_df(allsites, polygons, new_gdf):
     # only keep required columns
     new_gdf = new_gdf[['siteid', 'geometry']]
     # convert all site ids to string
-    new_gdf['siteid'] = new_gdf['siteid'].astype(str)
+    new_gdf.loc[:, 'siteid'] = new_gdf['siteid'].astype(str)
     # drop columns if required fields are null
     new_gdf.dropna(inplace=True)
     # trail name and project code is not present in the lines and access point files
@@ -94,7 +94,9 @@ def _prepare_party_characteristics_df():
     party_characteristics_df = None
     if Path(_CHATBOT_DIR + _PARTY_CHARACTERISTICS_FILE):
         party_characteristics_df = pd.read_csv(_CHATBOT_DIR + _PARTY_CHARACTERISTICS_FILE)
-    assert party_characteristics_df is not None
+    # convert SiteID from strings to Python lists
+    party_characteristics_df['SiteID'] = party_characteristics_df['SiteID'].apply(ast.literal_eval)
+    assert party_characteristics_df is not None, "Failed to prepare party characteristics data."
     return party_characteristics_df
 
 
