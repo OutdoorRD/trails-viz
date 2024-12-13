@@ -42,7 +42,9 @@ _MANAGER_ENDPOINTS.update([
     'get_user',
     'update_user',
     'get_project_party_characteristics',
-    'get_party_characteristics'
+    'get_party_characteristics',
+    'get_project_party_characteristics_yearly_statistics',
+    'get_party_characteristics_yearly_statistics',
 ])
 
 _ROLE_ACCESS_MAPPING = {
