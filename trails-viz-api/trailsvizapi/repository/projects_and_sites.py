@@ -11,7 +11,8 @@ def get_project_from_site(siteid):
     allsites = get_from_data_source('ALLSITES_DF')
     site = allsites[allsites['siteid'] == siteid]
     project_code = site[['Prjct_code']].iat[0, 0]
-    project_list = [code.strip() for code in project_code.split(',')] if ',' in project_code else [project_code.strip()]
+    project_list = [code.strip() for code in project_code.split(',')
+                    ] if ',' in project_code else [project_code.strip()]
     return project_list
 
 
