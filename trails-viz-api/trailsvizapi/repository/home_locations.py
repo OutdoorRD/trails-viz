@@ -167,12 +167,14 @@ def get_project_home_locations_by_census_tract(project, state_code, county_code)
 def get_demographic_summary(siteid):
     svi_df = get_from_data_source('SVI_DF')
     home_locations = get_from_data_source('HOME_LOCATIONS_DF')
-
-    project = get_project_from_site(siteid)
-    census_tract_states = app_config.CENSUS_TRACT_STATES[project]
+    project_list = get_project_from_site(siteid)
+    census_tract_states = []
+    for proj in project_list:
+        if proj in app_config.CENSUS_TRACT_STATES:
+            census_tract_states.extend(app_config.CENSUS_TRACT_STATES[proj])
+    census_tract_states = list(set(census_tract_states))
     svi_df = svi_df[svi_df['state_code'].isin(census_tract_states)]
     svi_df = svi_df.drop(columns=['state_code'])
-
     site_home_locations = home_locations[home_locations['siteid'] == siteid]
     demographics_data = site_home_locations.merge(svi_df, on='tract', how='inner')
     return demographics_data
