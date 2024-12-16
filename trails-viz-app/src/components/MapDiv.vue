@@ -13,6 +13,7 @@
   import {MAPBOX_CONSTS} from "../store/constants";
   import {MARKER} from "../store/vectors";
   import {EventBus} from "../event-bus";
+  import * as turf from "@turf/turf";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -112,6 +113,7 @@
     },
     methods: {
       _pointToMarker: function(feature, latlng) {
+        console.log("Feature:", feature, "LatLng:", latlng)
         let self = this;
         let siteid = feature['properties']['siteid'];
         let estimate = self.lastYearEstimates[siteid];
@@ -138,12 +140,14 @@
         };
 
         let iconUrl = 'data:image/svg+xml;base64,' + btoa(MARKER.replace('{fillMe}', getColor(estimate)));
+        // console.log("Generated iconUrl:", iconUrl)
         let icon = new IconSuper({iconUrl: iconUrl});
         return L.marker(latlng, {icon: icon});
       },
       renderProjectSites: function () {
         let self = this;
         let projectSites = {};
+        let centroidFeatures = [];
 
         // remove the existing visible sites of the project
         self.visibleLayers.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
@@ -158,6 +162,18 @@
 
             estimatesRes.data.forEach(x => lastYearEstimates[x.trail] = x.estimate);
             self.lastYearEstimates = lastYearEstimates;
+            
+            // calculate centroids
+            allSitesGeoJson.features.forEach((feature) => {
+              let centroid = turf.centroid(feature);
+              centroid.properties = {
+                ...feature.properties,
+                siteid: feature.properties.siteid,
+                name: feature.properties.Trail_name
+              };
+              centroidFeatures.push(centroid);
+            })
+            console.log('centroidFeatures:',centroidFeatures)
 
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
 
@@ -171,8 +187,8 @@
               }
               siteGroupsGeoJson[siteid]["features"].push(feature);
             }
-
             Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+              // console.log("site:", site)
               let siteLayer = L.geoJSON(site, {style: defaultStyle, pointToLayer: self._pointToMarker})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
@@ -204,7 +220,6 @@
                     self.selectSite(event.target["trailName"])
                   }
                 });
-
               // custom properties can be added to JS objects
               siteLayer.siteid = site["siteid"];
               siteLayer.trailName = site["name"];
@@ -213,6 +228,10 @@
               projectSites[siteLayer.trailName] = siteLayer;
               siteLayer.addTo(this.mapDiv);
             });
+            let centroidLayer = L.geoJSON({ type: "FeatureCollection", features: centroidFeatures }, {
+                pointToLayer: self._pointToMarker // Use your custom point marker logic
+              }).bindTooltip(layer => layer.feature.properties.name); // Tooltip for name
+              centroidLayer.addTo(self.mapDiv); // Add the centroid layer to the map
             self.$store.dispatch('setProjectSites', projectSites);
         }))
       },
