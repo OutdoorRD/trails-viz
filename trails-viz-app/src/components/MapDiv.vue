@@ -112,34 +112,34 @@
       EventBus.$off('top-bar:site-selected', self.selectSite);
     },
     methods: {
+      getColor(value) {
+        if (value > 50000) {
+          return '#7f2704'; // Darkest Orange (Largest values)
+        }
+        if (value > 10000) {
+          return '#d94801'; // Dark Orange
+        }
+        if (value > 5000) {
+          return '#f16913'; // Medium Orange
+        }
+        if (value > 1000) {
+          return '#fdae6b'; // Light Orange
+        }
+        if (value > 500) {
+          return '#fdd0a2'; // Lighter Orange
+        }
+        if (value >= 0) {
+          return '#feedde'; // Lightest Orange
+        }
+        return '#d9d9d9'; // Default grey for missing estimates
+      },
       _pointToMarker: function(feature, latlng) {
         console.log("Feature:", feature, "LatLng:", latlng)
         let self = this;
         let siteid = feature['properties']['siteid'];
         let estimate = self.lastYearEstimates[siteid];
 
-        let getColor = function (value) {
-          if (value > 50000) {
-            return '#253494';
-          }
-          if (value > 10000) {
-            return '#2c7fb8';
-          }
-          if (value > 5000) {
-            return '#41b6c4';
-          }
-          if (value > 1000) {
-            return '#7fcdbb';
-          }
-          if (value > 500) {
-            return '#c7e9b4';
-          }
-          if (value >= 0) {
-            return '#ffffcc';
-          }
-        };
-
-        let iconUrl = 'data:image/svg+xml;base64,' + btoa(MARKER.replace('{fillMe}', getColor(estimate)));
+        let iconUrl = 'data:image/svg+xml;base64,' + btoa(MARKER.replace('{fillMe}', self.getColor(estimate)));
         // console.log("Generated iconUrl:", iconUrl)
         let icon = new IconSuper({iconUrl: iconUrl});
         return L.marker(latlng, {icon: icon});
@@ -189,7 +189,18 @@
             }
             Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
               // console.log("site:", site)
-              let siteLayer = L.geoJSON(site, {style: defaultStyle, pointToLayer: self._pointToMarker})
+              let siteLayer = L.geoJSON(site, {
+                style: function (feature) {
+                  let siteid = feature.properties.siteid;
+                  let estimate = self.lastYearEstimates[siteid];
+                  return {
+                    color: self.getColor(estimate), // Apply color coding to polygon outlines
+                    fillColor: self.getColor(estimate), // Fill the polygon with color
+                    fillOpacity: 0.9, // Adjust opacity
+                    weight: 0.5 // Border thickness
+                  };
+                },
+                pointToLayer: self._pointToMarker})
                 .bindTooltip(site["name"])
                 .on('mouseover', function (event) {
                   if (event.target === self.$store.getters.getSelectedSite || event.target === self.$store.getters.getComparingSite) {
@@ -231,7 +242,7 @@
             let centroidLayer = L.geoJSON({ type: "FeatureCollection", features: centroidFeatures }, {
                 pointToLayer: self._pointToMarker // Use your custom point marker logic
               }).bindTooltip(layer => layer.feature.properties.name); // Tooltip for name
-              centroidLayer.addTo(self.mapDiv); // Add the centroid layer to the map
+              // centroidLayer.addTo(self.mapDiv); // Add the centroid layer to the map
             self.$store.dispatch('setProjectSites', projectSites);
         }))
       },
