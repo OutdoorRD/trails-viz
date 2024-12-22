@@ -45,6 +45,7 @@ _MANAGER_ENDPOINTS.update([
     'get_party_characteristics',
     'get_project_party_characteristics_yearly_statistics',
     'get_party_characteristics_yearly_statistics',
+    'get_annual_chatbot_response_counts'
 ])
 
 _ROLE_ACCESS_MAPPING = {
