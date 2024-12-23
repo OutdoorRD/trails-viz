@@ -7,24 +7,21 @@
       <p>Current Tab: {{ visibleTabGroup  }}</p>
     </div>
         <!-- Range Slider for Year Selection -->
-    <div>
-      <!-- <v-range-slider
-          v-model="yearRange"
-          :min="minYear"
-          :max="maxYear"
-          ticks
-          step="1"
-          thumb-label
-          @change="onYearRangeChange"
-        >
-          <template v-slot:prepend>
-            <span>{{ yearRange[0] }}</span>
-          </template>
-          <template v-slot:append>
-            <span>{{ yearRange[1] }}</span>
-          </template>
-      </v-range-slider> -->
-    </div>
+      <v-row>
+        <v-col class="pa-12">
+          <v-range-slider
+            v-model="yearRange"
+            :min="minYear"
+            :max="maxYear"
+            ticks
+            step="1"
+            thumb-label="always"
+            @change="onYearRangeChange"
+            tick-size="4"
+          >
+          </v-range-slider>
+        </v-col>
+      </v-row>
     <div class="map-div" ref="mapDiv"></div>
   </div>
 </template>

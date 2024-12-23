@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import {Cookie} from "./cookie"
 import axios from "axios";
+import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 Vue.prototype.$apiEndpoint = process.env.VUE_APP_API_ENDPOINT
@@ -27,5 +28,6 @@ if (username !== undefined) {
 new Vue({
   router,
   store,
+  vuetify,
   render: h => h(App)
 }).$mount('#app')
