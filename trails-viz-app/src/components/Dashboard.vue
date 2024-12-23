@@ -1,7 +1,7 @@
 <template>
   <b-row no-gutters class="app-container">
     <b-col sm="6" class="map-col">
-      <map-div ref="map-div" id="mapDiv"></map-div>
+      <map-div ref="map-div" id="mapDiv" :visible-tab-group="visibleTabGroup"></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
       <b-row no-gutters>
