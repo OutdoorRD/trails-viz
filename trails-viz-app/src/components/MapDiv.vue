@@ -262,10 +262,7 @@
 
       renderProjectSites: function () {
         let self = this;
-        let projectSites = {
-          basicSites:{},
-          chatbotSites:{},
-        };
+        let projectSites = {};
         let centroidFeatures = [];
 
         this.createPanes();
@@ -307,8 +304,9 @@
             self.addChatbotSitesLayer(siteGroupsGeoJson, projectSites); // Add chatbot sites layer logic
             
             self.$store.dispatch('setProjectSites', projectSites);
-            let site = self.$store.getters.getProjectSites(self.visibleTabGroup);
-            console.log('site:', site)
+            let sites = self.$store.getters.getProjectSites
+            console.log(sites)
+
         }))
       },
       createPanes: function () {
@@ -391,7 +389,7 @@
           siteLayer.trailName = site.name;
 
           this.chatbotSitesLayer.push(siteLayer);
-          projectSites.chatbotSites[siteLayer.trailName] = siteLayer;
+          projectSites[siteLayer.trailName] = siteLayer;
           if (this.visibleTabGroup === "visitorCharacteristics") {
             siteLayer.addTo(this.mapDiv);
           }
@@ -413,7 +411,8 @@
           siteLayer.trailName = site.name;
 
           this.basicSitesLayer.push(siteLayer);
-          projectSites.basicSites[siteLayer.trailName] = siteLayer;
+          projectSites[siteLayer.trailName] = siteLayer;
+
           if (this.visibleTabGroup !== "visitorCharacteristics") {
             siteLayer.addTo(this.mapDiv);
           }
@@ -462,29 +461,20 @@
             EventBus.$emit("map-div:compare-activated");
           }
         } else {
-          this.selectSite(event.target.trailName);
+          this.selectSite(event);
         }
       },
-      selectSite: function (trailName) {
+      selectSite: function (event) {
         let self = this;
         if (self.$store.getters.getComparingSite) {
-          if (self.visibleTabGroup === 'visitorCharacteristics') {
-            self.$store.getters.getComparingSite.setStyle(solidDefaultStyle);
-          }
-          else {
-            self.$store.getters.getComparingSite.setStyle(defaultStyle);
-          }
+          self.$store.getters.getComparingSite.setStyle(defaultStyle);
           self.$store.dispatch('setComparingSite', '');
         }
         if (self.$store.getters.getSelectedSite) {
-          if (self.visibleTabGroup === 'visitorCharacteristics') {
-            self.$store.getters.getSelectedSite.setStyle(solidDefaultStyle);
-          }
-          else {
-            self.$store.getters.getSelectedSite.setStyle(defaultStyle);
-          }
+          self.$store.getters.getSelectedSite.setStyle(defaultStyle);
         }
-        let site = self.$store.getters.getProjectSites(self.visibleTabGroup)[trailName];
+        event.target.setStyle(selectedStyle);
+        let site = self.$store.getters.getProjectSites[trailName];
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
         EventBus.$emit('map-div:site-selected');

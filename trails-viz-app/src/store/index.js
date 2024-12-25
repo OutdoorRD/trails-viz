@@ -9,10 +9,7 @@ const state = {
   selectedProjectName: '',
   selectedProjectCode: '',
   selectedProjectDataSources: [],
-  projectSites: {
-    basicSites: {},
-    chatbotSites: {},
-  },
+  projectSites: {},
   selectedSite: '',
   vizMode: '',
   censusTract: '',
@@ -66,10 +63,7 @@ const mutations = {
     state.selectedProjectName = '';
     state.selectedProjectCode = '';
     state.selectedProjectDataSources = [];
-    state.projectSites = {
-      basicSites: {},
-      chatbotSites: {},
-    };
+    state.projectSites = {};
     state.selectedSite = '';
 
     state.annualEstimates = [];
@@ -143,11 +137,8 @@ const getters = {
   getSelectedProjectDataSources(state) {
     return state.selectedProjectDataSources
   },
-  getProjectSites: (state) => (tabGroup) => {
-    if (tabGroup === 'visitorCharacteristics') {
-      return state.projectSites.chatbotSites
-    }
-    return state.projectSites.basicSites
+  getProjectSites(state) {
+    return state.projectSites
   },
   getSelectedSite(state) {
     return state.selectedSite
