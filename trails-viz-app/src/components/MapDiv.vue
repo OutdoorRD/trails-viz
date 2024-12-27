@@ -191,16 +191,17 @@
       onTabGroupChange(group) {
         console.log(`Visible Tab Group changed to: ${group}`);
         if (group === 'visitorCharacteristics') {
-          this.basicSitesLayer.forEach((layer) => {
-            if (this.mapDiv.hasLayer(layer)) {
-              this.mapDiv.removeLayer(layer)
-            }
-          })
-          this.chatbotSitesLayer.forEach((layer) => {
-            if (!this.mapDiv.hasLayer(layer)) {
-              layer.addTo(this.mapDiv)
-            }
-          })
+          // this.basicSitesLayer.forEach((layer) => {
+          //   if (this.mapDiv.hasLayer(layer)) {
+          //     this.mapDiv.removeLayer(layer)
+          //   }
+          // })
+          this.changeToChatbotSitesLayer()
+          // this.chatbotSitesLayer.forEach((layer) => {
+          //   if (!this.mapDiv.hasLayer(layer)) {
+          //     layer.addTo(this.mapDiv)
+          //   }
+          // })
           this.chatbotActivityLayer.forEach((layer) => {
             if (!this.mapDiv.hasLayer(layer)) {
               layer.addTo(this.mapDiv)
@@ -301,7 +302,7 @@
 
             self.addBasicSitesLayer(siteGroupsGeoJson, projectSites); // Add basic sites layer logic
             self.addChatbotAcitivityLayer(centroidFeatures); // Add centroid layer logic
-            self.addChatbotSitesLayer(siteGroupsGeoJson, projectSites); // Add chatbot sites layer logic
+            // self.addChatbotSitesLayer(siteGroupsGeoJson, projectSites); // Add chatbot sites layer logic
             
             self.$store.dispatch('setProjectSites', projectSites);
             let sites = self.$store.getters.getProjectSites
@@ -370,30 +371,58 @@
         }
       },
       // Add chatbot sites layer
-      addChatbotSitesLayer: function (siteGroupsGeoJson, projectSites) {
-        Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-          let siteLayer = L.geoJSON(site, {
-            pane: "chatbotSitesPane",
-            style: (feature) => {
-              const siteid = feature.properties.siteid;
-              const estimate = this.chatbotResponseCounts[siteid] || 0;
-              return estimate === 0 ? solidGreyStyle : solidDefaultStyle;
-            },
-          })
-            .bindTooltip(site.name)
-            .on("mouseover", this.handleMouseOver)
-            .on("mouseout", this.handleMouseOutChatbotSitesLayer)
-            .on("click", this.handleClick);
-
-          siteLayer.siteid = site.siteid;
-          siteLayer.trailName = site.name;
-
-          this.chatbotSitesLayer.push(siteLayer);
-          projectSites[siteLayer.trailName] = siteLayer;
-          if (this.visibleTabGroup === "visitorCharacteristics") {
-            siteLayer.addTo(this.mapDiv);
+      changeToChatbotSitesLayer: function () {
+        let sites = this.$store.getters.getProjectSites;
+        console.log('project sites:', sites)
+        Object.values(sites).forEach((site) => {
+          if (site && typeof site.setStyle === 'function') {
+            console.log('Site Trail Name:', site.trailName)
+            site.setStyle(selectedStyle);
           }
         });
+
+      //   addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
+      //   Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+      //     let siteLayer = L.geoJSON(site, {
+      //       pane: "basicSitesPane",
+      //       style: defaultStyle,
+      //     })
+      //       .bindTooltip(site.name)
+      //       .on("mouseover", this.handleMouseOver)
+      //       .on("mouseout", this.handleMouseOutBasicSitesLayer)
+      //       .on("click", this.handleClick);
+
+      //     siteLayer.siteid = site.siteid;
+      //     siteLayer.trailName = site.name;
+
+      //     this.basicSitesLayer.push(siteLayer);
+      //     projectSites[siteLayer.trailName] = siteLayer;
+      //   });
+      // },
+
+        // Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+        //   let siteLayer = L.geoJSON(site, {
+        //     pane: "chatbotSitesPane",
+        //     style: (feature) => {
+        //       const siteid = feature.properties.siteid;
+        //       const estimate = this.chatbotResponseCounts[siteid] || 0;
+        //       return estimate === 0 ? solidGreyStyle : solidDefaultStyle;
+        //     },
+        //   })
+        //     .bindTooltip(site.name)
+        //     .on("mouseover", this.handleMouseOver)
+        //     .on("mouseout", this.handleMouseOutChatbotSitesLayer)
+        //     .on("click", this.handleClick);
+
+        //   siteLayer.siteid = site.siteid;
+        //   siteLayer.trailName = site.name;
+
+        //   this.chatbotSitesLayer.push(siteLayer);
+        //   projectSites[siteLayer.trailName] = siteLayer;
+        //   if (this.visibleTabGroup === "visitorCharacteristics") {
+        //     siteLayer.addTo(this.mapDiv);
+        //   }
+        // });
       },
       // Add basic sites layer
       addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
@@ -412,10 +441,6 @@
 
           this.basicSitesLayer.push(siteLayer);
           projectSites[siteLayer.trailName] = siteLayer;
-
-          if (this.visibleTabGroup !== "visitorCharacteristics") {
-            siteLayer.addTo(this.mapDiv);
-          }
         });
       },
       // Mouse event handlers
@@ -464,7 +489,7 @@
           this.selectSite(event);
         }
       },
-      selectSite: function (event) {
+      selectSite: function (trailName) {
         let self = this;
         if (self.$store.getters.getComparingSite) {
           self.$store.getters.getComparingSite.setStyle(defaultStyle);
@@ -473,7 +498,6 @@
         if (self.$store.getters.getSelectedSite) {
           self.$store.getters.getSelectedSite.setStyle(defaultStyle);
         }
-        event.target.setStyle(selectedStyle);
         let site = self.$store.getters.getProjectSites[trailName];
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
