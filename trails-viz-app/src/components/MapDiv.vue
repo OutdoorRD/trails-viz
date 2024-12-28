@@ -67,7 +67,7 @@
 
   const defaultStyle = {
     color: "#ff0000",
-    weight: 1,
+    weight: 0.8,
     fillColor: '#ff0000',
     fillOpacity: 0.2
   };
@@ -191,41 +191,23 @@
       onTabGroupChange(group) {
         console.log(`Visible Tab Group changed to: ${group}`);
         if (group === 'visitorCharacteristics') {
-          // this.basicSitesLayer.forEach((layer) => {
-          //   if (this.mapDiv.hasLayer(layer)) {
-          //     this.mapDiv.removeLayer(layer)
-          //   }
-          // })
-          this.changeToChatbotSitesLayer()
-          // this.chatbotSitesLayer.forEach((layer) => {
+          // this.changeToChatbotSitesLayer()
+          // this.addChatbotActivityLayer()
+          // this.chatbotActivityLayer.forEach((layer) => {
           //   if (!this.mapDiv.hasLayer(layer)) {
           //     layer.addTo(this.mapDiv)
           //   }
           // })
-          this.chatbotActivityLayer.forEach((layer) => {
-            if (!this.mapDiv.hasLayer(layer)) {
-              layer.addTo(this.mapDiv)
-            }
-          })
         } 
         else {
-          this.chatbotActivityLayer.forEach((layer) => {
-            if (this.mapDiv.hasLayer(layer)) {
-              this.mapDiv.removeLayer(layer)
-            }
-          })
-          this.chatbotSitesLayer.forEach((layer) => {
-            if (this.mapDiv.hasLayer(layer)) {
-              this.mapDiv.removeLayer(layer)
-            }
-          })
-          this.basicSitesLayer.forEach((layer) => {
-            if (!this.mapDiv.hasLayer(layer)) {
-              layer.addTo(this.mapDiv)
-            }
-          })
+          // this.addBasicSitesLayer()
+          // this.changeToBasicSitesLayer()
+          // this.chatbotActivityLayer.forEach((layer) => {
+          //   if (this.mapDiv.hasLayer(layer)) {
+          //     this.mapDiv.removeLayer(layer)
+          //   }
+          // })
         }
-        // Handle tab group changes, e.g., update the map view or layers
       },
       filterChatbotData() {
         const filteredData = {};
@@ -294,15 +276,17 @@
             self.processYearRange(chatbotRes.data);
             self.chatbotResponseCounts = self.filterChatbotData();
 
-            centroidFeatures = self.getCentroidFeatures(allSitesGeoJson);
+            // centroidFeatures = self.getCentroidFeatures(allSitesGeoJson);
             
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
 
             let siteGroupsGeoJson = self.groupGeoJsonBySite(allSitesGeoJson);
 
             self.addBasicSitesLayer(siteGroupsGeoJson, projectSites); // Add basic sites layer logic
-            self.addChatbotAcitivityLayer(centroidFeatures); // Add centroid layer logic
-            // self.addChatbotSitesLayer(siteGroupsGeoJson, projectSites); // Add chatbot sites layer logic
+            // DAVID MAKE SURE CENTROID AND CHATBOT RESPONSE DOEN'T INCLUDE OTHERS
+            // centroidFeatures = self.getCentroidFeatures(allSitesGeoJson);
+            // self.createChatbotAcitivityLayer(centroidFeatures); // Add centroid layer logic
+            self.addChatbotActivityLayer(siteGroupsGeoJson);
             
             self.$store.dispatch('setProjectSites', projectSites);
             let sites = self.$store.getters.getProjectSites
@@ -343,86 +327,53 @@
       // Group geoJSON by site
       groupGeoJsonBySite: function (geoJsonData) {
         let siteGroupsGeoJson = {};
+        const selectedProjectCode = this.$store.getters.getSelectedProjectCode;
+        console.log('selectedProjectCode', selectedProjectCode)
         geoJsonData.features.forEach((feature) => {
           const siteid = feature.properties.siteid;
           const trailName = feature.properties.Trail_name;
-
-          if (!(siteid in siteGroupsGeoJson)) {
-            siteGroupsGeoJson[siteid] = {
-              type: "FeatureCollection",
-              name: trailName,
-              siteid: siteid,
-              features: [],
-            };
+          const prjctCode = feature.properties.Prjct_code;
+          const prjctCodeList = prjctCode.split(',').map(code => code.trim());
+          if (prjctCodeList.includes(selectedProjectCode)) {
+            if (!(siteid in siteGroupsGeoJson)) {
+              console.log('trailName:', trailName, 'siteid:', siteid, 'prjctCode:', prjctCode)
+              siteGroupsGeoJson[siteid] = {
+                type: "FeatureCollection",
+                name: trailName,
+                siteid: siteid,
+                features: [],
+              };
+            }
+            siteGroupsGeoJson[siteid].features.push(feature);
           }
-          siteGroupsGeoJson[siteid].features.push(feature);
         });
+        console.log('siteGroupsGeoJson:', siteGroupsGeoJson)
         return siteGroupsGeoJson;
       },
-      addChatbotAcitivityLayer: function (centroidFeatures) {
+      createChatbotAcitivityLayer: function (centroidFeatures) {
         const centroidLayer = L.geoJSON(
           { type: "FeatureCollection", features: centroidFeatures },
           { pointToLayer: this.createCircleMarker }
         ).bindTooltip((layer) => layer.feature.properties.name);
-
         this.chatbotActivityLayer.push(centroidLayer);
-        if (this.visibleTabGroup === "visitorCharacteristics") {
-          centroidLayer.addTo(this.mapDiv); // Add the centroid layer to the map
-        }
       },
-      // Add chatbot sites layer
+      // Change to chatbot sites
       changeToChatbotSitesLayer: function () {
         let sites = this.$store.getters.getProjectSites;
         console.log('project sites:', sites)
         Object.values(sites).forEach((site) => {
-          if (site && typeof site.setStyle === 'function') {
-            console.log('Site Trail Name:', site.trailName)
-            site.setStyle(selectedStyle);
-          }
-        });
-
-      //   addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
-      //   Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-      //     let siteLayer = L.geoJSON(site, {
-      //       pane: "basicSitesPane",
-      //       style: defaultStyle,
-      //     })
-      //       .bindTooltip(site.name)
-      //       .on("mouseover", this.handleMouseOver)
-      //       .on("mouseout", this.handleMouseOutBasicSitesLayer)
-      //       .on("click", this.handleClick);
-
-      //     siteLayer.siteid = site.siteid;
-      //     siteLayer.trailName = site.name;
-
-      //     this.basicSitesLayer.push(siteLayer);
-      //     projectSites[siteLayer.trailName] = siteLayer;
-      //   });
-      // },
-
-        // Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-        //   let siteLayer = L.geoJSON(site, {
-        //     pane: "chatbotSitesPane",
-        //     style: (feature) => {
-        //       const siteid = feature.properties.siteid;
-        //       const estimate = this.chatbotResponseCounts[siteid] || 0;
-        //       return estimate === 0 ? solidGreyStyle : solidDefaultStyle;
-        //     },
-        //   })
-        //     .bindTooltip(site.name)
-        //     .on("mouseover", this.handleMouseOver)
-        //     .on("mouseout", this.handleMouseOutChatbotSitesLayer)
-        //     .on("click", this.handleClick);
-
-        //   siteLayer.siteid = site.siteid;
-        //   siteLayer.trailName = site.name;
-
-        //   this.chatbotSitesLayer.push(siteLayer);
-        //   projectSites[siteLayer.trailName] = siteLayer;
-        //   if (this.visibleTabGroup === "visitorCharacteristics") {
-        //     siteLayer.addTo(this.mapDiv);
-        //   }
-        // });
+          const estimate = this.chatbotResponseCounts[site.siteid] || 0;
+          const style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
+          site.setStyle(style);
+        })
+      },
+      // Change to basic sites
+      changeToBasicSitesLayer: function () {
+        let sites = this.$store.getters.getProjectSites;
+        console.log('project sites:', sites)
+        Object.values(sites).forEach((site) => {
+          site.setStyle(defaultStyle)
+        })
       },
       // Add basic sites layer
       addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
@@ -439,8 +390,36 @@
           siteLayer.siteid = site.siteid;
           siteLayer.trailName = site.name;
 
+          if (projectSites[siteLayer.trailName]) {
+            // Append siteid as a differentiating identifier when duplicate trail names exist
+            siteLayer.trailName = `${site.name} (${site.siteid})`;
+          }
           this.basicSitesLayer.push(siteLayer);
           projectSites[siteLayer.trailName] = siteLayer;
+          siteLayer.addTo(this.mapDiv)
+        });
+      },
+      addChatbotActivityLayer: function (siteGroupsGeoJson) {
+        Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+          // Calculate the centroid for each site
+          const centroid = turf.centroid(site);
+          console.log('Centroid GeoJSON:', centroid);
+          // centroid.properties = {
+          //   siteid: site.siteid,
+          //   name: site.name,
+          // };
+          let siteLayer = L.geoJSON(centroid, {
+            pane: "circlesPane",
+            pointToLayer: this.createCircleMarker,
+          }).bindTooltip(site.name);
+
+          // Assign properties to the layer
+          siteLayer.siteid = site.siteid;
+          siteLayer.trailName = site.name;
+          // Add the layer to chatbotActivityLayer and projectSites
+          this.chatbotActivityLayer.push(siteLayer);
+          console.log('Adding centroid layer to map:', siteLayer);
+          siteLayer.addTo(this.mapDiv);
         });
       },
       // Mouse event handlers
