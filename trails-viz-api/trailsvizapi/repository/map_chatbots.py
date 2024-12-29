@@ -13,7 +13,7 @@ def get_annual_chatbot_response_counts(project):
     siteids = set(project_sites['siteid'].unique())
     chatbot_response_df = _prepare_chatbot_response_data(siteids=siteids)
     if chatbot_response_df.empty:
-        return chatbot_response_df
+        return []
     # Group by year and trail, then count rows
     group_counts = chatbot_response_df.groupby(['year', 'trail']).size()
     result = []

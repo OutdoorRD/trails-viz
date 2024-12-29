@@ -3,36 +3,48 @@
     <b-alert :show="dismissCountDown" dismissible fade variant="warning" @dismiss-count-down="countDownChanged">
       Only two sites can be compared at a time!
     </b-alert>
-    <div>
-      <p>Current Tab: {{ visibleTabGroup  }}</p>
-    </div>
     <!-- Range Slider for Year Selection -->
-    <div>
+    
       <v-app>
-        <v-card>
-          <v-card-text>
-            <v-range-slider
-              v-if="yearRange && minYear !== undefined && maxYear !== undefined"
-              v-model="yearRange"
-              :min="minYear"
-              :max="maxYear"
-              ticks
-              step="1"
-              thumb-label
-              @change="onYearRangeChange"
-            >
-              <template v-slot:prepend>
-                <span>{{ yearRange[0] }}</span>
-              </template>
-              <template v-slot:append>
-                <span>{{ yearRange[1] }}</span>
-              </template>
-            </v-range-slider>
-          </v-card-text>
-        </v-card>
+        <div 
+          v-if="visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0"
+          class="range-slider-container"
+        >
+          <v-card 
+            style="
+              max-width: 100%; 
+              max-height: 100%; 
+              padding: 0px; 
+              margin: 0; 
+              display: flex;
+              flex-direction: column;
+              align-items: center; 
+              justify-content: flex-start;
+            ">
+            <v-card-text style="width: 100%; padding-top: 4px;">
+              <v-range-slider
+                v-if="yearRange && minYear !== undefined && maxYear !== undefined"
+                v-model="yearRange"
+                :min="minYear"
+                :max="maxYear"
+                ticks="always"
+                tick-size = 4
+                thumb-label
+                @change="onYearRangeChange"
+              >
+                <template v-slot:prepend>
+                  <span>{{ minYear }}</span>
+                </template>
+                <template v-slot:append>
+                  <span>{{ maxYear }}</span>
+                </template>
+              </v-range-slider>
+            </v-card-text>
+          </v-card>
+        </div>
+        
         <div class="map-div" ref="mapDiv"></div>
       </v-app>
-    </div>
   </div>
 </template>
 
@@ -104,8 +116,15 @@
     color: "#fa00ff",
     weight: 0.8,
     fillColor: '#fa00ff',
-    fillOpacity: 0.2
+    fillOpacity: 0.8
   };
+
+  const circleMarkerDefaultStyle = {
+    color: "#3388ff", // Border color
+    weight: 1, // Border width
+    fillColor: "#3388ff", // Fill color
+    fillOpacity: 0.8, // Transparency
+  }
 
   export default {
     name: "MapDiv",
@@ -183,15 +202,14 @@
     },
     methods: {
       onYearRangeChange() {
-        console.log("year range changed:", this.yearRange)
-        const filteredData = this.filterChatbotData();
-        this.chatbotResponseCounts = { ...filteredData };
-        this.updateMapLayers();
+        this.chatbotResponseCounts = this.filterChatbotData();
+        this.updateChatbotActivityLayer();
       },
       onTabGroupChange(group) {
         console.log(`Visible Tab Group changed to: ${group}`);
-        if (group === 'visitorCharacteristics') {
-          // this.changeToChatbotSitesLayer()
+        if (group === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
+          this.addChatbotActivityLayer()
+          this.changeToChatbotSitesLayer()
           // this.addChatbotActivityLayer()
           // this.chatbotActivityLayer.forEach((layer) => {
           //   if (!this.mapDiv.hasLayer(layer)) {
@@ -200,8 +218,9 @@
           // })
         } 
         else {
+          this.removeChatbotActivityLayer()
           // this.addBasicSitesLayer()
-          // this.changeToBasicSitesLayer()
+          this.changeToBasicSitesLayer()
           // this.chatbotActivityLayer.forEach((layer) => {
           //   if (this.mapDiv.hasLayer(layer)) {
           //     this.mapDiv.removeLayer(layer)
@@ -235,11 +254,8 @@
         return L.circleMarker(latlng, {
           pane: 'circlesPane',
           radius: radius,
-          color: "#3388ff", // Border color
-          weight: 1, // Border width
-          fillColor: "#3388ff", // Fill color
-          fillOpacity: 1, // Transparency
-        }).bindTooltip(`${feature.properties.name}: ${data}`);
+          ...circleMarkerDefaultStyle,
+        })//.bindTooltip(`${feature.properties.name}: ${data}`);
       },
 
 
@@ -255,43 +271,38 @@
         self.basicSitesLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
         self.chatbotActivityLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer))
 
+        const requests = [
+          axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/sites/geojson')
+        ];
+
+        // Conditionally include the last two endpoints based on user status
+        const userRole = this.$store.getters.getUserRole;
+        console.log('User Role:', userRole);
+        if (userRole === 'admin' || userRole === 'manager') {
+          requests.push(
+            // axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/lastYearEstimates'),
+            axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/get_annual_chatbot_response_counts')
+          );
+        }
         axios
-        .all([
-          axios.get(
-            self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/sites/geojson'
-          ),
-          axios.get(
-            self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/lastYearEstimates'
-          ),
-          axios.get(
-            self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + 
-            '/get_annual_chatbot_response_counts'
-          ),
-        ])
+        .all(requests)
         .then(
-            axios.spread((geoJsonRes, estimatesRes, chatbotRes) => {
+            axios.spread((geoJsonRes, chatbotRes) => {
+            console.log('HI DAVID')
+            console.log('user role:',this.$store.getters.getUserRole)
             const allSitesGeoJson = geoJsonRes.data;
-            this.chatbotResData = chatbotRes.data
-
-            self.processYearRange(chatbotRes.data);
-            self.chatbotResponseCounts = self.filterChatbotData();
-
-            // centroidFeatures = self.getCentroidFeatures(allSitesGeoJson);
-            
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
-
             let siteGroupsGeoJson = self.groupGeoJsonBySite(allSitesGeoJson);
-
             self.addBasicSitesLayer(siteGroupsGeoJson, projectSites); // Add basic sites layer logic
-            // DAVID MAKE SURE CENTROID AND CHATBOT RESPONSE DOEN'T INCLUDE OTHERS
-            // centroidFeatures = self.getCentroidFeatures(allSitesGeoJson);
-            // self.createChatbotAcitivityLayer(centroidFeatures); // Add centroid layer logic
-            self.addChatbotActivityLayer(siteGroupsGeoJson);
-            
+            this.chatbotResData = chatbotRes.data
+            if (userRole === 'admin' || userRole === 'manager' && this.chatbotResData.length > 0) {
+              console.log('this.chatbotResData:', this.chatbotResData)
+              self.processYearRange(chatbotRes.data);
+              self.chatbotResponseCounts = self.filterChatbotData();
+              self.initializeChatbotActivityLayer(siteGroupsGeoJson);
+              this.onTabGroupChange(this.visibleTabGroup);
+            }
             self.$store.dispatch('setProjectSites', projectSites);
-            let sites = self.$store.getters.getProjectSites
-            console.log(sites)
-
         }))
       },
       createPanes: function () {
@@ -326,17 +337,18 @@
       },
       // Group geoJSON by site
       groupGeoJsonBySite: function (geoJsonData) {
+        console.log(geoJsonData)
         let siteGroupsGeoJson = {};
         const selectedProjectCode = this.$store.getters.getSelectedProjectCode;
-        console.log('selectedProjectCode', selectedProjectCode)
+        // console.log('selectedProjectCode', selectedProjectCode)
         geoJsonData.features.forEach((feature) => {
           const siteid = feature.properties.siteid;
           const trailName = feature.properties.Trail_name;
           const prjctCode = feature.properties.Prjct_code;
           const prjctCodeList = prjctCode.split(',').map(code => code.trim());
-          if (prjctCodeList.includes(selectedProjectCode)) {
+          // if (prjctCodeList.includes(selectedProjectCode)) {
             if (!(siteid in siteGroupsGeoJson)) {
-              console.log('trailName:', trailName, 'siteid:', siteid, 'prjctCode:', prjctCode)
+              // console.log('trailName:', trailName, 'siteid:', siteid, 'prjctCode:', prjctCode)
               siteGroupsGeoJson[siteid] = {
                 type: "FeatureCollection",
                 name: trailName,
@@ -345,38 +357,98 @@
               };
             }
             siteGroupsGeoJson[siteid].features.push(feature);
-          }
+          // }
         });
-        console.log('siteGroupsGeoJson:', siteGroupsGeoJson)
+        // console.log('siteGroupsGeoJson:', siteGroupsGeoJson)
         return siteGroupsGeoJson;
       },
-      createChatbotAcitivityLayer: function (centroidFeatures) {
-        const centroidLayer = L.geoJSON(
-          { type: "FeatureCollection", features: centroidFeatures },
-          { pointToLayer: this.createCircleMarker }
-        ).bindTooltip((layer) => layer.feature.properties.name);
-        this.chatbotActivityLayer.push(centroidLayer);
-      },
+      // createChatbotAcitivityLayer: function (centroidFeatures) {
+      //   const centroidLayer = L.geoJSON(
+      //     { type: "FeatureCollection", features: centroidFeatures },
+      //     { pointToLayer: this.createCircleMarker }
+      //   ).bindTooltip((layer) => layer.feature.properties.name);
+      //   this.chatbotActivityLayer.push(centroidLayer);
+      // },
       // Change to chatbot sites
       changeToChatbotSitesLayer: function () {
-        let sites = this.$store.getters.getProjectSites;
-        console.log('project sites:', sites)
-        Object.values(sites).forEach((site) => {
-          const estimate = this.chatbotResponseCounts[site.siteid] || 0;
-          const style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
-          site.setStyle(style);
-        })
+        const selectedSite = this.$store.getters.getSelectedSite;
+        const comparingSite = this.$store.getters.getComparingSite;
+
+        this.basicSitesLayer.forEach((site) => {
+          // Check if the site is the selected site or the comparing site
+          if (site === selectedSite || site === comparingSite) {
+            if (selectedSite && comparingSite) {
+              site.setStyle(compareStyle); // Keep comparing site styled
+            } else {
+              site.setStyle(selectedStyle); // Keep selected site styled
+            }
+          } else {
+            const estimate = this.chatbotResponseCounts[site.siteid] || 0;
+            const style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
+            site.setStyle(style);
+          }
+        });
+        // let sites = this.$store.getters.getProjectSites;
+        // const selectedSite = this.$store.getters.getSelectedSite;
+        // const comparingSite = this.$store.getters.getComparingSite;
+
+        // Object.values(sites).forEach((site) => {
+        //   // Check if the site is the selected site or the comparing site
+        //   if (site === selectedSite || site === comparingSite) {
+        //     if (selectedSite && comparingSite) {
+        //       site.setStyle(compareStyle); // Keep comparing site styled
+        //     }
+        //     else {
+        //       site.setStyle(selectedStyle); // Keep selected site styled
+        //     }
+        //   } 
+        //   else {
+        //     const estimate = this.chatbotResponseCounts[site.siteid] || 0;
+        //     const style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
+        //     site.setStyle(style);
+        //   }
+        // });
       },
       // Change to basic sites
       changeToBasicSitesLayer: function () {
-        let sites = this.$store.getters.getProjectSites;
-        console.log('project sites:', sites)
-        Object.values(sites).forEach((site) => {
-          site.setStyle(defaultStyle)
-        })
+        const selectedSite = this.$store.getters.getSelectedSite;
+        const comparingSite = this.$store.getters.getComparingSite;
+
+        this.basicSitesLayer.forEach((site) => {
+          // Check if the site is the selected site or the comparing site
+          if (site === selectedSite || site === comparingSite) {
+            if (selectedSite && comparingSite) {
+              site.setStyle(compareStyle); // Keep comparing site styled
+            } else {
+              site.setStyle(selectedStyle); // Keep selected site styled
+            }
+          } else {
+            site.setStyle(defaultStyle); // Reset others to default style;
+          }
+        });
+
+        // let sites = this.$store.getters.getProjectSites;
+        // const selectedSite = this.$store.getters.getSelectedSite;
+        // const comparingSite = this.$store.getters.getComparingSite;
+
+        // Object.values(sites).forEach((site) => {
+        //   // Check if the site is the selected site or the comparing site
+        //   if (site === selectedSite || site === comparingSite) {
+        //     if (selectedSite && comparingSite) {
+        //       site.setStyle(compareStyle); // Keep comparing site styled
+        //     }
+        //     else {
+        //       site.setStyle(selectedStyle); // Keep selected site styled
+        //     }
+        //   } 
+        //   else {
+        //     site.setStyle(defaultStyle); // Reset others to default style
+        //   }
+        // });
       },
       // Add basic sites layer
       addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
+        console.log('siteGroupsGeoJson',siteGroupsGeoJson)
         Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
           let siteLayer = L.geoJSON(site, {
             pane: "basicSitesPane",
@@ -384,7 +456,7 @@
           })
             .bindTooltip(site.name)
             .on("mouseover", this.handleMouseOver)
-            .on("mouseout", this.handleMouseOutBasicSitesLayer)
+            .on("mouseout", this.handleMouseOut)
             .on("click", this.handleClick);
 
           siteLayer.siteid = site.siteid;
@@ -396,31 +468,63 @@
           }
           this.basicSitesLayer.push(siteLayer);
           projectSites[siteLayer.trailName] = siteLayer;
+          console.log(siteLayer)
           siteLayer.addTo(this.mapDiv)
         });
       },
-      addChatbotActivityLayer: function (siteGroupsGeoJson) {
+      initializeChatbotActivityLayer: function (siteGroupsGeoJson) {
+        const uniqueTrailNames = new Set();
         Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
           // Calculate the centroid for each site
           const centroid = turf.centroid(site);
-          console.log('Centroid GeoJSON:', centroid);
-          // centroid.properties = {
-          //   siteid: site.siteid,
-          //   name: site.name,
-          // };
+          // console.log('Centroid GeoJSON:', centroid);
+          centroid.properties = {
+            siteid: site.siteid,
+            // name: site.name,
+          };
           let siteLayer = L.geoJSON(centroid, {
             pane: "circlesPane",
             pointToLayer: this.createCircleMarker,
-          }).bindTooltip(site.name);
+          })//.bindTooltip(site.name);
 
           // Assign properties to the layer
           siteLayer.siteid = site.siteid;
           siteLayer.trailName = site.name;
-          // Add the layer to chatbotActivityLayer and projectSites
+          if (uniqueTrailNames.has(siteLayer.trailName)) {
+            siteLayer.trailName = `${site.name} (${site.siteid})`;
+          }
+          uniqueTrailNames.add(siteLayer.trailName)
           this.chatbotActivityLayer.push(siteLayer);
-          console.log('Adding centroid layer to map:', siteLayer);
-          siteLayer.addTo(this.mapDiv);
+          // siteLayer.addTo(this.mapDiv);
         });
+      },
+      addChatbotActivityLayer: function() {
+        this.chatbotActivityLayer.forEach((layer) => {
+          if (!this.mapDiv.hasLayer(layer)) {
+            layer.addTo(this.mapDiv)
+          }
+        })
+      },
+      updateChatbotActivityLayer: function() {
+        this.chatbotActivityLayer.forEach((layer) => {
+          if (layer.eachLayer) {
+            layer.eachLayer((circleMarker) => {
+              if (circleMarker instanceof L.CircleMarker) {
+                const siteid = circleMarker.feature.properties.siteid;
+                const data = this.chatbotResponseCounts[siteid] || 0;
+                const radius = Math.sqrt(data) * 2;
+                circleMarker.setRadius(radius);
+              }
+            });
+          }
+        });
+      },
+      removeChatbotActivityLayer: function() {
+        this.chatbotActivityLayer.forEach((layer) => {
+          if (this.mapDiv.hasLayer(layer)) {
+            this.mapDiv.removeLayer(layer)
+          }
+        })
       },
       // Mouse event handlers
       handleMouseOver: function (event) {
@@ -429,28 +533,41 @@
           event.target !== this.$store.getters.getComparingSite
         ) {
           event.target.setStyle(hoverStyle);
-        }
-      },
-      handleMouseOutChatbotSitesLayer: function (event) {
-        if (
-          event.target !== this.$store.getters.getSelectedSite &&
-          event.target !== this.$store.getters.getComparingSite
-        ) {
-          const estimate =
-            this.chatbotResponseCounts[event.target.siteid] || 0;
-          event.target.setStyle(
-            estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          const siteid = event.target.siteid;
+          const circleMarker = this.chatbotActivityLayer.find(
+            (layer) => layer.siteid === siteid
           );
+          if (circleMarker) {
+            circleMarker.setStyle({
+              ...hoverStyle
+            });
+          }
         }
       },
-      handleMouseOutBasicSitesLayer: function (event) {
+      handleMouseOut: function (event) {
         if (
-          event.target !== this.$store.getters.getSelectedSite &&
-          event.target !== this.$store.getters.getComparingSite
-        ) {
-          event.target.setStyle(defaultStyle);
+            event.target !== this.$store.getters.getSelectedSite &&
+            event.target !== this.$store.getters.getComparingSite
+          ) {
+          let style = defaultStyle
+          if (this.visibleTabGroup === 'visitorCharacteristics') {
+            const estimate =
+              this.chatbotResponseCounts[event.target.siteid] || 0;
+              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          }
+          event.target.setStyle(style);
+          const siteid = event.target.siteid;
+          const circleMarker = this.chatbotActivityLayer.find(
+            (layer) => layer.siteid === siteid
+          );
+          if (circleMarker) {
+            circleMarker.setStyle({
+              ...circleMarkerDefaultStyle
+            });
+          }
         }
-      },
+      }
+      ,
       handleClick: function (event) {
         if (event.originalEvent.ctrlKey) {
           if (
@@ -459,29 +576,77 @@
           ) {
             this.showAlert();
           } else if (this.$store.getters.getSelectedSite) {
+            // console.log('TWO SELECTED')
             this.$store.dispatch("setComparingSite", event.target);
+            // console.log(this.$store.getters.getSelectedSite)
+            // console.log(this.$store.getters.getComparingSite)
             this.$store.getters.getSelectedSite.setStyle(compareStyle);
             this.$store.getters.getComparingSite.setStyle(compareStyle);
             EventBus.$emit("map-div:compare-activated");
           }
         } else {
-          this.selectSite(event);
+          this.selectSite(event.target.trailName);
         }
       },
       selectSite: function (trailName) {
         let self = this;
         if (self.$store.getters.getComparingSite) {
-          self.$store.getters.getComparingSite.setStyle(defaultStyle);
+          let style = defaultStyle
+          if (this.visibleTabGroup === 'visitorCharacteristics') {
+            const estimate =
+              this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
+              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          }
+          const siteid = self.$store.getters.getComparingSite.siteid;
+          const circleMarker = this.chatbotActivityLayer.find(
+            (layer) => layer.siteid === siteid
+          );
+          if (circleMarker) {
+            circleMarker.setStyle({
+              ...circleMarkerDefaultStyle
+            });
+          }
+          self.$store.getters.getComparingSite.setStyle(style);
           self.$store.dispatch('setComparingSite', '');
         }
         if (self.$store.getters.getSelectedSite) {
-          self.$store.getters.getSelectedSite.setStyle(defaultStyle);
+          let style = defaultStyle
+          if (this.visibleTabGroup === 'visitorCharacteristics') {
+            const estimate =
+              this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
+              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          }
+          const siteid = self.$store.getters.getSelectedSite.siteid;
+          const circleMarker = this.chatbotActivityLayer.find(
+            (layer) => layer.siteid === siteid
+          );
+          if (circleMarker) {
+            circleMarker.setStyle({
+              ...circleMarkerDefaultStyle
+            });
+          }
+          self.$store.getters.getSelectedSite.setStyle(style);
         }
-        let site = self.$store.getters.getProjectSites[trailName];
+        // console.log('trailName:', trailName)
+        // console.log('getProjectSites:',self.$store.getters.getProjectSites);
+        // let site = self.$store.getters.getProjectSites[trailName];
+        let site = this.basicSitesLayer.find((layer) => layer.trailName === trailName);
+        // console.log('selectSite:', site)
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
         EventBus.$emit('map-div:site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 11});
+        const siteid = site.siteid
+        console.log('siteid:', siteid)
+        const circleMarker = this.chatbotActivityLayer.find(
+          (layer) => layer.siteid === siteid
+        );
+        if (circleMarker) {
+          console.log('IM IN')
+          circleMarker.setStyle({
+            ...selectedStyle
+          });
+        }
       },
       countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
@@ -497,5 +662,13 @@
   @import "~leaflet/dist/leaflet.css";
   .map-div {
     height: 85vh;
+  }
+  .range-slider-container {
+    position: absolute;
+    bottom:16vh;
+    left: 1vh;
+    z-index: 1000;
+    width: 50%;
+    height: 4vh;
   }
 </style>
