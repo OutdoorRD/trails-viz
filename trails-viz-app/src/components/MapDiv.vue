@@ -550,7 +550,7 @@
             event.target !== this.$store.getters.getComparingSite
           ) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics') {
+          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[event.target.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -592,7 +592,7 @@
         let self = this;
         if (self.$store.getters.getComparingSite) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics') {
+          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -611,7 +611,7 @@
         }
         if (self.$store.getters.getSelectedSite) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics') {
+          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
