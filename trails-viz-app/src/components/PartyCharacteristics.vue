@@ -223,8 +223,8 @@ export default {
       try {
         const endpoint =
           this.vizMode === VIZ_MODES.PROJECT
-            ? `${this.$apiEndpoint}/projects/${this.projectCode}/partyCharacteristics/${char}`
-            : `${this.$apiEndpoint}/sites/${this.siteid}/partyCharacteristics/${char}`;
+            ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotData/${char}`
+            : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotData/${char}`;
 
         const response = await axios.get(endpoint);
         this.barDataFetchStatus[char] = response.status;
@@ -254,8 +254,8 @@ export default {
       try {
         const endpoint =
           this.vizMode === VIZ_MODES.PROJECT
-            ? `${this.$apiEndpoint}/projects/${this.projectCode}/partyCharacteristicsYearlyStatistics/${char}`
-            : `${this.$apiEndpoint}/sites/${this.siteid}/partyCharacteristicsYearlyStatistics/${char}`;
+            ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotDataYearlyStatistics/${char}`
+            : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotDataYearlyStatistics/${char}`;
 
         const response = await axios.get(endpoint);
         this.timeSeriesFetchStatus[char] = response.status;

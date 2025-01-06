@@ -41,10 +41,10 @@ _MANAGER_ENDPOINTS.update([
     'get_project_home_locations_demographics',
     'get_user',
     'update_user',
-    'get_project_party_characteristics',
-    'get_party_characteristics',
-    'get_project_party_characteristics_yearly_statistics',
-    'get_party_characteristics_yearly_statistics',
+    'get_project_chatbot_data',
+    'get_chatbot_data',
+    'get_project_chatbot_data_yearly_statistics',
+    'get_chatbot_data_yearly_statistics',
 ])
 
 _ROLE_ACCESS_MAPPING = {
