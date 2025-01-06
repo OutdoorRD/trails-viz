@@ -9,7 +9,7 @@ CONFIDENCE_LEVEL = 1.96
 
 def get_project_chatbot_data(project, characteristic):
     chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
-    if not chatbot_data_df_long:
+    if chatbot_data_df_long is None:
         return Response(status=204)
     response_data = chatbot_data_df_long.to_json(orient='records')
     return Response(response_data, status=200, mimetype='application/json')
@@ -17,7 +17,7 @@ def get_project_chatbot_data(project, characteristic):
 
 def get_chatbot_data(siteid, characteristic):
     chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
-    if not chatbot_data_df_long:
+    if chatbot_data_df_long is None:
         return Response(status=204)
     response_data = chatbot_data_df_long.to_json(orient='records')
     return Response(response_data, status=200, mimetype='application/json')
@@ -27,7 +27,7 @@ def get_project_chatbot_data_yearly_statistics(project, characteristic):
     chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
     aggregate_data = _prep_chatbot_aggregate_stats(df_long=chatbot_data_df_long,
                                                    characteristic=characteristic)
-    if not aggregate_data:
+    if aggregate_data is None:
         return Response(status=204)
     return jsonify(aggregate_data), 200
 
@@ -36,7 +36,7 @@ def get_chatbot_data_yearly_statistics(siteid, characteristic):
     chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
     aggregate_data = _prep_chatbot_aggregate_stats(df_long=chatbot_data_df_long,
                                                    characteristic=characteristic)
-    if not aggregate_data:
+    if aggregate_data is None:
         return Response(status=204)
     return jsonify(aggregate_data), 200
 
@@ -68,6 +68,7 @@ def _prep_chatbot_project_long_df(project, characteristic):
     chatbot_data_df_long = chatbot_data_df_long.dropna(subset=['date', 'year', 'trail', 'value'])
     if chatbot_data_df_long.empty:
         return None
+    return chatbot_data_df_long
 
 
 def _prep_chatbot_site_long_df(siteid, characteristic):
@@ -95,10 +96,11 @@ def _prep_chatbot_site_long_df(siteid, characteristic):
     chatbot_data_df_long = chatbot_data_df_long.dropna(subset=['date', 'year', 'trail', 'value'])
     if chatbot_data_df_long.empty:
         return None
+    return chatbot_data_df_long
 
 
 def _prep_chatbot_aggregate_stats(df_long, characteristic):
-    if not df_long:
+    if df_long is None:
         return None
     grouped = (
         df_long.groupby(['year', 'characteristic'])
