@@ -1,8 +1,5 @@
-from flask import Response
 from trailsvizapi import app
 from trailsvizapi.repository import party_characteristics
-import json
-
 
 
 @app.route('/api/projects/<string:project>/partyCharacteristics/<string:characteristic>')
