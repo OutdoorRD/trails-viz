@@ -27,7 +27,7 @@ def get_annual_chatbot_response_counts(project):
 
 
 def _prepare_chatbot_response_data(siteids=None):
-    chatbot_response_df = get_from_data_source('PARTY_CHARACTERISTICS_DF')
+    chatbot_response_df = get_from_data_source('CHATBOT_DATA_DF')
     # Add a 'trail' feature that contains the project site ids (None if observation is not part of project siteids)
     if siteids:
         chatbot_response_df['trail'] = chatbot_response_df['SiteID'].apply(

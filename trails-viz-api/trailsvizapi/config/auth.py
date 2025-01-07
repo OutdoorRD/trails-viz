@@ -45,6 +45,7 @@ _MANAGER_ENDPOINTS.update([
     'get_chatbot_data',
     'get_project_chatbot_data_yearly_statistics',
     'get_chatbot_data_yearly_statistics',
+    'get_annual_chatbot_response_counts'
 ])
 
 _ROLE_ACCESS_MAPPING = {
