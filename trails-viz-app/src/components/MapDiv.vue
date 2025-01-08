@@ -155,7 +155,7 @@
         chatbotActivityLayer : [],
         lastYearEstimates: undefined,
         chatbotResponseCounts: undefined,
-        chatbotResData: undefined,
+        chatbotResData: [],
         yearRange: [], // Default range
         minYear: undefined,
         maxYear: undefined,
@@ -320,7 +320,9 @@
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
             let siteGroupsGeoJson = self.groupGeoJsonBySite(allSitesGeoJson);
             self.addBasicSitesLayer(siteGroupsGeoJson, projectSites); // Add basic sites layer logic
-            this.chatbotResData = chatbotRes.data
+            if (chatbotRes) {
+              this.chatbotResData = chatbotRes.data;
+            }
             if (userRole === 'admin' || userRole === 'manager' && this.chatbotResData.length > 0) {
               // console.log('this.chatbotResData:', this.chatbotResData)
               self.processYearRange(chatbotRes.data);
