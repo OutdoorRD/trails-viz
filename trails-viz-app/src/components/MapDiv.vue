@@ -7,7 +7,7 @@
     
       <v-app>
         <div 
-          v-if="visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0"
+          v-if="TAB_CONFIG.chatbotMapTabs.includes(visibleTab) && this.chatbotResData.length > 0"
           class="range-slider-container"
         >
           <v-card 
@@ -56,6 +56,7 @@
   import {MARKER} from "../store/vectors";
   import {EventBus} from "../event-bus";
   import * as turf from "@turf/turf";
+  import { TAB_CONFIG } from "../store/constants";
 
   // The following two statements are required because of an issue with leaflet and webpack
   // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -129,10 +130,10 @@
   export default {
     name: "MapDiv",
     props: {
-      visibleTabGroup: {
+      visibleTab: {
         type: String,
         required: true,
-      },
+      }
     },
     data: function() {
       return {
@@ -150,8 +151,8 @@
       }
     },
     watch: {
-      visibleTabGroup(newGroup) {
-        this.onTabGroupChange(newGroup);
+      visibleTab(newTab) {
+        this.onTabChange(newTab);
       },
     },
     mounted() {
@@ -205,28 +206,31 @@
         this.chatbotResponseCounts = this.filterChatbotData();
         this.updateChatbotActivityLayer();
       },
-      onTabGroupChange(group) {
-        console.log(`Visible Tab Group changed to: ${group}`);
-        if (group === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
-          this.addChatbotActivityLayer()
-          this.changeToChatbotSitesLayer()
-          // this.addChatbotActivityLayer()
-          // this.chatbotActivityLayer.forEach((layer) => {
-          //   if (!this.mapDiv.hasLayer(layer)) {
-          //     layer.addTo(this.mapDiv)
-          //   }
-          // })
+      // onTabGroupChange(group) {
+      //   console.log(`Visible Tab Group changed to: ${group}`);
+      //   if (group === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
+      //     this.showChatbotMap()
+      //   } 
+      //   else {
+      //     this.showBasicMap()
+      //   }
+      // },
+      onTabChange(tab) {
+        console.log(`Visible Tab changed to: ${tab}`);
+        if (TAB_CONFIG.chatbotMapTabs.includes(tab) && this.chatbotResData.length > 0) {
+          this.showChatbotMap()
         } 
         else {
-          this.removeChatbotActivityLayer()
-          // this.addBasicSitesLayer()
-          this.changeToBasicSitesLayer()
-          // this.chatbotActivityLayer.forEach((layer) => {
-          //   if (this.mapDiv.hasLayer(layer)) {
-          //     this.mapDiv.removeLayer(layer)
-          //   }
-          // })
+          this.showBasicMap()
         }
+      },
+      showChatbotMap() {
+          this.addChatbotActivityLayer()
+          this.changeToChatbotSitesLayer()
+      },
+      showBasicMap() {
+        this.removeChatbotActivityLayer()
+        this.changeToBasicSitesLayer()
       },
       filterChatbotData() {
         const filteredData = {};
@@ -300,7 +304,8 @@
               self.processYearRange(chatbotRes.data);
               self.chatbotResponseCounts = self.filterChatbotData();
               self.initializeChatbotActivityLayer(siteGroupsGeoJson);
-              this.onTabGroupChange(this.visibleTabGroup);
+              // this.onTabGroupChange(this.visibleTabGroup);
+              this.onTabChange(this.visibleTab)
             }
             self.$store.dispatch('setProjectSites', projectSites);
         }))
@@ -550,7 +555,7 @@
             event.target !== this.$store.getters.getComparingSite
           ) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
+          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTab) && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[event.target.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -592,7 +597,7 @@
         let self = this;
         if (self.$store.getters.getComparingSite) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
+          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTab) && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -611,7 +616,7 @@
         }
         if (self.$store.getters.getSelectedSite) {
           let style = defaultStyle
-          if (this.visibleTabGroup === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
+          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTabGroup) && this.chatbotResData.length > 0) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
