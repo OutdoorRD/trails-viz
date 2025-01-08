@@ -126,6 +126,14 @@
     fillOpacity: 0.8, // Transparency
   }
 
+  const highlightStyle = {
+    color: "#fa00ff",
+    weight: 0.8,
+    fillColor: '#fa00ff',
+    fillOpacity: 0.8
+  };
+
+
   export default {
     name: "MapDiv",
     props: {
@@ -209,10 +217,12 @@
       self.mapDiv = mapDiv;
 
       EventBus.$on('top-bar:site-selected', self.selectSite);
+      EventBus.$on('top-bar:site-search-results', self.searchSite); // David over here
     },
     beforeDestroy() {
       let self = this;
       EventBus.$off('top-bar:site-selected', self.selectSite);
+      EventBus.$off('top-bar:site-search-results', self.searchSite); // David over here
     },
     methods: {
       onYearRangeChange() {
@@ -563,22 +573,23 @@
             event.target !== this.$store.getters.getSelectedSite &&
             event.target !== this.$store.getters.getComparingSite
           ) {
-          let style = defaultStyle
-          if (this.showChatbotMapCondition) {
-            const estimate =
-              this.chatbotResponseCounts[event.target.siteid] || 0;
-              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
-          }
-          event.target.setStyle(style);
-          const siteid = event.target.siteid;
-          const circleMarker = this.chatbotActivityLayer.find(
-            (layer) => layer.siteid === siteid
-          );
-          if (circleMarker) {
-            circleMarker.setStyle({
-              ...circleMarkerDefaultStyle
-            });
-          }
+            this.resetStyle([event.target])
+          // let style = defaultStyle
+          // if (this.showChatbotMapCondition) {
+          //   const estimate =
+          //     this.chatbotResponseCounts[event.target.siteid] || 0;
+          //     style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          // }
+          // event.target.setStyle(style);
+          // const siteid = event.target.siteid;
+          // const circleMarker = this.chatbotActivityLayer.find(
+          //   (layer) => layer.siteid === siteid
+          // );
+          // if (circleMarker) {
+          //   circleMarker.setStyle({
+          //     ...circleMarkerDefaultStyle
+          //   });
+          // }
         }
       }
       ,
@@ -608,42 +619,44 @@
         const siteID = target.siteid
         let self = this;
         if (self.$store.getters.getComparingSite) {
-          let style = defaultStyle
-          if (this.showChatbotMapCondition) {
-            console.log('DOES THIS RUN AS WELL??')
-            const estimate =
-              this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
-              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
-          }
-          const siteid = self.$store.getters.getComparingSite.siteid;
-          const circleMarker = this.chatbotActivityLayer.find(
-            (layer) => layer.siteid === siteid
-          );
-          if (circleMarker) {
-            circleMarker.setStyle({
-              ...circleMarkerDefaultStyle
-            });
-          }
-          self.$store.getters.getComparingSite.setStyle(style);
+          this.resetStyle([self.$store.getters.getComparingSite])
+          // let style = defaultStyle
+          // if (this.showChatbotMapCondition) {
+          //   console.log('DOES THIS RUN AS WELL??')
+          //   const estimate =
+          //     this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
+          //     style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          // }
+          // const siteid = self.$store.getters.getComparingSite.siteid;
+          // const circleMarker = this.chatbotActivityLayer.find(
+          //   (layer) => layer.siteid === siteid
+          // );
+          // if (circleMarker) {
+          //   circleMarker.setStyle({
+          //     ...circleMarkerDefaultStyle
+          //   });
+          // }
+          // self.$store.getters.getComparingSite.setStyle(style);
           self.$store.dispatch('setComparingSite', '');
         }
         if (self.$store.getters.getSelectedSite) {
-          let style = defaultStyle
-          if (this.showChatbotMapCondition) {
-            const estimate =
-              this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
-              style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
-          }
-          const siteid = self.$store.getters.getSelectedSite.siteid;
-          const circleMarker = this.chatbotActivityLayer.find(
-            (layer) => layer.siteid === siteid
-          );
-          if (circleMarker) {
-            circleMarker.setStyle({
-              ...circleMarkerDefaultStyle
-            });
-          }
-          self.$store.getters.getSelectedSite.setStyle(style);
+          this.resetStyle([self.$store.getters.getSelectedSite])
+          // let style = defaultStyle
+          // if (this.showChatbotMapCondition) {
+          //   const estimate =
+          //     this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
+          //     style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+          // }
+          // const siteid = self.$store.getters.getSelectedSite.siteid;
+          // const circleMarker = this.chatbotActivityLayer.find(
+          //   (layer) => layer.siteid === siteid
+          // );
+          // if (circleMarker) {
+          //   circleMarker.setStyle({
+          //     ...circleMarkerDefaultStyle
+          //   });
+          // }
+          // self.$store.getters.getSelectedSite.setStyle(style);
         }
         // console.log('trailName:', trailName)
         console.log('getProjectSites:',self.$store.getters.getProjectSites);
@@ -669,6 +682,28 @@
             ...selectedStyle
           });
         }
+      },
+      searchSite: function (trailNamesList) {
+        console.log('so far so good:', trailNamesList)
+
+      },
+      resetStyle: function(sitesList) {
+        sitesList.forEach(site => {
+          let style = defaultStyle;
+          if (this.showChatbotMapCondition) {
+            const estimate = this.chatbotResponseCounts[site.siteid] || 0;
+            style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
+          }
+          const circleMarker = this.chatbotActivityLayer.find(
+            layer => layer.siteid === site.siteid
+          );
+          if (circleMarker) {
+            circleMarker.setStyle({
+              ...circleMarkerDefaultStyle,
+            });
+          }
+          site.setStyle(style);
+        });        
       },
       // selectSite: function (trailName) {
       //   let self = this;

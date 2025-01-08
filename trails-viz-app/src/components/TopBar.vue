@@ -60,6 +60,7 @@
         } else {
           this.filteredSites = []
         }
+        EventBus.$emit('top-bar:site-search-results', this.filteredSites)
       },
       emitSiteNameEvent: function() {
         const projectSites = Object.values(this.$store.getters.getProjectSites);
