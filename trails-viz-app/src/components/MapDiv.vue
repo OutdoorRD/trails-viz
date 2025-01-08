@@ -7,7 +7,7 @@
     
       <v-app>
         <div 
-          v-if="TAB_CONFIG.chatbotMapTabs.includes(visibleTab) && this.chatbotResData.length > 0"
+          v-if="showChatbotMapCondition"
           class="range-slider-container"
         >
           <v-card 
@@ -53,7 +53,6 @@
   import L from "leaflet";
   import axios from "axios";
   import {MAPBOX_CONSTS} from "../store/constants";
-  import {MARKER} from "../store/vectors";
   import {EventBus} from "../event-bus";
   import * as turf from "@turf/turf";
   import { TAB_CONFIG } from "../store/constants";
@@ -130,10 +129,14 @@
   export default {
     name: "MapDiv",
     props: {
-      visibleTab: {
+      activeSubTab: {
         type: String,
         required: true,
-      }
+      },
+      visibleTabGroup: {
+        type: String,
+        required: true,
+      },
     },
     data: function() {
       return {
@@ -150,9 +153,19 @@
         maxYear: undefined,
       }
     },
+    computed: {
+      showChatbotMapCondition() {
+        return this.visibleTabGroup === 'visitorCharacteristics' && 
+               TAB_CONFIG.chatbotMapTabs.includes(this.activeSubTab) && 
+               this.chatbotResData.length > 0;
+      }
+    },
     watch: {
-      visibleTab(newTab) {
-        this.onTabChange(newTab);
+      activeSubTab() {
+        this.onSubTabChange();
+      },
+      visibleTabGroup(newTabGroup) {
+        this.onTabGroupChange(newTabGroup);
       },
     },
     mounted() {
@@ -206,18 +219,16 @@
         this.chatbotResponseCounts = this.filterChatbotData();
         this.updateChatbotActivityLayer();
       },
-      // onTabGroupChange(group) {
-      //   console.log(`Visible Tab Group changed to: ${group}`);
-      //   if (group === 'visitorCharacteristics' && this.chatbotResData.length > 0) {
-      //     this.showChatbotMap()
-      //   } 
-      //   else {
-      //     this.showBasicMap()
-      //   }
-      // },
-      onTabChange(tab) {
-        console.log(`Visible Tab changed to: ${tab}`);
-        if (TAB_CONFIG.chatbotMapTabs.includes(tab) && this.chatbotResData.length > 0) {
+      onTabGroupChange(newTabGroup) {
+        if (newTabGroup !== 'visitorCharacteristics') {
+          this.showBasicMap();
+        }
+        else {
+          this.onSubTabChange()
+        }
+      },
+      onSubTabChange() {
+        if (this.showChatbotMapCondition) {
           this.showChatbotMap()
         } 
         else {
@@ -281,7 +292,7 @@
 
         // Conditionally include the last two endpoints based on user status
         const userRole = this.$store.getters.getUserRole;
-        console.log('User Role:', userRole);
+        // console.log('User Role:', userRole);
         if (userRole === 'admin' || userRole === 'manager') {
           requests.push(
             // axios.get(self.$apiEndpoint + '/projects/' + self.$store.getters.getSelectedProjectCode + '/lastYearEstimates'),
@@ -292,20 +303,19 @@
         .all(requests)
         .then(
             axios.spread((geoJsonRes, chatbotRes) => {
-            console.log('HI DAVID')
-            console.log('user role:',this.$store.getters.getUserRole)
+            // console.log('HI DAVID')
+            // console.log('user role:',this.$store.getters.getUserRole)
             const allSitesGeoJson = geoJsonRes.data;
             this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
             let siteGroupsGeoJson = self.groupGeoJsonBySite(allSitesGeoJson);
             self.addBasicSitesLayer(siteGroupsGeoJson, projectSites); // Add basic sites layer logic
             this.chatbotResData = chatbotRes.data
             if (userRole === 'admin' || userRole === 'manager' && this.chatbotResData.length > 0) {
-              console.log('this.chatbotResData:', this.chatbotResData)
+              // console.log('this.chatbotResData:', this.chatbotResData)
               self.processYearRange(chatbotRes.data);
               self.chatbotResponseCounts = self.filterChatbotData();
               self.initializeChatbotActivityLayer(siteGroupsGeoJson);
-              // this.onTabGroupChange(this.visibleTabGroup);
-              this.onTabChange(this.visibleTab)
+              this.onSubTabChange()
             }
             self.$store.dispatch('setProjectSites', projectSites);
         }))
@@ -325,7 +335,7 @@
         this.minYear = Math.min(...allYears);
         this.maxYear = Math.max(...allYears);
         this.yearRange = [this.minYear, this.maxYear];
-        console.log("Calculated Year Range:", this.yearRange);
+        // console.log("Calculated Year Range:", this.yearRange);
       },
       getCentroidFeatures: function (geoJsonData) {
         let centroidFeatures = [];
@@ -342,7 +352,7 @@
       },
       // Group geoJSON by site
       groupGeoJsonBySite: function (geoJsonData) {
-        console.log(geoJsonData)
+        // console.log(geoJsonData)
         let siteGroupsGeoJson = {};
         const selectedProjectCode = this.$store.getters.getSelectedProjectCode;
         // console.log('selectedProjectCode', selectedProjectCode)
@@ -453,7 +463,7 @@
       },
       // Add basic sites layer
       addBasicSitesLayer: function (siteGroupsGeoJson, projectSites) {
-        console.log('siteGroupsGeoJson',siteGroupsGeoJson)
+        // console.log('siteGroupsGeoJson',siteGroupsGeoJson)
         Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
           let siteLayer = L.geoJSON(site, {
             pane: "basicSitesPane",
@@ -467,13 +477,14 @@
           siteLayer.siteid = site.siteid;
           siteLayer.trailName = site.name;
 
-          if (projectSites[siteLayer.trailName]) {
-            // Append siteid as a differentiating identifier when duplicate trail names exist
-            siteLayer.trailName = `${site.name} (${site.siteid})`;
-          }
+
+          // if (projectSites[siteLayer.trailName]) {
+          //   // Append siteid as a differentiating identifier when duplicate trail names exist
+          //   siteLayer.trailName = `${site.name} (${site.siteid})`;
+          // }
+          projectSites[siteLayer.siteid] = siteLayer;
           this.basicSitesLayer.push(siteLayer);
-          projectSites[siteLayer.trailName] = siteLayer;
-          console.log(siteLayer)
+          // console.log(siteLayer)
           siteLayer.addTo(this.mapDiv)
         });
       },
@@ -555,7 +566,7 @@
             event.target !== this.$store.getters.getComparingSite
           ) {
           let style = defaultStyle
-          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTab) && this.chatbotResData.length > 0) {
+          if (this.showChatbotMapCondition) {
             const estimate =
               this.chatbotResponseCounts[event.target.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -597,7 +608,7 @@
         let self = this;
         if (self.$store.getters.getComparingSite) {
           let style = defaultStyle
-          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTab) && this.chatbotResData.length > 0) {
+          if (this.showChatbotMapCondition) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -616,7 +627,7 @@
         }
         if (self.$store.getters.getSelectedSite) {
           let style = defaultStyle
-          if (TAB_CONFIG.chatbotMapTabs.includes(this.visibleTabGroup) && this.chatbotResData.length > 0) {
+          if (this.showChatbotMapCondition) {
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -633,7 +644,7 @@
           self.$store.getters.getSelectedSite.setStyle(style);
         }
         // console.log('trailName:', trailName)
-        // console.log('getProjectSites:',self.$store.getters.getProjectSites);
+        console.log('getProjectSites:',self.$store.getters.getProjectSites);
         // let site = self.$store.getters.getProjectSites[trailName];
         let site = this.basicSitesLayer.find((layer) => layer.trailName === trailName);
         // console.log('selectSite:', site)
@@ -642,12 +653,12 @@
         EventBus.$emit('map-div:site-selected');
         this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 11});
         const siteid = site.siteid
-        console.log('siteid:', siteid)
+        // console.log('siteid:', siteid)
         const circleMarker = this.chatbotActivityLayer.find(
           (layer) => layer.siteid === siteid
         );
         if (circleMarker) {
-          console.log('IM IN')
+          // console.log('IM IN')
           circleMarker.setStyle({
             ...selectedStyle
           });

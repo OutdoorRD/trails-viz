@@ -1,7 +1,7 @@
 <template>
   <b-row no-gutters class="app-container">
     <b-col sm="6" class="map-col">
-      <map-div ref="map-div" id="mapDiv" :visible-tab-group="visibleTabGroup"></map-div>
+      <map-div ref="map-div" id="mapDiv" :visible-tab-group="visibleTabGroup" :active-sub-tab="activeSubTab"></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
       <b-row no-gutters>
@@ -35,19 +35,20 @@
           </b-tabs>
 
           <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'">
-            <b-tab title="Home Locations">
+            <b-tab title="Home Locations" @click="handleSubTabClick('Home Locations')">
               <home-locations ref="home-locations"></home-locations>
             </b-tab>
-            <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap">
+            <b-tab title="Home Locations Map" v-on:update:active="activateHomeLocationsMap"
+                   @click="handleSubTabClick('Home Locations Map')">
               <home-locations-map ref="home-locations-map"></home-locations-map>
             </b-tab>
-            <b-tab title="Demographics">
+            <b-tab title="Demographics" @click="handleSubTabClick('Demographics')">
               <demographics-summary ref="demographics-summary"></demographics-summary>
             </b-tab>
-            <b-tab title="Party Characteristics">
+            <b-tab title="Party Characteristics" @click="handleSubTabClick('Party Characteristics')">
               <party-characteristics ref="party-characteristics"></party-characteristics>
             </b-tab>
-            <b-tab title="Methods">
+            <b-tab title="Methods" @click="handleSubTabClick('Methods')">
               <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
           </b-tabs>
@@ -80,7 +81,8 @@
         breadcrumbItems: [],
         trailName: '',
         comparingTrailName: '',
-        visibleTabGroup: 'project-info'
+        visibleTabGroup: 'project-info',
+        activeSubTab: ''
       }
     },
     mounted() {
@@ -201,6 +203,9 @@
       },
       showSelectedTab: function(tab) {
         this.visibleTabGroup = tab;
+      },
+      handleSubTabClick(subTabName) {
+        this.activeSubTab = subTabName
       },
       activateHomeLocationsMap: function (event) {
         // The event here is a boolean variable which tell if the

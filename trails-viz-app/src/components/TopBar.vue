@@ -49,7 +49,8 @@
     },
     methods: {
       autoCompleteSite:  function() {
-        let trailNames = Object.keys(this.$store.getters.getProjectSites);
+        // let trailNames = Object.keys(this.$store.getters.getProjectSites);
+        let trailNames = Object.values(this.$store.getters.getProjectSites).map(site => site.trailName);
 
         if (trailNames.includes(this.siteSearchText)) {
           return
