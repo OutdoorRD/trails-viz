@@ -127,9 +127,9 @@
   }
 
   const highlightStyle = {
-    color: "#fa00ff",
+    color: "#8A00C4",
     weight: 0.8,
-    fillColor: '#fa00ff',
+    fillColor: '#8A00C4',
     fillOpacity: 0.8
   };
 
@@ -151,7 +151,7 @@
         dismissSecs: 5,
         dismissCountDown: 0,
         basicSitesLayer : [],
-        chatbotSitesLayer : [],
+        // chatbotSitesLayer : [],
         chatbotActivityLayer : [],
         lastYearEstimates: undefined,
         chatbotResponseCounts: undefined,
@@ -159,6 +159,7 @@
         yearRange: [], // Default range
         minYear: undefined,
         maxYear: undefined,
+        trailNamesInDropdown: [],
       }
     },
     computed: {
@@ -292,7 +293,7 @@
         this.createPanes();
 
         // remove the existing visible sites of the project
-        self.chatbotSitesLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
+        // self.chatbotSitesLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
         self.basicSitesLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer));
         self.chatbotActivityLayer.forEach(siteLayer => this.mapDiv.removeLayer(siteLayer))
 
@@ -684,13 +685,41 @@
         }
       },
       searchSite: function (trailNamesList) {
-        console.log('so far so good:', trailNamesList)
+        this.trailNamesInDropdown = trailNamesList
+        const selectedSite = this.$store.getters.getSelectedSite;
+        const comparingSite = this.$store.getters.getComparingSite;
+        this.resetStyle(this.basicSitesLayer)
+        // check if need to restore comparing sites styles
+        if (selectedSite && comparingSite) {
+          selectedSite.setStyle(compareStyle)
+          comparingSite.setStyle(compareStyle)
+        }
+        // check if need to restore selected site style
+        else if (selectedSite) {
+          selectedSite.setStyle(selectedStyle)
+        }
+        // this.basicSitesLayer.forEach(site => site.setStyle(defaultStyle));
+        // console.log('so far so good:', trailNamesList)
+        
+        const matchingSites = this.basicSitesLayer.filter(site =>
+          trailNamesList.includes(site.trailName)
+        );
+        console.log('matchingSites:', matchingSites)
+        matchingSites.forEach(site => {
+          console.log('Applying style to site:', site, highlightStyle);
+          site.setStyle({
+            ...highlightStyle, // Highlight style for matching sites
+          });
+        });
 
       },
       resetStyle: function(sitesList) {
         sitesList.forEach(site => {
           let style = defaultStyle;
-          if (this.showChatbotMapCondition) {
+          if (this.trailNamesInDropdown.includes(site.trailName)) {
+            style = highlightStyle;
+          }
+          else if (this.showChatbotMapCondition) {
             const estimate = this.chatbotResponseCounts[site.siteid] || 0;
             style = estimate === 0 ? solidGreyStyle : solidDefaultStyle;
           }

@@ -70,6 +70,8 @@
         } else {
           console.warn('Site not found:', this.siteSearchText);
         }
+        EventBus.$emit('top-bar:site-search-results', [])
+        this.filteredSites = []
         this.siteSearchText = '';
       },
       doNothing: function(event) {
