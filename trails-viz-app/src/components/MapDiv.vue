@@ -477,14 +477,12 @@
           siteLayer.siteid = site.siteid;
           siteLayer.trailName = site.name;
 
-
-          // if (projectSites[siteLayer.trailName]) {
-          //   // Append siteid as a differentiating identifier when duplicate trail names exist
-          //   siteLayer.trailName = `${site.name} (${site.siteid})`;
-          // }
+          const isDuplicate = Object.values(siteGroupsGeoJson).filter(
+            s => s.name === site.name
+          ).length > 1;
+          siteLayer.trailName = isDuplicate ? `${site.name} (${site.siteid})` : site.name;
           projectSites[siteLayer.siteid] = siteLayer;
           this.basicSitesLayer.push(siteLayer);
-          // console.log(siteLayer)
           siteLayer.addTo(this.mapDiv)
         });
       },
@@ -601,14 +599,18 @@
             EventBus.$emit("map-div:compare-activated");
           }
         } else {
-          this.selectSite(event.target.trailName);
+          this.selectSite(event.target);
         }
       },
-      selectSite: function (trailName) {
+      selectSite: function (target) {
+        console.log('Target:',target)
+        const trailName = target.trailName
+        const siteID = target.siteid
         let self = this;
         if (self.$store.getters.getComparingSite) {
           let style = defaultStyle
           if (this.showChatbotMapCondition) {
+            console.log('DOES THIS RUN AS WELL??')
             const estimate =
               this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
               style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
@@ -646,7 +648,11 @@
         // console.log('trailName:', trailName)
         console.log('getProjectSites:',self.$store.getters.getProjectSites);
         // let site = self.$store.getters.getProjectSites[trailName];
-        let site = this.basicSitesLayer.find((layer) => layer.trailName === trailName);
+        // let site = this.basicSitesLayer.find((layer) => layer.trailName === trailName);
+        console.log(this.basicSitesLayer)
+        let site = this.basicSitesLayer.find((layer) => layer.siteid === siteID);
+
+
         // console.log('selectSite:', site)
         site.setStyle(selectedStyle);
         self.$store.dispatch('setSelectedSite', site);
@@ -664,6 +670,66 @@
           });
         }
       },
+      // selectSite: function (trailName) {
+      //   let self = this;
+      //   if (self.$store.getters.getComparingSite) {
+      //     let style = defaultStyle
+      //     if (this.showChatbotMapCondition) {
+      //       const estimate =
+      //         this.chatbotResponseCounts[self.$store.getters.getComparingSite.siteid] || 0;
+      //         style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+      //     }
+      //     const siteid = self.$store.getters.getComparingSite.siteid;
+      //     const circleMarker = this.chatbotActivityLayer.find(
+      //       (layer) => layer.siteid === siteid
+      //     );
+      //     if (circleMarker) {
+      //       circleMarker.setStyle({
+      //         ...circleMarkerDefaultStyle
+      //       });
+      //     }
+      //     self.$store.getters.getComparingSite.setStyle(style);
+      //     self.$store.dispatch('setComparingSite', '');
+      //   }
+      //   if (self.$store.getters.getSelectedSite) {
+      //     let style = defaultStyle
+      //     if (this.showChatbotMapCondition) {
+      //       const estimate =
+      //         this.chatbotResponseCounts[self.$store.getters.getSelectedSite.siteid] || 0;
+      //         style = estimate === 0 ? solidGreyStyle : solidDefaultStyle
+      //     }
+      //     const siteid = self.$store.getters.getSelectedSite.siteid;
+      //     const circleMarker = this.chatbotActivityLayer.find(
+      //       (layer) => layer.siteid === siteid
+      //     );
+      //     if (circleMarker) {
+      //       circleMarker.setStyle({
+      //         ...circleMarkerDefaultStyle
+      //       });
+      //     }
+      //     self.$store.getters.getSelectedSite.setStyle(style);
+      //   }
+      //   // console.log('trailName:', trailName)
+      //   console.log('getProjectSites:',self.$store.getters.getProjectSites);
+      //   // let site = self.$store.getters.getProjectSites[trailName];
+      //   let site = this.basicSitesLayer.find((layer) => layer.trailName === trailName);
+      //   // console.log('selectSite:', site)
+      //   site.setStyle(selectedStyle);
+      //   self.$store.dispatch('setSelectedSite', site);
+      //   EventBus.$emit('map-div:site-selected');
+      //   this.mapDiv.fitBounds(site.getBounds(), {maxZoom: 11});
+      //   const siteid = site.siteid
+      //   // console.log('siteid:', siteid)
+      //   const circleMarker = this.chatbotActivityLayer.find(
+      //     (layer) => layer.siteid === siteid
+      //   );
+      //   if (circleMarker) {
+      //     // console.log('IM IN')
+      //     circleMarker.setStyle({
+      //       ...selectedStyle
+      //     });
+      //   }
+      // },
       countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
       },

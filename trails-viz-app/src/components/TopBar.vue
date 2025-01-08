@@ -62,7 +62,13 @@
         }
       },
       emitSiteNameEvent: function() {
-        EventBus.$emit('top-bar:site-selected', this.siteSearchText);
+        const projectSites = Object.values(this.$store.getters.getProjectSites);
+        const selectedSite = projectSites.find(site => site.trailName === this.siteSearchText);
+        if (selectedSite) {
+          EventBus.$emit('top-bar:site-selected', selectedSite); // Emit the site object
+        } else {
+          console.warn('Site not found:', this.siteSearchText);
+        }
         this.siteSearchText = '';
       },
       doNothing: function(event) {
