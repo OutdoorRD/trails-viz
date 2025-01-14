@@ -81,16 +81,16 @@ let IconSuper = L.Icon.extend({
 });
 
 const defaultStyle = {
-  color: "#ff0000",
+  color: "#EC5800",
   weight: 0.8,
-  fillColor: "#ff0000",
+  fillColor: "#EC5800",
   fillOpacity: 0.2,
 };
 
 const solidDefaultStyle = {
-  color: "#ff0000",
+  color: "#EC5800", //EC5800
   weight: 0.8,
-  fillColor: "#ff0000",
+  fillColor: "#EC5800",
   fillOpacity: 0.2,
 };
 
@@ -123,9 +123,9 @@ const compareStyle = {
 };
 
 const bubbleDefaultStyle = {
-  color: "#00FFFF", // Border color
+  color: "#C04000", // Border color
   weight: 0.8, // Border width
-  fillColor: "#00FFFF", // Fill color
+  fillColor: "#C04000", // Fill color
   fillOpacity: 0.2, // Transparency
 };
 
@@ -168,6 +168,7 @@ export default {
       yearRange: [], // Default range
       minYear: undefined,
       maxYear: undefined,
+      legend: null,
       trailNamesInDropdown: [],
     };
   },
@@ -239,6 +240,96 @@ export default {
     EventBus.$off("top-bar:site-search-results", self.searchSite); // David over here
   },
   methods: {
+    removeLegend() {
+      if (this.legend !== null) {
+        this.legend.remove();
+        this.legend = null;
+      }
+    },
+    addLegend() {
+      if (this.legend === null) {
+        this.legend = L.control({ position: "bottomright" });
+
+        this.legend.onAdd = function(map) {
+          // Create a container for your legend
+          const div = L.DomUtil.create("div", "info legend");
+          div.innerHTML = `
+          <div style="background-color: white; padding: 10px; border-radius: 4px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); line-height: 1.4em;">
+            <h4 style="margin-bottom: 12px; font-weight: bold; text-align: center;">Legend</h4>
+
+            <div style="margin-bottom: 12px;">
+              <span style="font-size: 14px; font-weight: bold; color: #333; text-align: center; display: block;">Polygon Colors</span>
+              <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 4px;">
+                <!-- Red polygon -->
+                <svg width="22" height="22" style="margin-right: 6px;">
+                  <polygon points="5,5 15,5 15,15 5,15"
+                          style="fill:${
+                            solidDefaultStyle.fillColor
+                          };fill-opacity:${
+            solidDefaultStyle.fillOpacity
+          };stroke:${solidDefaultStyle.color};stroke-width:${
+            solidDefaultStyle.weight
+          }"/>
+                </svg>
+                <span style="font-size: 13px;">With chatbot responses</span>
+              </div>
+
+              <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 4px;">
+                <!-- Grey polygon -->
+                <svg width="22" height="22" style="margin-right: 6px;">
+                  <polygon points="5,5 15,5 15,15 5,15"
+                          style="fill:${
+                            solidGreyStyle.fillColor
+                          };fill-opacity:${solidGreyStyle.fillOpacity};stroke:${
+            solidGreyStyle.color
+          };stroke-width:${solidGreyStyle.weight}"/>
+                </svg>
+                <span style="font-size: 13px;">Without chatbot responses</span>
+              </div>
+            </div>
+
+            <div>
+              <span style="font-size: 14px; font-weight: bold; color: #333; text-align: center; display: block;">Bubble Sizes</span>
+              <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 4px;">
+                <!-- Large bubble -->
+                <svg width="22" height="22" style="margin-right: 6px;">
+                  <circle cx="10" cy="12" r="8"
+                          style="fill:${
+                            bubbleDefaultStyle.fillColor
+                          };fill-opacity:${
+            bubbleDefaultStyle.fillOpacity
+          };stroke:${bubbleDefaultStyle.color};stroke-width:${
+            bubbleDefaultStyle.weight
+          }"/>
+                </svg>
+                <span style="font-size: 13px;">More chatbot responses</span>
+              </div>
+
+              <div class="legend-item" style="display: flex; align-items: center;">
+                <!-- Small bubble -->
+                <svg width="22" height="22" style="margin-right: 6px;">
+                  <circle cx="10" cy="10" r="4"
+                          style="fill:${
+                            bubbleDefaultStyle.fillColor
+                          };fill-opacity:${
+            bubbleDefaultStyle.fillOpacity
+          };stroke:${bubbleDefaultStyle.color};stroke-width:${
+            bubbleDefaultStyle.weight
+          }"/>
+                </svg>
+                <span style="font-size: 13px;">Less chatbot responses</span>
+              </div>
+            </div>
+          </div>
+
+          `;
+
+          return div;
+        };
+      }
+      // Finally, add the legend to the map
+      this.legend.addTo(this.mapDiv);
+    },
     onYearRangeChange() {
       this.chatbotResponseCounts = this.filterChatbotData();
       this.updateBubblesLayer();
@@ -249,8 +340,10 @@ export default {
       this.resetStyle(this.sitesLayer);
       if (this.showChatbotMapCondition) {
         this.addbubblesLayer();
+        this.addLegend();
       } else {
         this.removebubblesLayer();
+        this.removeLegend();
       }
     },
     showChatbotMap() {
@@ -275,9 +368,7 @@ export default {
       return filteredData;
     },
     createBubble: function(feature, latlng) {
-      let self = this;
-      let siteid = feature["properties"]["siteid"];
-      let data = self.chatbotResponseCounts[siteid];
+      let data = feature["properties"]["num_responses"];
 
       if (!data) {
         return null;
@@ -288,7 +379,7 @@ export default {
         pane: "bubblesPane",
         radius: radius,
         ...bubbleDefaultStyle,
-      }); //.bindTooltip(`${feature.properties.name}: ${data}`);
+      });
     },
 
     renderProjectSites: function() {
@@ -371,12 +462,12 @@ export default {
     // Group geoJSON by site
     groupGeoJsonBySite: function(geoJsonData) {
       let siteGroupsGeoJson = {};
-      const selectedProjectCode = this.$store.getters.getSelectedProjectCode;
+      const selectedProjectCode = this.$store.getters.getSelectedProjectCode; //project code
       geoJsonData.features.forEach((feature) => {
         const siteid = feature.properties.siteid;
         const trailName = feature.properties.Trail_name;
         const prjctCode = feature.properties.Prjct_code;
-        const prjctCodeList = prjctCode.split(",").map((code) => code.trim());
+        const prjctCodeList = prjctCode.split(",").map((code) => code.trim()); // checks if site is in project
         // if (prjctCodeList.includes(selectedProjectCode)) {
         if (!(siteid in siteGroupsGeoJson)) {
           siteGroupsGeoJson[siteid] = {
@@ -419,29 +510,32 @@ export default {
     },
     initializeBubblesLayer: function(siteGroupsGeoJson) {
       Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+        const siteid = site.siteid;
+        const num_responses = this.chatbotResponseCounts[siteid] || 0;
+        const isDuplicate =
+          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
+            .length > 1;
+        const trailName = isDuplicate
+          ? `${site.name} (${site.siteid})`
+          : site.name;
+
         const centroid = turf.centroid(site);
         centroid.properties = {
-          siteid: site.siteid,
+          // siteid: site.siteid,
+          num_responses: num_responses,
         };
         let centroidLayer = L.geoJSON(centroid, {
           pane: "bubblesPane",
           pointToLayer: this.createBubble,
         })
-          .bindTooltip(site.name)
+          .bindTooltip(`${trailName}: ${num_responses} responses`)
           .on("mouseover", this.handleMouseOver)
           .on("mouseout", this.handleMouseOut)
           .on("click", this.handleClick);
 
         // Assign properties to the layer
         centroidLayer.siteid = site.siteid;
-        centroidLayer.trailName = site.name;
-
-        const isDuplicate =
-          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
-            .length > 1;
-        centroidLayer.trailName = isDuplicate
-          ? `${site.name} (${site.siteid})`
-          : site.name;
+        centroidLayer.trailName = trailName;
         this.bubblesLayer.push(centroidLayer);
         this.onTabChange();
       });
@@ -463,19 +557,25 @@ export default {
     updateBubblesLayer: function() {
       this.bubblesLayer.forEach((layer) => {
         if (layer.eachLayer) {
+          const trailName = layer.trailName;
+          const siteid = layer.siteid;
+          const num_responses = this.chatbotResponseCounts[siteid] || 0;
           layer.eachLayer((circleMarker) => {
             if (circleMarker instanceof L.CircleMarker) {
-              const siteid = circleMarker.feature.properties.siteid;
-              const data = this.chatbotResponseCounts[siteid] || 0;
-              const radius = Math.sqrt(data) * 2;
+              // const siteid = circleMarker.feature.properties.siteid;
+              const radius = Math.sqrt(num_responses) * 2;
               circleMarker.setRadius(radius);
-              if (data == 0) {
+              if (num_responses == 0) {
                 circleMarker.setStyle({ fill: false, stroke: false });
               } else {
                 circleMarker.setStyle({ fill: true, stroke: true });
               }
+              // circleMarker.bindTooltip(
+              //   `${trailName}: ${num_responses} responses`
+              // );
             }
           });
+          layer.bindTooltip(`${trailName}: ${num_responses} responses`);
         }
       });
     },
