@@ -485,24 +485,24 @@ export default {
     // Add basic sites layer
     initializeSitesLayer: function(siteGroupsGeoJson, projectSites) {
       Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+        const siteid = site.siteid;
+        const isDuplicate =
+          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
+            .length > 1;
+        const trailName = isDuplicate
+          ? `${site.name} (${site.siteid})`
+          : site.name;
         let siteLayer = L.geoJSON(site, {
           pane: "basicSitesPane",
           style: defaultStyle,
         })
-          .bindTooltip(site.name)
+          .bindTooltip(trailName)
           .on("mouseover", this.handleMouseOver)
           .on("mouseout", this.handleMouseOut)
           .on("click", this.handleClick);
 
         siteLayer.siteid = site.siteid;
-        siteLayer.trailName = site.name;
-
-        const isDuplicate =
-          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
-            .length > 1;
-        siteLayer.trailName = isDuplicate
-          ? `${site.name} (${site.siteid})`
-          : site.name;
+        siteLayer.trailName = trailName;
         projectSites[siteLayer.siteid] = siteLayer;
         this.sitesLayer.push(siteLayer);
         siteLayer.addTo(this.mapDiv);
@@ -518,7 +518,6 @@ export default {
         const trailName = isDuplicate
           ? `${site.name} (${site.siteid})`
           : site.name;
-
         const centroid = turf.centroid(site);
         centroid.properties = {
           // siteid: site.siteid,
