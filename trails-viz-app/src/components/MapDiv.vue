@@ -81,64 +81,64 @@ let IconSuper = L.Icon.extend({
 });
 
 const defaultStyle = {
-  color: "#EC5800",
-  weight: 0.8,
-  fillColor: "#EC5800",
+  color: "#C04000", //EC5800
+  weight: 1,
+  fillColor: "#C04000",
   fillOpacity: 0.2,
 };
 
 const solidDefaultStyle = {
   color: "#EC5800", //EC5800
-  weight: 0.8,
+  weight: 1,
   fillColor: "#EC5800",
   fillOpacity: 0.2,
 };
 
 const solidGreyStyle = {
   color: "#545454",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#545454",
   fillOpacity: 0.2,
 };
 
 const hoverStyle = {
   color: "#ffb801",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#ffb801",
   fillOpacity: 0.2,
 };
 
 const selectedStyle = {
   color: "#0000ff",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#0000ff",
   fillOpacity: 0.2,
 };
 
 const compareStyle = {
   color: "#fa00ff",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#fa00ff",
   fillOpacity: 0.8,
 };
 
 const bubbleDefaultStyle = {
   color: "#C04000", // Border color
-  weight: 0.8, // Border width
+  weight: 1, // Border width
   fillColor: "#C04000", // Fill color
   fillOpacity: 0.2, // Transparency
 };
 
 const highlightStyle = {
   color: "#8A00C4",
-  weight: 3,
+  weight: 1,
   fillColor: "#8A00C4",
   fillOpacity: 0.2,
 };
 
 const bubbleHighlightStyle = {
   color: "#8A00C4",
-  weight: 2,
+  weight: 1,
   fillColor: "#8A00C4",
   fillOpacity: 0.4,
 };
