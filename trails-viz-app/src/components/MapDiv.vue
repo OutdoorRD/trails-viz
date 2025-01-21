@@ -528,7 +528,16 @@ export default {
       });
     },
     initializeBubblesLayer: function(siteGroupsGeoJson) {
-      Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+      // Sort sites by response count in descending order
+      const sortedSites = Object.entries(siteGroupsGeoJson).sort(
+        ([, siteA], [, siteB]) => {
+          const responsesA = this.chatbotResponseCounts[siteA.siteid] || 0;
+          const responsesB = this.chatbotResponseCounts[siteB.siteid] || 0;
+          return responsesB - responsesA; // Descending order
+        }
+      );
+
+      sortedSites.forEach(([, site]) => {
         const siteid = site.siteid;
         const num_responses = this.chatbotResponseCounts[siteid] || 0;
         const isDuplicate =
@@ -573,7 +582,13 @@ export default {
       });
     },
     updateBubblesLayer: function() {
-      this.bubblesLayer.forEach((layer) => {
+      // Sort sites by response count in descending order
+      const sortedBubblesLayers = this.bubblesLayer.sort((layerA, layerB) => {
+        const responsesA = this.chatbotResponseCounts[layerA.siteid] || 0;
+        const responsesB = this.chatbotResponseCounts[layerB.siteid] || 0;
+        return responsesB - responsesA;
+      });
+      sortedBubblesLayers.forEach((layer) => {
         if (layer.eachLayer) {
           const trailName = layer.trailName;
           const siteid = layer.siteid;
