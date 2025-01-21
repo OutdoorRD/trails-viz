@@ -15,35 +15,56 @@
       <div v-if="showChatbotMapCondition" class="range-slider-container">
         <v-card
           style="
-              max-width: 100%; 
-              max-height: 100%; 
-              padding: 0px; 
-              margin: 0; 
-              display: flex;
-              flex-direction: column;
-              align-items: center; 
-              justify-content: flex-start;
-            "
+        max-width: 100%;
+        padding: 10px;
+        margin: 0; 
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: flex-start;
+        background-color: white;
+        border-radius: 4px;
+      "
         >
-          <v-card-text style="width: 100%; padding-top: 4px;">
-            <v-range-slider
-              v-if="yearRange && minYear !== undefined && maxYear !== undefined"
-              v-model="yearRange"
-              :min="minYear"
-              :max="maxYear"
-              ticks="always"
-              tick-size="4"
-              thumb-label
-              @change="onYearRangeChange"
-            >
-              <template v-slot:prepend>
-                <span>{{ minYear }}</span>
-              </template>
-              <template v-slot:append>
-                <span>{{ maxYear }}</span>
-              </template>
-            </v-range-slider>
-          </v-card-text>
+          <label
+            for="year-range-slider"
+            style="
+          font-size: 14px;
+          display: block;
+          font-weight: bold;
+          text-align: center; 
+          width: 100%;
+          font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+          color: #333;
+          margin:0;
+        "
+          >
+            Year Range
+          </label>
+          <v-range-slider
+            id="year-range-slider"
+            v-if="yearRange && minYear !== undefined && maxYear !== undefined"
+            v-model="yearRange"
+            :min="minYear"
+            :max="maxYear"
+            ticks="always"
+            tick-size="4"
+            thumb-label
+            hide-details
+            @change="onYearRangeChange"
+            style="
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            "
+          >
+            <template v-slot:prepend>
+              <span>{{ minYear }}</span>
+            </template>
+            <template v-slot:append>
+              <span>{{ maxYear }}</span>
+            </template>
+          </v-range-slider>
         </v-card>
       </div>
 
@@ -254,9 +275,7 @@ export default {
           // Create a container for your legend
           const div = L.DomUtil.create("div", "info legend");
           div.innerHTML = `
-          <div style="background-color: white; padding: 10px; border-radius: 4px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); line-height: 1.4em;">
-            <h4 style="margin-bottom: 12px; font-weight: bold; text-align: center;">Legend</h4>
-
+          <div style="background-color: white; padding: 10px; border-radius: 4px; line-height: 1.4em;">
             <div style="margin-bottom: 12px;">
               <span style="font-size: 14px; font-weight: bold; color: #333; text-align: center; display: block;">Polygon Colors</span>
               <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 4px;">
@@ -709,7 +728,7 @@ export default {
 
 .range-slider-container {
   position: absolute;
-  bottom: 16vh;
+  bottom: 19vh;
   left: 1vh;
   z-index: 1000;
   width: 50%;
