@@ -76,9 +76,9 @@ export default {
         this.siteSearchText.startsWith("#") &&
         this.siteSearchText.length >= 2
       ) {
-        const siteIdSearchText = this.siteSearchText.substring(1);
+        const siteIdSearchText = this.siteSearchText.substring(1).toUpperCase();
         this.filteredSites = projectSites
-          .filter((site) => site.siteid.includes(siteIdSearchText))
+          .filter((site) => site.siteid.startsWith(siteIdSearchText))
           .map((site) => site.trailName);
       } else if (this.siteSearchText.length >= 2) {
         this.filteredSites = trailNames.filter((name) =>
@@ -94,7 +94,8 @@ export default {
       let selectedSite = undefined;
       if (this.siteSearchText.startsWith("#")) {
         selectedSite = projectSites.find(
-          (site) => site.siteid === this.siteSearchText.substring(1)
+          (site) =>
+            site.siteid === this.siteSearchText.substring(1).toUpperCase()
         );
       } else {
         selectedSite = projectSites.find(

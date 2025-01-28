@@ -15,35 +15,56 @@
       <div v-if="showChatbotMapCondition" class="range-slider-container">
         <v-card
           style="
-              max-width: 100%; 
-              max-height: 100%; 
-              padding: 0px; 
-              margin: 0; 
-              display: flex;
-              flex-direction: column;
-              align-items: center; 
-              justify-content: flex-start;
-            "
+        max-width: 100%;
+        padding: 10px;
+        margin: 0; 
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: flex-start;
+        background-color: white;
+        border-radius: 4px;
+      "
         >
-          <v-card-text style="width: 100%; padding-top: 4px;">
-            <v-range-slider
-              v-if="yearRange && minYear !== undefined && maxYear !== undefined"
-              v-model="yearRange"
-              :min="minYear"
-              :max="maxYear"
-              ticks="always"
-              tick-size="4"
-              thumb-label
-              @change="onYearRangeChange"
-            >
-              <template v-slot:prepend>
-                <span>{{ minYear }}</span>
-              </template>
-              <template v-slot:append>
-                <span>{{ maxYear }}</span>
-              </template>
-            </v-range-slider>
-          </v-card-text>
+          <label
+            for="year-range-slider"
+            style="
+          font-size: 14px;
+          display: block;
+          font-weight: bold;
+          text-align: center; 
+          width: 100%;
+          font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+          color: #333;
+          margin:0;
+        "
+          >
+            Year Range
+          </label>
+          <v-range-slider
+            id="year-range-slider"
+            v-if="yearRange && minYear !== undefined && maxYear !== undefined"
+            v-model="yearRange"
+            :min="minYear"
+            :max="maxYear"
+            ticks="always"
+            tick-size="4"
+            thumb-label
+            hide-details
+            @change="onYearRangeChange"
+            style="
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            "
+          >
+            <template v-slot:prepend>
+              <span>{{ minYear }}</span>
+            </template>
+            <template v-slot:append>
+              <span>{{ maxYear }}</span>
+            </template>
+          </v-range-slider>
         </v-card>
       </div>
 
@@ -81,64 +102,64 @@ let IconSuper = L.Icon.extend({
 });
 
 const defaultStyle = {
-  color: "#EC5800",
-  weight: 0.8,
-  fillColor: "#EC5800",
+  color: "#C04000", //EC5800
+  weight: 1,
+  fillColor: "#C04000",
   fillOpacity: 0.2,
 };
 
 const solidDefaultStyle = {
   color: "#EC5800", //EC5800
-  weight: 0.8,
+  weight: 1,
   fillColor: "#EC5800",
   fillOpacity: 0.2,
 };
 
 const solidGreyStyle = {
   color: "#545454",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#545454",
   fillOpacity: 0.2,
 };
 
 const hoverStyle = {
   color: "#ffb801",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#ffb801",
   fillOpacity: 0.2,
 };
 
 const selectedStyle = {
   color: "#0000ff",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#0000ff",
   fillOpacity: 0.2,
 };
 
 const compareStyle = {
   color: "#fa00ff",
-  weight: 0.8,
+  weight: 1,
   fillColor: "#fa00ff",
   fillOpacity: 0.8,
 };
 
 const bubbleDefaultStyle = {
   color: "#C04000", // Border color
-  weight: 0.8, // Border width
+  weight: 1, // Border width
   fillColor: "#C04000", // Fill color
   fillOpacity: 0.2, // Transparency
 };
 
 const highlightStyle = {
   color: "#8A00C4",
-  weight: 3,
+  weight: 1,
   fillColor: "#8A00C4",
   fillOpacity: 0.2,
 };
 
 const bubbleHighlightStyle = {
   color: "#8A00C4",
-  weight: 2,
+  weight: 1,
   fillColor: "#8A00C4",
   fillOpacity: 0.4,
 };
@@ -254,9 +275,7 @@ export default {
           // Create a container for your legend
           const div = L.DomUtil.create("div", "info legend");
           div.innerHTML = `
-          <div style="background-color: white; padding: 10px; border-radius: 4px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); line-height: 1.4em;">
-            <h4 style="margin-bottom: 12px; font-weight: bold; text-align: center;">Legend</h4>
-
+          <div style="background-color: white; padding: 10px; border-radius: 4px; line-height: 1.4em;">
             <div style="margin-bottom: 12px;">
               <span style="font-size: 14px; font-weight: bold; color: #333; text-align: center; display: block;">Polygon Colors</span>
               <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 4px;">
@@ -485,31 +504,40 @@ export default {
     // Add basic sites layer
     initializeSitesLayer: function(siteGroupsGeoJson, projectSites) {
       Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+        const siteid = site.siteid;
+        const isDuplicate =
+          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
+            .length > 1;
+        const trailName = isDuplicate
+          ? `${site.name} (${site.siteid})`
+          : site.name;
         let siteLayer = L.geoJSON(site, {
           pane: "basicSitesPane",
           style: defaultStyle,
         })
-          .bindTooltip(site.name)
+          .bindTooltip(trailName)
           .on("mouseover", this.handleMouseOver)
           .on("mouseout", this.handleMouseOut)
           .on("click", this.handleClick);
 
         siteLayer.siteid = site.siteid;
-        siteLayer.trailName = site.name;
-
-        const isDuplicate =
-          Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
-            .length > 1;
-        siteLayer.trailName = isDuplicate
-          ? `${site.name} (${site.siteid})`
-          : site.name;
+        siteLayer.trailName = trailName;
         projectSites[siteLayer.siteid] = siteLayer;
         this.sitesLayer.push(siteLayer);
         siteLayer.addTo(this.mapDiv);
       });
     },
     initializeBubblesLayer: function(siteGroupsGeoJson) {
-      Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
+      // Sort sites by response count in descending order
+      const sortedSites = Object.entries(siteGroupsGeoJson).sort(
+        ([, siteA], [, siteB]) => {
+          const responsesA = this.chatbotResponseCounts[siteA.siteid] || 0;
+          const responsesB = this.chatbotResponseCounts[siteB.siteid] || 0;
+          return responsesB - responsesA; // Descending order
+        }
+      );
+
+      sortedSites.forEach(([, site]) => {
         const siteid = site.siteid;
         const num_responses = this.chatbotResponseCounts[siteid] || 0;
         const isDuplicate =
@@ -518,7 +546,6 @@ export default {
         const trailName = isDuplicate
           ? `${site.name} (${site.siteid})`
           : site.name;
-
         const centroid = turf.centroid(site);
         centroid.properties = {
           // siteid: site.siteid,
@@ -555,7 +582,13 @@ export default {
       });
     },
     updateBubblesLayer: function() {
-      this.bubblesLayer.forEach((layer) => {
+      // Sort sites by response count in descending order
+      const sortedBubblesLayers = this.bubblesLayer.sort((layerA, layerB) => {
+        const responsesA = this.chatbotResponseCounts[layerA.siteid] || 0;
+        const responsesB = this.chatbotResponseCounts[layerB.siteid] || 0;
+        return responsesB - responsesA;
+      });
+      sortedBubblesLayers.forEach((layer) => {
         if (layer.eachLayer) {
           const trailName = layer.trailName;
           const siteid = layer.siteid;
@@ -710,7 +743,7 @@ export default {
 
 .range-slider-container {
   position: absolute;
-  bottom: 16vh;
+  bottom: 19vh;
   left: 1vh;
   z-index: 1000;
   width: 50%;
