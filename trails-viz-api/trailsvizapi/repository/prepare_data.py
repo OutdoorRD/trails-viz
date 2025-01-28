@@ -95,10 +95,16 @@ def _prepare_chatbot_data_df():
     if Path(_CHATBOT_DIR + _CHATBOT_DATA_FILE):
         chatbot_data_df = pd.read_csv(_CHATBOT_DIR + _CHATBOT_DATA_FILE, dtype={
             'SiteID': str, 'CountyFIPS' : str, 'StateFIPS' : str, 'ZipCode': str,
-            'from': str, 'to':str
+            'from': str, 'to':str, 'InfoSource' : str,
         })
-    # convert SiteID from comma-separated string to Python lists
-    chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(lambda x: x.split(','))
+    # Convert SiteID from comma-separated string to Python lists
+    chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(
+        lambda x: x.split(',') if pd.notna(x) else None
+    )
+    # Convert InfoSource from comma-separated string to Python lists
+    chatbot_data_df['InfoSource'] = chatbot_data_df['InfoSource'].apply(
+        lambda x: x.split(',') if pd.notna(x) else None
+    )
     assert chatbot_data_df is not None, "Failed to prepare chatbot data."
     return chatbot_data_df
 
