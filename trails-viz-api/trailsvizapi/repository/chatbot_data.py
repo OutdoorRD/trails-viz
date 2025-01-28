@@ -44,7 +44,7 @@ def get_chatbot_data_yearly_statistics(siteid, characteristic):
 def _prep_chatbot_project_long_df(project, characteristic):
     project_sites = get_project_sites(project)
     siteids = set(project_sites['siteid'].unique())
-    chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
+    chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
     # Add a 'trail' feature that contains the project assoicated site id.
     # 'trail' value set to None if no site ids in 'SiteID' are not included in the list of project siteids.
     chatbot_data_df['trail'] = chatbot_data_df['SiteID'].apply(
@@ -72,7 +72,7 @@ def _prep_chatbot_project_long_df(project, characteristic):
 
 
 def _prep_chatbot_site_long_df(siteid, characteristic):
-    chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
+    chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
     # Add a 'trail' feature that contains the given siteid.
     # 'trail' value set to None if 'SiteID' does not include siteid.
     chatbot_data_df['trail'] = chatbot_data_df['SiteID'].apply(
