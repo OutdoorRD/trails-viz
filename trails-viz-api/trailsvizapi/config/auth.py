@@ -45,7 +45,14 @@ _MANAGER_ENDPOINTS.update([
     'get_chatbot_data',
     'get_project_chatbot_data_yearly_statistics',
     'get_chatbot_data_yearly_statistics',
-    'get_annual_chatbot_response_counts'
+    'get_annual_chatbot_response_counts',
+    'get_chatbot_project_home_locations',
+    'get_chatbot_home_locations',
+    'get_chatbot_home_locations_state',
+    'get_chatbot_home_locations_county',
+    'get_chatbot_project_home_locations_state',
+    'get_chatbot_home_project_locations_county',
+
 ])
 
 _ROLE_ACCESS_MAPPING = {

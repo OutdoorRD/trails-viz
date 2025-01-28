@@ -93,9 +93,12 @@ def _prepare_geo_dfs():
 def _prepare_chatbot_data_df():
     chatbot_data_df = None
     if Path(_CHATBOT_DIR + _CHATBOT_DATA_FILE):
-        chatbot_data_df = pd.read_csv(_CHATBOT_DIR + _CHATBOT_DATA_FILE)
-    # convert SiteID from strings to Python lists
-    chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(ast.literal_eval)
+        chatbot_data_df = pd.read_csv(_CHATBOT_DIR + _CHATBOT_DATA_FILE, dtype={
+            'SiteID': str, 'CountyFIPS' : str, 'StateFIPS' : str, 'ZipCode': str,
+            'from': str, 'to':str
+        })
+    # convert SiteID from comma-separated string to Python lists
+    chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(lambda x: x.split(','))
     assert chatbot_data_df is not None, "Failed to prepare chatbot data."
     return chatbot_data_df
 

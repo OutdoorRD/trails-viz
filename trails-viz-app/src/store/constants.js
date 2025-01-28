@@ -36,5 +36,5 @@ export const VIZ_MODES = {
 };
 
 export const TAB_CONFIG = {
-  chatbotMapTabs: ['Party Characteristics']
+  chatbotMapTabs: ['Party Characteristics', 'Chatbot Home Locations', 'Chatbot Home Locations Map']
 }
