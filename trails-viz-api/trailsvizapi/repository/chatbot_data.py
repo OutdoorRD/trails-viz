@@ -124,7 +124,4 @@ def _prep_chatbot_aggregate_stats(df_long, characteristic):
 
 
 def _add_additional_features(df, feature):
-    if feature == 'PeoplePerVehics':
-        if 'PartyPeople' in df.columns and 'PartyVehics' in df.columns:
-            df.loc[:, 'PeoplePerVehics'] = df['PartyPeople'] / df['PartyVehics'].replace(0, np.nan)
-    return df
+    pass
