@@ -136,7 +136,6 @@ export default {
       return mergedTree;
     },
     renderTreeMap: function() {
-      console.log('hellloooo')
       // Initialize at this seed
       this.randomSeed = 12;
       let self = this;
@@ -165,7 +164,6 @@ export default {
       });
     },
     _renderTreeMap: function() {
-      console.log('hellloooo')
       let self = this;
       let data = self.homeLocations;
       let labels = [];

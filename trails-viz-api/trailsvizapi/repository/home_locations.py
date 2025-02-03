@@ -33,6 +33,7 @@ def _treefy_home_locations(id_, home_locations):
 
     return tree
 
+
 def get_chatbot_home_locations_df(df):
     home_locations = df.groupby(['County', 'State', 'Country', 'CountyFIPS', 'StateFIPS']).agg(
         visit_days=('from', 'count'),
@@ -47,15 +48,13 @@ def get_chatbot_home_locations_df(df):
     })
     return home_locations
 
+
 def get_chatbot_home_locations(siteid):
     chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
-    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID']
-                                               .apply(lambda x: siteid in x if x else False)]
-    # chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(
-    #     lambda x: siteid if siteid in x else None)
-    # chatbot_data_df = chatbot_data_df.dropna(subset=['SiteID'])
+    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
     site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     return _treefy_home_locations(siteid, site_home_locations)
+
 
 def get_chatbot_project_home_locations(project):
     project_sites = get_project_sites(project)
@@ -75,6 +74,7 @@ def get_chatbot_project_home_locations(project):
     # project_home_locations = project_home_locations.groupby(by=['country', 'state', 'county'], as_index=False).sum()
     # project_home_locations = project_home_locations.append(international_visits, ignore_index=True, sort=False)
     return _treefy_home_locations(project, project_home_locations)
+
 
 def get_home_locations(siteid):
     home_locations = get_from_data_source('HOME_LOCATIONS_DF')
@@ -102,11 +102,7 @@ def get_project_home_locations(project):
 def get_chatbot_home_locations_by_state(siteid):
     state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
     chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
-    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID']
-                                            .apply(lambda x: siteid in x if x else False)]
-    # chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(
-    #     lambda x: siteid if siteid in x else None)
-    # chatbot_data_df = chatbot_data_df.dropna(subset=['SiteID'])
+    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
     site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     site_home_locations = site_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
     site_home_locations = site_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
@@ -136,10 +132,7 @@ def get_chatbot_project_home_locations_by_state(project):
     # keep observations with non-missing 'trail' values
     chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
     project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
-
-
     project_home_locations = project_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
-
     project_home_locations = project_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
     project_home_state_data = state_boundaries.merge(project_home_locations, on=['state_code', 'state'], how='inner')
     return project_home_state_data
@@ -163,13 +156,9 @@ def get_project_home_locations_by_state(project):
 def get_chatbot_home_locations_by_county(siteid, state_code):
     county_geographies = get_from_data_source('COUNTIES_DF')
     county_geographies = county_geographies[county_geographies['state_code'] == state_code]
-    
+
     chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
-    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID']
-                                            .apply(lambda x: siteid in x if x else False)]
-    # chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(
-    #     lambda x: siteid if siteid in x else None)
-    # chatbot_data_df = chatbot_data_df.dropna(subset=['SiteID'])
+    chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
     site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     site_home_locations = site_home_locations[site_home_locations['state_code'] == state_code]
 
@@ -209,8 +198,7 @@ def get_chatbot_project_home_locations_by_county(project, state_code):
     # keep observations with non-missing 'trail' values
     chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
     project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
-    project_home_locations = project_home_locations[project_home_locations['state_code'] == state_code]    
-    # print('project_home_locations:', project_home_locations)
+    project_home_locations = project_home_locations[project_home_locations['state_code'] == state_code]
     project_home_locations = project_home_locations[['county_code', 'county', 'visit_days', 'visitors_unq']]
     project_home_locations = project_home_locations.groupby(by=['county_code', 'county'], as_index=False).sum()
     project_home_county_data = county_geographies.merge(project_home_locations,

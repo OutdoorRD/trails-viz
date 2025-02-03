@@ -104,8 +104,6 @@ export default {
       }
       if (selectedSite) {
         EventBus.$emit("top-bar:site-selected", selectedSite); // Emit the site object
-      } else {
-        console.warn("Site not found:", this.siteSearchText);
       }
       EventBus.$emit("top-bar:site-search-results", []);
       this.filteredSites = [];

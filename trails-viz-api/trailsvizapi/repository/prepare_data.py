@@ -1,9 +1,7 @@
 from pathlib import Path
 import os
-import ast
 import pandas as pd
 import geopandas as gpd
-
 import trailsvizapi.config.app_config as config
 
 _PROJECT_FILES_ROOT = config.DATA_FILES_ROOT + 'projects/'
@@ -94,8 +92,8 @@ def _prepare_chatbot_data_df():
     chatbot_data_df = None
     if Path(_CHATBOT_DIR + _CHATBOT_DATA_FILE):
         chatbot_data_df = pd.read_csv(_CHATBOT_DIR + _CHATBOT_DATA_FILE, dtype={
-            'SiteID': str, 'CountyFIPS' : str, 'StateFIPS' : str, 'ZipCode': str,
-            'from': str, 'to':str, 'InfoSource' : str,
+            'SiteID': str, 'CountyFIPS': str, 'StateFIPS': str, 'ZipCode': str,
+            'from': str, 'to': str, 'InfoSource': str,
         })
     # Convert SiteID from comma-separated string to Python lists
     chatbot_data_df['SiteID'] = chatbot_data_df['SiteID'].apply(

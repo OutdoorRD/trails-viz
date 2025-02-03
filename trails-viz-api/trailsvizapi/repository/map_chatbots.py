@@ -1,12 +1,10 @@
 from trailsvizapi.repository.prepare_data import get_from_data_source
 from trailsvizapi.repository.projects_and_sites import get_project_sites
 import pandas as pd
-import numpy as np
-import math
-from flask import Response
-import json
+
 
 SURVEY_START = 'PartyPeople'
+
 
 def get_annual_chatbot_response_counts(project):
     project_sites = get_project_sites(project)
@@ -37,7 +35,7 @@ def _prepare_chatbot_response_data(siteids=None):
     if chatbot_response_df.empty:
         return chatbot_response_df
     # Convert the 'date' column to datetime format and extract year
-    chatbot_response_df.loc[:,'date'] = pd.to_datetime(chatbot_response_df['date'])
-    chatbot_response_df.loc[:,'year'] = chatbot_response_df['date'].dt.year
+    chatbot_response_df.loc[:, 'date'] = pd.to_datetime(chatbot_response_df['date'])
+    chatbot_response_df.loc[:, 'year'] = chatbot_response_df['date'].dt.year
     chatbot_response_df = chatbot_response_df[['trail', 'year']]
     return chatbot_response_df

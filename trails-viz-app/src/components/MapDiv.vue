@@ -97,9 +97,9 @@ L.Icon.Default.prototype.options.iconSize = [13, 20];
 L.Icon.Default.prototype.options.shadowSize = [20, 20];
 
 // Update icon URL to use the SVG
-let IconSuper = L.Icon.extend({
-  options: L.Icon.Default.prototype.options,
-});
+// let IconSuper = L.Icon.extend({
+//   options: L.Icon.Default.prototype.options,
+// });
 
 const defaultStyle = {
   color: "#C04000", //EC5800
@@ -253,12 +253,12 @@ export default {
     self.mapDiv = mapDiv;
 
     EventBus.$on("top-bar:site-selected", self.selectSite);
-    EventBus.$on("top-bar:site-search-results", self.searchSite); // David over here
+    EventBus.$on("top-bar:site-search-results", self.searchSite);
   },
   beforeDestroy() {
     let self = this;
     EventBus.$off("top-bar:site-selected", self.selectSite);
-    EventBus.$off("top-bar:site-search-results", self.searchSite); // David over here
+    EventBus.$off("top-bar:site-search-results", self.searchSite);
   },
   methods: {
     removeLegend() {
@@ -271,7 +271,7 @@ export default {
       if (this.legend === null) {
         this.legend = L.control({ position: "bottomright" });
 
-        this.legend.onAdd = function(map) {
+        this.legend.onAdd = function() {
           // Create a container for your legend
           const div = L.DomUtil.create("div", "info legend");
           div.innerHTML = `
@@ -481,12 +481,12 @@ export default {
     // Group geoJSON by site
     groupGeoJsonBySite: function(geoJsonData) {
       let siteGroupsGeoJson = {};
-      const selectedProjectCode = this.$store.getters.getSelectedProjectCode; //project code
+      // const selectedProjectCode = this.$store.getters.getSelectedProjectCode; //project code
       geoJsonData.features.forEach((feature) => {
         const siteid = feature.properties.siteid;
         const trailName = feature.properties.Trail_name;
-        const prjctCode = feature.properties.Prjct_code;
-        const prjctCodeList = prjctCode.split(",").map((code) => code.trim()); // checks if site is in project
+        // const prjctCode = feature.properties.Prjct_code;
+        // const prjctCodeList = prjctCode.split(",").map((code) => code.trim()); // checks if site is in project
         // if (prjctCodeList.includes(selectedProjectCode)) {
         if (!(siteid in siteGroupsGeoJson)) {
           siteGroupsGeoJson[siteid] = {
@@ -504,7 +504,6 @@ export default {
     // Add basic sites layer
     initializeSitesLayer: function(siteGroupsGeoJson, projectSites) {
       Object.entries(siteGroupsGeoJson).forEach(([, site]) => {
-        const siteid = site.siteid;
         const isDuplicate =
           Object.values(siteGroupsGeoJson).filter((s) => s.name === site.name)
             .length > 1;
