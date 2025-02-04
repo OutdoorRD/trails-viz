@@ -4,6 +4,7 @@ from trailsvizapi.repository.projects_and_sites import get_project_sites
 import pandas as pd
 import numpy as np
 
+
 CONFIDENCE_LEVEL = 1.96
 
 
