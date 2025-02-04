@@ -10,7 +10,10 @@ def get_project_sites(project_group):
 def get_project_from_site(siteid):
     allsites = get_from_data_source('ALLSITES_DF')
     site = allsites[allsites['siteid'] == siteid]
-    return site[['Prjct_code']].iat[0, 0]
+    project_code = site[['Prjct_code']].iat[0, 0]
+    project_list = [code.strip() for code in project_code.split(',')
+                    ] if ',' in project_code else [project_code.strip()]
+    return project_list
 
 
 def get_project_readme(readme_type, project=None):

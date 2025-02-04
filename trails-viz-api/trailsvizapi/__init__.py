@@ -15,4 +15,5 @@ from trailsvizapi.controller.estimates import *
 from trailsvizapi.controller.home_locations import *
 from trailsvizapi.controller.visitation import *
 from trailsvizapi.controller.users_controller import *
-from trailsvizapi.controller.party_characteristics import *
+from trailsvizapi.controller.chatbot_data import *
+from trailsvizapi.controller.map_chatbots import *
