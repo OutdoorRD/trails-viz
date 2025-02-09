@@ -72,9 +72,9 @@
                 </b-form-checkbox>
               </div>
             </div>
-            <!-- Include Total toggle -->
+            <!-- Show Total toggle -->
             <div class="d-flex align-items-center mb-2">
-              <span class="controls-label mr-2">Include Total:</span>
+              <span class="controls-label mr-2">Show Total:</span>
               <b-form-checkbox v-model="showTotal" class="mr-3">
                 Total
               </b-form-checkbox>
@@ -354,7 +354,7 @@ export default {
       };
 
       data.forEach((item) => {
-        const { characteristic, value, year } = item;
+        const { characteristic, year, counts } = item;
         if (year === "Total") {
           if (!this.showTotal) return;
         } else {
@@ -363,9 +363,9 @@ export default {
         if (!result[characteristic][year]) {
           result[characteristic][year] = {};
         }
-        Object.keys(item.counts).forEach((cat) => {
+        Object.keys(counts).forEach((cat) => {
           result[characteristic][year][cat] =
-            (result[characteristic][year][cat] || 0) + item.counts[cat];
+            (result[characteristic][year][cat] || 0) + counts[cat];
         });
       });
 
