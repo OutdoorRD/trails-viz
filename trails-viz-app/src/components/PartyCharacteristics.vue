@@ -56,37 +56,39 @@
       <b-row class="mt-4">
         <b-col sm="12">
           <h4 class="section-title">Distribution of Responses</h4>
-          <div class="controls-container d-flex align-items-center">
-            <span class="controls-label mr-2">Select Year(s):</span>
-            <div class="d-flex flex-wrap">
-              <b-form-checkbox
-                v-model="allYearsSelected"
-                class="mr-3"
-              >
-                All Years
+          <div class="controls-container d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <span class="controls-label mr-2">Select Year(s):</span>
+              <div class="d-flex flex-wrap">
+                <!-- Exclude the Total column from these checkboxes -->
+                <b-form-checkbox
+                  v-for="field in tableFields.slice(1).filter(field => field.key !== 'Total')"
+                  :key="field.key"
+                  :value="field.key"
+                  v-model="selectedYears"
+                  class="mr-3"
+                >
+                  {{ field.label }}
+                </b-form-checkbox>
+              </div>
+            </div>
+            <!-- Include Total toggle -->
+            <div class="d-flex align-items-center mb-2">
+              <span class="controls-label mr-2">Include Total:</span>
+              <b-form-checkbox v-model="showTotal" class="mr-3">
+                Total
               </b-form-checkbox>
-              <b-form-checkbox
-                v-for="field in tableFields.slice(1).filter(field => field.key !== 'total')"
-                :key="field.key"
-                :value="field.key"
-                v-model="selectedYears"
-                class="mr-3"
-              >
-                {{ field.label }}
-              </b-form-checkbox>
+            </div>
+            <!-- Display Mode -->
+            <div class="d-flex align-items-center">
+              <span class="controls-label mr-2">Display Mode:</span>
+              <b-form-radio-group v-model="displayMode" @change="updateCharts" class="radio-group">
+                <b-form-radio value="count">Count</b-form-radio>
+                <b-form-radio value="%">%</b-form-radio>
+              </b-form-radio-group>
             </div>
           </div>
         </b-col>
-        <b-col sm="12" class="mt-3">
-          <div class="controls-container d-flex align-items-center">
-            <span class="controls-label mr-2">Display Mode:</span>
-            <b-form-radio-group v-model="displayMode" @change="updateCharts" class="radio-group">
-              <b-form-radio value="count">Count</b-form-radio>
-              <b-form-radio value="%">%</b-form-radio>
-            </b-form-radio-group>
-          </div>
-        </b-col>
-
         <!-- Party People Chart -->
         <b-col sm="12" v-if="barDataFetchStatus.PartyPeople === 200">
           <div id="party-people-chart" class="chart-container"></div>
@@ -126,6 +128,7 @@ export default {
       projectName: null,
       projectCode: null,
       siteid: null,
+      showTotal: false,
 
       characteristics: ['TrailVisits', 'PartyPeople', 'PartyVehics', 'PeoplePerVehics'],
 
@@ -162,7 +165,6 @@ export default {
       // Display mode states
       displayMode: 'count', // 'count' or '%'
       selectedYears: [],
-      allYearsSelected: false,
 
       // Table
       tableFields: [],
@@ -230,17 +232,29 @@ export default {
         this.barDataFetchStatus[char] = response.status;
 
         if (response.status === 200) {
-          // Store in rawData
-          this.rawData[char] = response.data;
+          const aggregatedData = response.data[char];
+          const transformedData = [];
+          Object.keys(aggregatedData).forEach((year) => {
+            const counts = aggregatedData[year];
+            // Compute the total count for the year
+            const total = Object.values(counts).reduce((acc, count) => acc + count, 0);
+            transformedData.push({
+              characteristic: char,
+              year: year,
+              value: total,
+              counts: counts,
+            });
+          });
+          this.rawData[char] = transformedData;
         } else {
           this.rawData[char] = [];
         }
       } catch (err) {
-        // Fallback if error
         this.barDataFetchStatus[char] = err.response ? err.response.status : 500;
         this.rawData[char] = [];
       }
     },
+
 
     // ------------------------------------------
     // FETCH TIME-SERIES DATA FOR ALL CHARACTERISTICS
@@ -275,18 +289,6 @@ export default {
     // TABLE & DISTRIBUTION CHARTS
     // ------------------------------------------
     generateTableData(data) {
-      /**
-       * data is an array with multiple items:
-       * [
-       *    {
-       *      "date": "6/12/2022",
-       *      "year": 2022.0,
-       *      "trail": "34",
-       *      "characteristic": "PartyPeople",
-       *      "value": 4.0
-       *    }, ...
-       * ]
-       */
       const yearSet = new Set(data.map((item) => item.year));
       const characteristics = [...new Set(data.map((item) => item.characteristic))];
 
@@ -298,7 +300,6 @@ export default {
           label: year.toString(),
           isYear: true,
         })),
-        { key: "total", label: "Total" },
       ];
 
       // Initialize selectedYears with all years
@@ -311,33 +312,28 @@ export default {
         };
 
         [...yearSet].forEach((year) => {
-          const countForYear = data.filter(
-            (item) => item.characteristic === char && item.year === year
-          ).length;
+          const countForYear = data
+            .filter(
+              (item) =>
+                item.characteristic === char &&
+                item.year.toString() === year.toString()
+            )
+            .reduce((acc, item) => acc + item.value, 0);
           row[year] = countForYear;
         });
-
-        // Compute the total for each row
-        row.total = [...yearSet].reduce((sum, year) => sum + (row[year] || 0), 0);
         return row;
       });
 
       this.tableData = tableRows;
     },
 
+
     updateCharts() {
-      // 1) Build the aggregated object needed for bar charts
+
       const yearlyData = this.yearlyCounts(this.combinedRawData);
+      this.chartData = yearlyData;
 
-      // If "All Years" is selected, merge with aggregated "allYearsCounts"
-      if (this.allYearsSelected) {
-        const allYearsData = this.allYearsCounts(this.combinedRawData);
-        this.chartData = this.mergeYearlyAndAllYearsCounts(yearlyData, allYearsData);
-      } else {
-        this.chartData = yearlyData;
-      }
-
-      // 2) Render the bar charts, but only if their fetch status == 200
+      // Render the bar charts if their fetch status == 200
       if (this.barDataFetchStatus['PartyVehics'] === 200) {
         this._makePartyVehiclesChart(this.chartData);
       }
@@ -348,62 +344,34 @@ export default {
         this._makeTrailVisitsChart(this.chartData);
       }
     },
-
-    allYearsCounts(data) {
-      // Return the aggregated data for all years combined
-      const result = {
-        PartyVehics: {},
-        PartyPeople: {},
-        TrailVisits: {},
-      };
-
-      data.forEach((item) => {
-        const { characteristic, value } = item;
-        if (characteristic === 'PeoplePerVehics') return; // skip in bar chart
-
-        if (!result[characteristic]['all_years']) {
-          result[characteristic]['all_years'] = [];
-        }
-        result[characteristic]['all_years'].push(value);
-      });
-
-      // Group & Count
-      const aggregatedResult = {};
-      Object.keys(result).forEach((char) => {
-        aggregatedResult[char] = this.groupAndCount(result[char]['all_years']);
-      });
-
-      return aggregatedResult;
-    },
-
+  
     yearlyCounts(data) {
       const result = {
         PartyVehics: {},
         PartyPeople: {},
         TrailVisits: {},
+        PeoplePerVehics: {},
       };
 
       data.forEach((item) => {
         const { characteristic, value, year } = item;
-        if (characteristic === 'PeoplePerVehics') return; // skip in bar chart
-        if (!this.selectedYears.includes(year.toString())) return; // skip if not selected
-
-        if (!result[characteristic][year]) {
-          result[characteristic][year] = [];
+        if (year === "Total") {
+          if (!this.showTotal) return;
+        } else {
+          if (!this.selectedYears.includes(year.toString())) return;
         }
-        result[characteristic][year].push(value);
-      });
-
-      const aggregatedResult = {};
-      Object.keys(result).forEach((char) => {
-        aggregatedResult[char] = {};
-        Object.keys(result[char]).forEach((yr) => {
-          aggregatedResult[char][yr] = this.groupAndCount(result[char][yr]);
+        if (!result[characteristic][year]) {
+          result[characteristic][year] = {};
+        }
+        Object.keys(item.counts).forEach((cat) => {
+          result[characteristic][year][cat] =
+            (result[characteristic][year][cat] || 0) + item.counts[cat];
         });
       });
 
-      return aggregatedResult;
+      return result;
     },
+
 
     groupAndCount(valuesArray) {
       const counts = { '0': 0, '1': 0, '2': 0, '3+': 0 };
@@ -416,16 +384,6 @@ export default {
         else counts['3+']++;
       });
       return counts;
-    },
-
-    mergeYearlyAndAllYearsCounts(yearlyData, allYearsData) {
-      // Deep clone
-      const mergedData = JSON.parse(JSON.stringify(yearlyData));
-      Object.keys(allYearsData).forEach((char) => {
-        if (!mergedData[char]) mergedData[char] = {};
-        mergedData[char]['All Years'] = allYearsData[char];
-      });
-      return mergedData;
     },
 
     _makePartyVehiclesChart(data) {
@@ -458,8 +416,8 @@ export default {
       // 3) Build columns for c3
       const columns = [];
       const sortedKeys = Object.keys(data).sort((a, b) => {
-        if (a === 'All Years') return -1;
-        if (b === 'All Years') return 1;
+        if (a === 'Total') return -1;
+        if (b === 'Total') return 1;
         return parseInt(a) - parseInt(b);
       });
 
@@ -497,7 +455,10 @@ export default {
         },
         data: {
           columns: columns,
-          type: 'bar'
+          type: 'bar',
+          colors: {
+            'Total': '#FF5733'
+          }
         },
         tooltip: {
           order: null,
@@ -549,16 +510,6 @@ export default {
      * @param {string} title
      */
     _makeTimeSeriesChart(labels, featureData, htmlElemId, title) {
-      // If the server returns the data in shape:
-      // {
-      //   "PeoplePerVehics": {
-      //       "lower_bound": [...],
-      //       "mean": [...],
-      //       "upper_bound": [...]
-      //   },
-      //   "years": [...]
-      // }
-      // Then `featureData` is the object { lower_bound, mean, upper_bound }
       if (!featureData) return;
 
       c3.generate({
@@ -610,10 +561,10 @@ export default {
     selectedYears() {
       this.updateCharts();
     },
-    allYearsSelected() {
+    displayMode() {
       this.updateCharts();
     },
-    displayMode() {
+    showTotal() {
       this.updateCharts();
     }
   },
