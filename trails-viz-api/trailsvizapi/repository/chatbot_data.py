@@ -11,7 +11,7 @@ CONFIDENCE_LEVEL = 1.96
 def get_project_chatbot_data(project, characteristic):
     chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
     aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
-                                                   characteristic=characteristic)
+                                                    characteristic=characteristic)
     if aggregate_data is None:
         return Response(status=204)
     return jsonify(aggregate_data), 200
@@ -20,7 +20,7 @@ def get_project_chatbot_data(project, characteristic):
 def get_chatbot_data(siteid, characteristic):
     chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
     aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
-                                                   characteristic=characteristic)
+                                                    characteristic=characteristic)
     if aggregate_data is None:
         return Response(status=204)
     return jsonify(aggregate_data), 200
@@ -156,6 +156,7 @@ def _prep_chatbot_aggregate_counts(df_long, characteristic):
         if all_years_totals:
             result[characteristic]["Total"] = all_years_totals
         return result
+
 
 def _add_additional_features(df, feature):
     pass
