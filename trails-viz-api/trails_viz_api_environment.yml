@@ -1,4 +1,4 @@
-name: trails_viz_api
+name: trails-viz-api
 channels:
   - defaults
 dependencies:
