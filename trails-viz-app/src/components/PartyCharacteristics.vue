@@ -76,7 +76,7 @@
             <div class="d-flex align-items-center mb-2">
               <span class="controls-label mr-2">Show Total:</span>
               <b-form-checkbox v-model="showTotal" class="mr-3">
-                Total
+                Across Years
               </b-form-checkbox>
             </div>
             <!-- Display Mode -->
