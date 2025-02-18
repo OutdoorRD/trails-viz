@@ -25,7 +25,7 @@
       }
     },
     watch: {
-      selectedSource(newVal, oldVal) {
+      selectedSource() {
         this.renderHomeLocationsMap();
       }
     },

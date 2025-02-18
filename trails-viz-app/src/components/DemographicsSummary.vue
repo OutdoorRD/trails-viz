@@ -47,7 +47,7 @@
       }
     },
     watch: {
-      selectedSource(newVal, oldVal) {
+      selectedSource() {
         this.renderDemographicsSummary();
       }
     },
