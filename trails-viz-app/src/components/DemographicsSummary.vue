@@ -32,6 +32,7 @@
 
   export default {
     name: "DemographicsSummary",
+    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
@@ -43,6 +44,11 @@
         weightedMedianIncome: null,
         weightedMinorityPercentage: null,
         weightedSVI: null
+      }
+    },
+    watch: {
+      selectedSource(newVal, oldVal) {
+        this.renderDemographicsSummary();
       }
     },
     methods: {
@@ -69,9 +75,9 @@
 
         let url;
         if (vizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsDemographics';
         } else if (vizMode === VIZ_MODES.SITE) {
-          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsDemographics';
         }
 
         axios.get(url)

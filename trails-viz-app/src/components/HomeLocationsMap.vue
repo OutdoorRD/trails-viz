@@ -10,6 +10,7 @@
 
   export default {
     name: "HomeLocationsMap",
+    props: ["selectedSource"],
     data: function () {
       return {
         mapDiv: '',
@@ -21,6 +22,11 @@
         clickedCounty: '',
         level: 'state',  // allowed values are ['state', 'county', 'censusTract']
         activated: false
+      }
+    },
+    watch: {
+      selectedSource(newVal, oldVal) {
+        this.renderHomeLocationsMap();
       }
     },
     methods: {
@@ -86,10 +92,10 @@
         self.level = 'state';
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
           self.projectCode = self.$store.getters.getSelectedProjectCode;
-          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsState';
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsState';
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           self.siteid = self.$store.getters.getSelectedSite['siteid'];
-          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsState';
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsState';
         }
 
         axios.get(url)
@@ -107,9 +113,9 @@
         let url;
         self.level = 'county';
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsCounty/' + stateCode;
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsCounty/' + stateCode;
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
-          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsCounty/' + stateCode;
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsCounty/' + stateCode;
         }
         axios.get(url)
           .then(response => {

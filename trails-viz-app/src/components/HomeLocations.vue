@@ -9,6 +9,7 @@
 
   export default {
     name: "HomeLocations",
+    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
@@ -16,6 +17,11 @@
         siteid: null,
         homeLocations: null,
         randomSeed: null
+      }
+    },
+    watch: {
+      selectedSource(newVal, oldVal) {
+        this.renderTreeMap();
       }
     },
     methods: {
@@ -127,9 +133,9 @@
 
         let homeLocationsUrl;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocations'
+          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocations'
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
-          homeLocationsUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocations'
+          homeLocationsUrl = this.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocations'
         }
 
         axios.get(homeLocationsUrl)

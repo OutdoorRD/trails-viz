@@ -37,6 +37,13 @@
           </b-button-group>
         </b-col>
       </b-row>
+      <!-- Radio Button Row -->
+      <b-form-group label="Select Data Source:" class="mb-3" v-show="visibleTabGroup === 'visitorCharacteristics'">
+        <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary">
+          <b-form-radio value="chatbot">Chatbot</b-form-radio>
+          <b-form-radio value="flickr">Flickr</b-form-radio>
+        </b-form-radio-group>
+      </b-form-group>
       <b-row no-gutters>
         <b-col sm="12">
           <info-viewer
@@ -60,27 +67,14 @@
               title="Home Locations"
               @click="handleSubTabClick('Home Locations')"
             >
-              <home-locations ref="home-locations"></home-locations>
+              <home-locations ref="home-locations" :selected-source="selectedSource"></home-locations>
             </b-tab>
             <b-tab
               title="Home Locations Map"
               v-on:update:active="activateHomeLocationsMap"
               @click="handleSubTabClick('Home Locations Map')"
             >
-              <home-locations-map ref="home-locations-map"></home-locations-map>
-            </b-tab>
-            <b-tab
-              title="Chatbot Home Locations"
-              @click="handleSubTabClick('Chatbot Home Locations')"
-            >
-              <chatbot-home-locations ref="chatbot-home-locations"></chatbot-home-locations>
-            </b-tab>
-            <b-tab
-              title="Chatbot Home Locations Map"
-              v-on:update:active="activateChatbotHomeLocationsMap"
-              @click="handleSubTabClick('Chatbot Home Locations Map')"
-            >
-              <chatbot-home-locations-map ref="chatbot-home-locations-map"></chatbot-home-locations-map>
+              <home-locations-map ref="home-locations-map" :selected-source="selectedSource"></home-locations-map>
             </b-tab>
             <b-tab
               title="Demographics"
@@ -88,6 +82,7 @@
             >
               <demographics-summary
                 ref="demographics-summary"
+                :selected-source="selectedSource"
               ></demographics-summary>
             </b-tab>
             <b-tab
@@ -119,8 +114,6 @@ import HomeLocationsMap from "../components/HomeLocationsMap";
 import InfoViewer from "../components/InfoViewer";
 import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
-import ChatbotHomeLocations from "../components/ChatbotHomeLocations";
-import ChatbotHomeLocationsMap from "../components/ChatbotHomeLocationsMap";
 
 import { VIZ_MODES } from "../store/constants";
 import { EventBus } from "../event-bus";
@@ -134,6 +127,7 @@ export default {
       comparingTrailName: "",
       visibleTabGroup: "project-info",
       activeSubTab: "",
+      selectedSource: "chatbot",
     };
   },
   mounted() {
@@ -171,8 +165,6 @@ export default {
     PartyCharacteristics,
     HomeLocationsMap,
     HomeLocations,
-    ChatbotHomeLocations,
-    ChatbotHomeLocationsMap,
     TimeSeries,
     BarGraph,
     MapDiv,
@@ -212,8 +204,6 @@ export default {
           self.$refs["time-series"].renderTimeSeries();
           self.$refs["home-locations"].renderTreeMap();
           self.$refs["home-locations-map"].renderHomeLocationsMap();
-          self.$refs["chatbot-home-locations"].renderTreeMap();
-          self.$refs["chatbot-home-locations-map"].renderHomeLocationsMap();
           self.$refs["project-info"].renderInfo("project");
           self.$refs["visitation-info"].renderInfo("visitation");
           self.$refs["home-locations-info"].renderInfo("homeLocations");
@@ -238,8 +228,6 @@ export default {
       this.$refs["time-series"].renderTimeSeries();
       this.$refs["home-locations"].renderTreeMap();
       this.$refs["home-locations-map"].renderHomeLocationsMap();
-      this.$refs["chatbot-home-locations"].renderTreeMap();
-      this.$refs["chatbot-home-locations-map"].renderHomeLocationsMap();
       this.$refs["demographics-summary"].renderDemographicsSummary();
       this.$refs["party-characteristics"].renderPartyCharacteristics();
     },
@@ -274,13 +262,6 @@ export default {
       // tab was activated (true) or deactivated (false)
       if (event) {
         this.$refs["home-locations-map"].activateHomeLocationsMap();
-      }
-    },
-    activateChatbotHomeLocationsMap: function(event) {
-      // The event here is a boolean variable which tell if the
-      // tab was activated (true) or deactivated (false)
-      if (event) {
-        this.$refs["chatbot-home-locations-map"].activateHomeLocationsMap();
       }
     },
   },
