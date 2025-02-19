@@ -154,7 +154,7 @@ const highlightStyle = {
   color: "#8A00C4",
   weight: 1,
   fillColor: "#8A00C4",
-  fillOpacity: 0.2,
+  fillOpacity: 0.4,
 };
 
 const bubbleHighlightStyle = {

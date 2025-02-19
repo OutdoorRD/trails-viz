@@ -10,18 +10,20 @@ CONFIDENCE_LEVEL = 1.96
 
 def get_project_chatbot_data(project, characteristic):
     chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
-    if chatbot_data_df_long is None:
+    aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
+                                                    characteristic=characteristic)
+    if aggregate_data is None:
         return Response(status=204)
-    response_data = chatbot_data_df_long.to_json(orient='records')
-    return Response(response_data, status=200, mimetype='application/json')
+    return jsonify(aggregate_data), 200
 
 
 def get_chatbot_data(siteid, characteristic):
     chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
-    if chatbot_data_df_long is None:
+    aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
+                                                    characteristic=characteristic)
+    if aggregate_data is None:
         return Response(status=204)
-    response_data = chatbot_data_df_long.to_json(orient='records')
-    return Response(response_data, status=200, mimetype='application/json')
+    return jsonify(aggregate_data), 200
 
 
 def get_project_chatbot_data_yearly_statistics(project, characteristic):
@@ -122,6 +124,38 @@ def _prep_chatbot_aggregate_stats(df_long, characteristic):
         }
     }
     return response_data
+
+
+def _prep_chatbot_aggregate_counts(df_long, characteristic):
+    if df_long is None:
+        return None
+    grouped = (
+        df_long.groupby(['year', 'characteristic', 'value'])
+        .size()
+        .reset_index(name='count')
+    ).sort_values(by='year')
+    if grouped.empty:
+        return None
+    result = {}
+    all_years_totals = {}
+    for characteristic, char_group in grouped.groupby('characteristic'):
+        result[characteristic] = {}
+
+        for year, year_group in char_group.groupby('year'):
+            year_dict = {}
+            for value, count in zip(year_group['value'], year_group['count']):
+                value_str = str(int(value))
+                if value >= 3:
+                    year_dict["3+"] = year_dict.get("3+", 0) + count
+                    all_years_totals["3+"] = all_years_totals.get("3+", 0) + count
+                else:
+                    year_dict[value_str] = year_dict.get(value_str, 0) + count
+                    all_years_totals[value_str] = all_years_totals.get(value_str, 0) + count
+            result[characteristic][str(int(year))] = year_dict
+
+        if all_years_totals:
+            result[characteristic]["Total"] = all_years_totals
+        return result
 
 
 def _add_additional_features(df, feature):
