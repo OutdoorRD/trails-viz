@@ -20,7 +20,7 @@
       }
     },
     watch: {
-      selectedSource(newVal, oldVal) {
+      selectedSource() {
         this.renderTreeMap();
       }
     },

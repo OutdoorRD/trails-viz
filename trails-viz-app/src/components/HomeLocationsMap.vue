@@ -64,7 +64,8 @@
           let div = L.DomUtil.create('div');
           div.innerHTML +=
             "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden'>Back to State Level</a>" +
-            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>";
+            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>" + 
+            "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden'>Back to ZCTA Level</a>";;
 
           return div;
         };
@@ -75,6 +76,7 @@
         // add event listeners to switch back to higher level
         document.getElementById('backToState').addEventListener('click', () => self.renderHomeLocationsMap());
         document.getElementById('backToCounty').addEventListener('click', () => self._renderCountyLevel(self.clickedState));
+        document.getElementById('backToZCTA').addEventListener('click', () => self._renderZCTALevel(self.clickedState ,self.clickedCounty));
       },
       _getColors: function(d) {
         return d > 100 ? '#800026' :
@@ -123,6 +125,21 @@
             self._addLayersToMap();
           })
       },
+      _renderZCTALevel: function(stateCode, countyCode) {
+        let self = this;
+        let url;
+        self.level = 'zcta';
+        if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsZCTA/' + stateCode + '/' + countyCode;
+        } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsZCTA/' + stateCode + '/' + countyCode;
+        }
+        axios.get(url)
+          .then(response => {
+            self.homeLocationsGeoJson = response.data;
+            self._addLayersToMap();
+          })
+      },
       _renderCensusTractLevel: function(stateCode, countyCode) {
         let self = this;
         let url;
@@ -151,16 +168,25 @@
           };
         }
 
-        // show hide go back buttons
         if (self.level === 'state') {
           document.getElementById('backToState').classList.add('hl-hidden');
           document.getElementById('backToCounty').classList.add('hl-hidden');
-        } else if (self.level === 'county') {
+          document.getElementById('backToZCTA').classList.add('hl-hidden');
+        } 
+        else if (self.level === 'county') {
           document.getElementById('backToState').classList.remove('hl-hidden');
           document.getElementById('backToCounty').classList.add('hl-hidden');
-        } else if (self.level === 'censusTract') {
+          document.getElementById('backToZCTA').classList.add('hl-hidden');
+        }
+        else if (self.level === 'zcta') {
           document.getElementById('backToState').classList.add('hl-hidden');
           document.getElementById('backToCounty').classList.remove('hl-hidden');
+          document.getElementById('backToZCTA').classList.add('hl-hidden');
+        } 
+        else if (self.level === 'censusTract') {
+          document.getElementById('backToCounty').classList.add('hl-hidden');
+          document.getElementById('backToState').classList.add('hl-hidden');
+          document.getElementById('backToZCTA').classList.remove('hl-hidden');
         }
 
         function getTooltipHtml(layer) {
@@ -182,6 +208,9 @@
           }
           if (props.median_income) {
             toolTip += '<tr><td> Median Income</td><td>' + props.median_income + '</td></tr>';
+          }
+          if (props.housing_cost_burden) {
+            toolTip += '<tr><td> Housing Cost Burden</td><td>' + props.housing_cost_burden + '</td></tr>';
           }
           if (props.minority_percentage) {
             toolTip += '<tr><td> Percent Minority</td><td>' + props.minority_percentage + '</td></tr>';
@@ -206,13 +235,15 @@
             if (self.level === 'state') {
               self._renderCountyLevel(stateCode);
               self.clickedState = stateCode;
-            } else if (self.level === 'county') {
-              // Right now we only have census tract level info for NM and WA. change the array
-              // if new states are added or remove altogether if complete info is available
-              const statesWithCensusTractData = ['35', '53'];
-              if (!statesWithCensusTractData.includes(stateCode)) {
-                return
-              }
+            }
+            else if (self.level === 'county') {
+              const countyCode = props['county_code'];
+              // self._renderCensusTractLevel(stateCode, countyCode);
+              self._renderZCTALevel(stateCode, countyCode);
+              self.clickedState = stateCode;
+              self.clickedCounty = countyCode;
+            }
+            else if (self.level === 'zcta') {
               const countyCode = props['county_code'];
               self._renderCensusTractLevel(stateCode, countyCode);
               self.clickedState = stateCode;

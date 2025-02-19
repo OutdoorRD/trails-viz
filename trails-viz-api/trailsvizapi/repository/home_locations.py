@@ -41,7 +41,6 @@ def get_project_home_locations_df(project, source):
         home_locations = get_from_data_source('HOME_LOCATIONS_DF')
         project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
     elif source == 'chatbot':
-        print('entered')
         chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
         # Add a 'trail' feature that contains the project assoicated site id.
         # 'trail' value set to None if no site ids in 'SiteID' are not included in the list of project siteids.
@@ -50,7 +49,6 @@ def get_project_home_locations_df(project, source):
         # keep observations with non-missing 'trail' values
         chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
         project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
-
     return project_home_locations
 
 def get_site_home_locations_df(siteid, source):
@@ -65,7 +63,7 @@ def get_site_home_locations_df(siteid, source):
 
 
 def get_chatbot_home_locations_df(df):
-    home_locations = df.groupby(['County', 'State', 'Country', 'CountyFIPS', 'StateFIPS']).agg(
+    home_locations = df.groupby(['County', 'State', 'Country', 'CountyFIPS', 'StateFIPS', 'ZipCode']).agg(
         visit_days=('from', 'count'),
         visitors_unq=('from', 'nunique')
     ).reset_index()
@@ -74,7 +72,8 @@ def get_chatbot_home_locations_df(df):
         'CountyFIPS': 'county_code',
         'StateFIPS': 'state_code',
         'State': 'state',
-        'Country': 'country'
+        'Country': 'country',
+        'ZipCode': 'zcta'
     })
     return home_locations
 
@@ -149,11 +148,37 @@ def get_home_locations_by_census_tract(siteid, state_code, county_code):
     site_home_locations = site_home_locations[['tract', 'visit_days', 'visitors_unq']]
     site_home_census_data = census_tract_geographies.merge(site_home_locations, on='tract', how='inner')
 
-    svi_df = get_from_data_source('SVI_DF')
+    svi_df = get_from_data_source('SVI_TRACT_DF')
     svi_df = svi_df[svi_df['state_code'] == state_code]
     svi_df = svi_df.drop(columns=['state_code'])
     site_home_census_data = site_home_census_data.merge(svi_df, on='tract', how='inner')
 
+    return site_home_census_data
+
+#### NEXT STEPS
+"""
+Add API endpoints for get_project_home_locations_by_zcta and get_home_locations_by_zcta (might work, haven't tested yet)
+Add frontend call to zcta and create layer
+Go inside data_source_parameterized_workflow branch, update tract to also take in souce (similar to ZCTA kind of...) should not keep going in if no more data for deeper level, e.g. chatbot stop at zipcode
+When chatbot selected: we want County -> Zip Code 
+When flickr selected: we want County -> (maybe... see relationship files: Zip Code ->) Tract
+
+"""
+
+def get_home_locations_by_zcta(siteid, source, state_code, county_code):
+    zcta_geographies = get_from_data_source('ZCTA_DF')
+    state_and_county_code = str(state_code) + str(county_code)
+    zcta_geographies = zcta_geographies[zcta_geographies['state_and_county_code'] == state_and_county_code]
+
+    site_home_locations = get_site_home_locations_df(siteid, source)
+    site_home_locations = site_home_locations[(site_home_locations['state_code'] == state_code)
+                                         & (site_home_locations['county_code'] == county_code)]
+
+    site_home_locations = site_home_locations[['zcta', 'visit_days', 'visitors_unq']]  
+    site_home_census_data = zcta_geographies.merge(site_home_locations, on='zcta', how='inner')
+
+    svi_df = get_from_data_source('SVI_ZCTA_DF')
+    site_home_census_data = site_home_census_data.merge(svi_df, on='zcta', how='inner')
     return site_home_census_data
 
 
@@ -175,7 +200,7 @@ def get_project_home_locations_by_census_tract(project, state_code, county_code)
                                                             as_index=False)['visit_days', 'visitors_unq'].sum()
     project_home_census_data = census_tract_geographies.merge(project_home_locations, on='tract', how='inner')
 
-    svi_df = get_from_data_source('SVI_DF')
+    svi_df = get_from_data_source('SVI_TRACT_DF')
     svi_df = svi_df[svi_df['state_code'] == state_code]
     svi_df = svi_df.drop(columns=['state_code'])
     project_home_census_data = project_home_census_data.merge(svi_df, on='tract', how='inner')
@@ -183,9 +208,34 @@ def get_project_home_locations_by_census_tract(project, state_code, county_code)
     return project_home_census_data
 
 
+def get_project_home_locations_by_zcta(project, source, state_code, county_code):
+    zcta_geographies = get_from_data_source('ZCTA_DF')
+    state_and_county_code = str(state_code) + str(county_code)
+    zcta_geographies = zcta_geographies[zcta_geographies['state_and_county_code'] == state_and_county_code]
+    
+    project_home_locations = get_project_home_locations_df(project, source)
+    project_home_locations = project_home_locations[(project_home_locations['state_code'] == state_code)
+                                            & (project_home_locations['county_code'] == county_code)]
+    
+    if 'zcta' not in project_home_locations.columns:
+        return None
+    
+    # for each zipcode, we need to sum visit days and visitors_unq (multiple sites in each project)
+    project_home_locations = project_home_locations.groupby(by=['zcta'],
+                                                            as_index=False)['visit_days', 'visitors_unq'].sum()
+    
+    project_home_census_data = zcta_geographies.merge(project_home_locations, on='zcta', how='inner')
+
+    svi_df = get_from_data_source('SVI_ZCTA_DF')
+    # svi_df = svi_df[svi_df['state_code'] == state_code]
+    # svi_df = svi_df.drop(columns=['state_code'])
+    project_home_census_data = project_home_census_data.merge(svi_df, on='zcta', how='inner')
+    return project_home_census_data
+
+
 def get_demographic_summary(siteid, source):
     # if source == 'flickr':
-    svi_df = get_from_data_source('SVI_DF')
+    svi_df = get_from_data_source('SVI_TRACT_DF')
     home_locations = get_from_data_source('HOME_LOCATIONS_DF')
     project_list = get_project_from_site(siteid)
     census_tract_states = []
@@ -202,7 +252,7 @@ def get_demographic_summary(siteid, source):
 
 def get_project_demographic_summary(project, source):
     # if source == 'flickr':
-    svi_df = get_from_data_source('SVI_DF')
+    svi_df = get_from_data_source('SVI_TRACT_DF')
     home_locations = get_from_data_source('HOME_LOCATIONS_DF')
 
     project_sites = get_project_sites(project)
