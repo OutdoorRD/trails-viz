@@ -40,8 +40,8 @@
       <!-- Radio Button Row -->
       <b-form-group label="Select Data Source:" class="mb-3" v-show="visibleTabGroup === 'visitorCharacteristics'">
         <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary">
-          <b-form-radio value="chatbot">Chatbot</b-form-radio>
-          <b-form-radio value="flickr">Flickr</b-form-radio>
+          <b-form-radio value="chatbot">Chatbot (2018 - 2024)</b-form-radio>
+          <b-form-radio value="flickr">Flickr (2018)</b-form-radio>
         </b-form-radio-group>
       </b-form-group>
       <b-row no-gutters>
