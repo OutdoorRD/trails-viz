@@ -65,7 +65,7 @@
           div.innerHTML +=
             "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden'>Back to State Level</a>" +
             "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>" + 
-            "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden'>Back to ZCTA Level</a>";;
+            "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden'>Back to ZCTA Level</a>";
 
           return div;
         };
