@@ -165,10 +165,10 @@ def _prepare_home_locations_df():
             home_locations_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_HOME_LOCATIONS_FILE
             if Path(home_locations_file).exists():
                 if home_locations is not None:
-                    df = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
+                    df = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str, 'zcta': str})
                     home_locations = home_locations.append(df, sort=False)
                 else:
-                    home_locations = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
+                    home_locations = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str, 'zcta': str})
 
     # the census tract id is in the format STATEFP COUNTFP TRACTCE. Thus the state code
     # and county code can be extracted by doing a simple substring
@@ -218,7 +218,9 @@ def _prepare_census_tract_df():
     return census_tract_df
 
 def _prepare_zcta_df():
+    print('zcta geo start')
     zcta_df = _prepare_geographies_df(_CENSUS_ZCTA_GEOGRAPHIES_DIR)
+    print('zcta geo finish')
     return zcta_df
 
 

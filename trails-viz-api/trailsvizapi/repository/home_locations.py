@@ -61,11 +61,12 @@ def get_site_home_locations_df(siteid, source):
         site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     return site_home_locations
 
-
 def get_chatbot_home_locations_df(df):
     home_locations = df.groupby(['County', 'State', 'Country', 'CountyFIPS', 'StateFIPS', 'ZipCode']).agg(
         visit_days=('from', 'count'),
-        visitors_unq=('from', 'nunique')
+        visitors_unq=('from', 'nunique'),
+        age_sum=('Age', 'sum'),
+        age_count=('Age', 'count')
     ).reset_index()
     home_locations = home_locations.rename(columns={
         'County': 'county',
@@ -76,6 +77,17 @@ def get_chatbot_home_locations_df(df):
         'ZipCode': 'zcta'
     })
     return home_locations
+
+# def get_chatbot_home_locations_df(df):
+#     df = df.rename(columns={
+#         'County': 'county',
+#         'CountyFIPS': 'county_code',
+#         'StateFIPS': 'state_code',
+#         'State': 'state',
+#         'Country': 'country',
+#         'ZipCode': 'zcta'
+#     })
+#     return df
 
 
 def get_home_locations(siteid, source):
@@ -166,15 +178,19 @@ When flickr selected: we want County -> (maybe... see relationship files: Zip Co
 """
 
 def get_home_locations_by_zcta(siteid, source, state_code, county_code):
+    site_home_locations = get_site_home_locations_df(siteid, source)
+    site_home_locations = site_home_locations[(site_home_locations['state_code'] == state_code)
+                                         & (site_home_locations['county_code'] == county_code)]
+    
     zcta_geographies = get_from_data_source('ZCTA_DF')
     state_and_county_code = str(state_code) + str(county_code)
     zcta_geographies = zcta_geographies[zcta_geographies['state_and_county_code'] == state_and_county_code]
 
-    site_home_locations = get_site_home_locations_df(siteid, source)
-    site_home_locations = site_home_locations[(site_home_locations['state_code'] == state_code)
-                                         & (site_home_locations['county_code'] == county_code)]
+    keep_columns = ['zcta', 'visit_days', 'visitors_unq', 'state_code', 'county_code']
+    if 'reported_mean_age' in site_home_locations.columns:
+        keep_columns.append('reported_mean_age')
+    site_home_locations = site_home_locations[keep_columns]
 
-    site_home_locations = site_home_locations[['zcta', 'visit_days', 'visitors_unq']]  
     site_home_census_data = zcta_geographies.merge(site_home_locations, on='zcta', how='inner')
 
     svi_df = get_from_data_source('SVI_ZCTA_DF')
@@ -216,14 +232,30 @@ def get_project_home_locations_by_zcta(project, source, state_code, county_code)
     project_home_locations = get_project_home_locations_df(project, source)
     project_home_locations = project_home_locations[(project_home_locations['state_code'] == state_code)
                                             & (project_home_locations['county_code'] == county_code)]
-    
     if 'zcta' not in project_home_locations.columns:
         return None
     
-    # for each zipcode, we need to sum visit days and visitors_unq (multiple sites in each project)
-    project_home_locations = project_home_locations.groupby(by=['zcta'],
-                                                            as_index=False)['visit_days', 'visitors_unq'].sum()
-    
+    agg_dict = {
+        'visit_days': ('visit_days', 'sum'),
+        'visitors_unq': ('visitors_unq', 'sum'),
+    }
+    if {'age_sum', 'age_count'}.issubset(project_home_locations.columns):
+        agg_dict.update({
+            'age_sum': ('age_sum', 'sum'),
+            'age_count': ('age_count', 'sum')
+        })
+
+    project_home_locations = project_home_locations.groupby(['state_code', 'county_code', 'zcta']).agg(**agg_dict).reset_index()
+    if {'age_sum', 'age_count'}.issubset(project_home_locations.columns):
+        project_home_locations['reported_mean_age'] = (
+            project_home_locations['age_sum'] / project_home_locations['age_count']
+        )
+    # project_home_locations = project_home_locations.groupby(['zcta']).agg(
+    #     visit_days=('from', 'count'),
+    #     visitors_unq=('from', 'nunique'),
+    #     reported_mean_age=('Age', 'median')
+    # ).reset_index()
+
     project_home_census_data = zcta_geographies.merge(project_home_locations, on='zcta', how='inner')
 
     svi_df = get_from_data_source('SVI_ZCTA_DF')

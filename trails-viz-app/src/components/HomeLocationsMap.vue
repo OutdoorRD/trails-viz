@@ -121,6 +121,7 @@
         }
         axios.get(url)
           .then(response => {
+            // self.clickedState = stateCode;
             self.homeLocationsGeoJson = response.data;
             self._addLayersToMap();
           })
@@ -136,8 +137,12 @@
         }
         axios.get(url)
           .then(response => {
-            self.homeLocationsGeoJson = response.data;
-            self._addLayersToMap();
+            if (response.data && Array.isArray(response.data.features) && response.data.features.length !== 0) {
+              self.homeLocationsGeoJson = response.data;
+              self._addLayersToMap();
+              // self.clickedState = stateCode;
+              // self.clickedCounty = countyCode;
+            }
           })
       },
       _renderCensusTractLevel: function(stateCode, countyCode) {
@@ -151,8 +156,12 @@
         }
         axios.get(url)
           .then(response => {
-            self.homeLocationsGeoJson = response.data;
-            self._addLayersToMap();
+            if (response.data && Array.isArray(response.data.features) && response.data.features.length !== 0) {
+              self.homeLocationsGeoJson = response.data;
+              self._addLayersToMap();
+              // self.clickedState = stateCode;
+              // self.clickedCounty = countyCode;
+            }
           })
       },
       _addLayersToMap: function () {
@@ -194,29 +203,32 @@
           let toolTip = '<table class="home-location-tooltip">';
 
           if (props.state) {
-            toolTip += '<tr><td> State </td><td>' + props.state + '</td></tr>';
+            toolTip += '<tr><td> State </td><td> ' + props.state + '</td></tr>';
           }
           if (props.county) {
-            toolTip += '<tr><td> County</td><td>' + props.county + '</td></tr>';
+            toolTip += '<tr><td> County </td><td> ' + props.county + '</td></tr>';
           }
 
-          toolTip += '<tr><td> Visit Days</td><td>' + props.visit_days + '</td></tr>' +
-            '<tr><td> Unique Visitors</td><td>' + props.visitors_unq + '</td></tr>';
+          toolTip += '<tr><td> Visit Days </td><td> ' + props.visit_days + '</td></tr>' +
+            '<tr><td> Unique Visitors </td><td> ' + props.visitors_unq + '</td></tr>';
 
           if (props.population) {
-            toolTip += '<tr><td> Total Population</td><td>' + props.population + '</td></tr>';
+            toolTip += '<tr><td> Total Population </td><td> ' + props.population + '</td></tr>';
           }
           if (props.median_income) {
-            toolTip += '<tr><td> Median Income</td><td>' + props.median_income + '</td></tr>';
+            toolTip += '<tr><td> Median Income </td><td> ' + props.median_income + '</td></tr>';
           }
           if (props.housing_cost_burden) {
-            toolTip += '<tr><td> Housing Cost Burden</td><td>' + props.housing_cost_burden + '</td></tr>';
+            toolTip += '<tr><td> Housing Cost Burden </td><td> ' + props.housing_cost_burden + '</td></tr>';
           }
           if (props.minority_percentage) {
-            toolTip += '<tr><td> Percent Minority</td><td>' + props.minority_percentage + '</td></tr>';
+            toolTip += '<tr><td> Percent Minority </td><td> ' + props.minority_percentage + '</td></tr>';
           }
           if (props.svi) {
-            toolTip += '<tr><td> Social Vulnerability Index</td><td>' + parseFloat(Math.round(props.svi * 100)/ 100).toFixed(2) + '</td></tr>';
+            toolTip += '<tr><td> Social Vulnerability Index </td><td> ' + parseFloat(Math.round(props.svi * 100)/ 100).toFixed(2) + '</td></tr>';
+          }
+          if (props.reported_mean_age) {
+            toolTip += '<tr><td> Mean Age (Reported) </td><td> ' + parseFloat(Math.round(props.reported_mean_age * 100)/ 100).toFixed(2) + '</td></tr>';
           }
 
           toolTip += '</table>';
@@ -238,7 +250,6 @@
             }
             else if (self.level === 'county') {
               const countyCode = props['county_code'];
-              // self._renderCensusTractLevel(stateCode, countyCode);
               self._renderZCTALevel(stateCode, countyCode);
               self.clickedState = stateCode;
               self.clickedCounty = countyCode;
@@ -246,6 +257,7 @@
             else if (self.level === 'zcta') {
               const countyCode = props['county_code'];
               self._renderCensusTractLevel(stateCode, countyCode);
+
               self.clickedState = stateCode;
               self.clickedCounty = countyCode;
             }
