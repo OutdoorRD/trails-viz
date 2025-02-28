@@ -5,7 +5,7 @@
         ref="map-div"
         id="mapDiv"
         :visible-tab-group="visibleTabGroup"
-        :active-sub-tab="activeSubTab"
+        :selected-source="selectedSource"
       ></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
@@ -38,12 +38,15 @@
         </b-col>
       </b-row>
       <!-- Radio Button Row -->
-      <b-form-group label="Select Data Source:" class="mb-3" v-show="visibleTabGroup === 'visitorCharacteristics'">
-        <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary">
+      <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics'">
+        <label class="mr-2 font-weight-bold">Select Data Source:</label>
+        <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary" size="sm">
           <b-form-radio value="chatbot">Chatbot (2018 - 2024)</b-form-radio>
-          <b-form-radio value="flickr">Flickr (2018)</b-form-radio>
+          <b-form-radio value="flickr" :disabled="activeSubTab === 'Party Characteristics'">
+            Flickr (2005 - 2019)
+          </b-form-radio>
         </b-form-radio-group>
-      </b-form-group>
+    </b-form>
       <b-row no-gutters>
         <b-col sm="12">
           <info-viewer
@@ -62,7 +65,7 @@
             </b-tab>
           </b-tabs>
 
-          <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'">
+          <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'" class="tab-group">
             <b-tab
               title="Home Locations"
               @click="handleSubTabClick('Home Locations')"
@@ -256,6 +259,12 @@ export default {
     },
     handleSubTabClick(subTabName) {
       this.activeSubTab = subTabName;
+      if (subTabName === 'Party Characteristics') {
+        this.selectedSource = 'chatbot';
+      }
+    },
+    handleSelectedSource(selectedSource) {
+      this.selectedSource = selectedSource
     },
     activateHomeLocationsMap: function(event) {
       // The event here is a boolean variable which tell if the
@@ -293,5 +302,9 @@ export default {
 .app-button {
   color: #6c757d;
   background-color: #e9ecef;
+}
+
+.tab-group {
+  font-size: 0.95rem;
 }
 </style>

@@ -34,7 +34,3 @@ export const VIZ_MODES = {
   SITE: 'site',
   COMPARE: 'compare',
 };
-
-export const TAB_CONFIG = {
-  chatbotMapTabs: ['Party Characteristics', 'Chatbot Home Locations', 'Chatbot Home Locations Map']
-}

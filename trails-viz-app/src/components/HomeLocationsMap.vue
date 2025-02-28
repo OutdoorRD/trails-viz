@@ -26,7 +26,15 @@
     },
     watch: {
       selectedSource() {
-        this.renderHomeLocationsMap();
+        if (this.level === 'state') {
+          this.renderHomeLocationsMap();
+        } else if (this.level === 'county') {
+          this._renderCountyLevel(this.clickedState);
+        } else if (this.level === 'zcta') {
+          this._renderZCTALevel(this.clickedState, this.clickedCounty);
+        } else if (this.level === 'censusTract') {
+          this._renderCensusTractLevel(this.clickedState, this.clickedCounty, this.clickedZCTA);
+        }
       }
     },
     methods: {
@@ -63,10 +71,9 @@
         switchOptions.onAdd = function() {
           let div = L.DomUtil.create('div');
           div.innerHTML +=
-            "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden'>Back to State Level</a>" +
-            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden'>Back to County Level</a>" + 
-            "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden'>Back to ZCTA Level</a>";
-
+            "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to State Level</a>" +
+            "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to County Level</a>" + 
+            "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to ZCTA Level</a>";
           return div;
         };
 
@@ -121,11 +128,17 @@
         }
         axios.get(url)
           .then(response => {
-            // self.clickedState = stateCode;
-            self.homeLocationsGeoJson = response.data;
-            self._addLayersToMap();
+            // Check if response has data
+            if (response.data && Array.isArray(response.data.features) && response.data.features.length !== 0) {
+              self.homeLocationsGeoJson = response.data;
+              self._addLayersToMap();
+            } else {
+              self.level = 'state';
+              self.renderHomeLocationsMap();
+            }
           })
       },
+
       _renderZCTALevel: function(stateCode, countyCode) {
         let self = this;
         let url;
@@ -137,32 +150,37 @@
         }
         axios.get(url)
           .then(response => {
+            // If data is present, render
             if (response.data && Array.isArray(response.data.features) && response.data.features.length !== 0) {
               self.homeLocationsGeoJson = response.data;
               self._addLayersToMap();
-              // self.clickedState = stateCode;
-              // self.clickedCounty = countyCode;
+            } else {
+              // If empty, revert to county
+              self.level = 'county';
+              self._renderCountyLevel(stateCode);
             }
           })
       },
-      _renderCensusTractLevel: function(stateCode, countyCode) {
+
+      _renderCensusTractLevel: function(stateCode, countyCode, zctaCode) {
         let self = this;
         let url;
         self.level = 'censusTract';
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode;
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode + '/' + zctaCode;
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
-          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode;
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode + '/' + zctaCode;
         }
         axios.get(url)
           .then(response => {
             if (response.data && Array.isArray(response.data.features) && response.data.features.length !== 0) {
               self.homeLocationsGeoJson = response.data;
               self._addLayersToMap();
-              // self.clickedState = stateCode;
-              // self.clickedCounty = countyCode;
+            } else {
+              self.level = 'zcta';
+              self._renderZCTALevel(stateCode, countyCode);
             }
-          })
+          });
       },
       _addLayersToMap: function () {
         let self = this;
@@ -256,10 +274,11 @@
             }
             else if (self.level === 'zcta') {
               const countyCode = props['county_code'];
-              self._renderCensusTractLevel(stateCode, countyCode);
-
+              const zctaCode = props['zcta']
+              self._renderCensusTractLevel(stateCode, countyCode, zctaCode);
               self.clickedState = stateCode;
               self.clickedCounty = countyCode;
+              self.clickedZCTA = zctaCode;
             }
           });
         self.visibleLayer.addTo(self.mapDiv);
@@ -295,4 +314,5 @@
   #mapHomeLocations {
     height: 72vh;
   }
+
 </style>
