@@ -169,8 +169,8 @@ def get_home_locations_by_zcta(siteid, source, state_code, county_code):
                                               & (site_home_locations['county_code'] == county_code)]
 
     zcta_geographies = get_from_data_source('ZCTA_DF')
-    state_and_county_code = str(state_code) + str(county_code)
-    zcta_geographies = zcta_geographies[zcta_geographies['state_and_county_code'] == state_and_county_code]
+    st_county = str(state_code) + str(county_code)
+    zcta_geographies = zcta_geographies[zcta_geographies['st_county'] == st_county]
 
     keep_columns = ['zcta', 'visit_days', 'visitors_unq', 'state_code', 'county_code']
     if 'reported_mean_age' in site_home_locations.columns:
@@ -219,8 +219,8 @@ def get_project_home_locations_by_census_tract(project, source, state_code, coun
 
 def get_project_home_locations_by_zcta(project, source, state_code, county_code):
     zcta_geographies = get_from_data_source('ZCTA_DF')
-    state_and_county_code = str(state_code) + str(county_code)
-    zcta_geographies = zcta_geographies[zcta_geographies['state_and_county_code'] == state_and_county_code]
+    st_county = str(state_code) + str(county_code)
+    zcta_geographies = zcta_geographies[zcta_geographies['st_county'] == st_county]
     project_home_locations = get_project_home_locations_df(project, source)
     project_home_locations = project_home_locations[(project_home_locations['state_code'] == state_code)
                                                     & (project_home_locations['county_code'] == county_code)]

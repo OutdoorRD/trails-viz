@@ -180,16 +180,17 @@ def _prepare_home_locations_df():
 
 
 def _prepare_geographies_df(root):
-    geographies_df = None
+    geographies_list = []
     for item in os.listdir(root):
-        if item.endswith('.geojson'):
-            geojson_file = root + item
-            if geographies_df is None:
-                geographies_df = gpd.read_file(geojson_file)
-            else:
-                geographies_df = geographies_df.append(gpd.read_file(geojson_file), sort=False)
+        file_path = os.path.join(root, item)
+        # Check if the file is a .geojson or .shp
+        if item.endswith('.geojson') or item.endswith('.shp'):
+            gdf = gpd.read_file(file_path)
+            geographies_list.append(gdf)
+    assert geographies_list
+    # Combine all GeoDataFrames
+    geographies_df = gpd.GeoDataFrame(pd.concat(geographies_list, ignore_index=True, sort=False))
 
-    assert geographies_df is not None
     return geographies_df
 
 
