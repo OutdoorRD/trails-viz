@@ -33,7 +33,6 @@ def _treefy_home_locations(id_, home_locations):
 
 
 def get_project_home_locations_df(project, source):
-    print('source', source)
     project_sites = get_project_sites(project)
     project_site_ids = set(project_sites['siteid'].drop_duplicates())
     if source == 'flickr':
