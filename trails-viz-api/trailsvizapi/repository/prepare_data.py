@@ -209,18 +209,12 @@ def _prepare_counties_df():
 
 def _prepare_census_tract_df():
     census_tract_df = _prepare_geographies_df(_CENSUS_TRACT_GEOGRAPHIES_DIR)
-
-    # keep only required columns
-    census_tract_df = census_tract_df[['STATEFP', 'COUNTYFP', 'GEOID', 'geometry']]
-    census_tract_df.rename(columns={'STATEFP': 'state_code',
-                                    'COUNTYFP': 'county_code',
-                                    'GEOID': 'tract'}, inplace=True)
+    census_tract_df = census_tract_df[['zcta', 'fips', 'geometry']]
     return census_tract_df
 
+
 def _prepare_zcta_df():
-    print('zcta geo start')
     zcta_df = _prepare_geographies_df(_CENSUS_ZCTA_GEOGRAPHIES_DIR)
-    print('zcta geo finish')
     return zcta_df
 
 
@@ -238,9 +232,10 @@ def _prepare_svi_df(geographic_level):
     elif geographic_level == 'ZCTA':
         _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "zcta/")
         renamed_columns['FIPS'] = 'zcta'
-    elif geographic_level == 'COUNTY':
-        _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "county/")    
-        renamed_columns['FIPS'] = 'county'
+    # currently dashboard does not use county level SVI
+    # elif geographic_level == 'COUNTY':
+    #     _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "county/")
+    #     renamed_columns['FIPS'] = 'county'
     # read the SVI data and merge to it
     svi_df = None
     for item in os.listdir(_SVI_DIR_LEVEL):
@@ -250,13 +245,11 @@ def _prepare_svi_df(geographic_level):
                 svi_df = pd.read_csv(file, dtype={'ST': str, 'FIPS': str})
             else:
                 svi_df = svi_df.append(pd.read_csv(file, dtype={'ST': str, 'FIPS': str}), sort=False)
-
-
-    # Conditionally choose 'EP_PCI' if present, otherwise 'E_HBURD'
+    # Conditionally choose 'EP_PCI' if present, otherwise 'EP_HBURD'
     if 'EP_PCI' in svi_df.columns:
         renamed_columns['EP_PCI'] = 'median_income'
-    elif 'E_HBURD' in svi_df.columns:
-        renamed_columns['E_HBURD'] = 'housing_cost_burden'
+    elif 'EP_HBURD' in svi_df.columns:
+        renamed_columns['EP_HBURD'] = 'housing_cost_burden'
     # Select only columns that exist in the DataFrame
     existing_cols = [col for col in renamed_columns.keys() if col in svi_df.columns]
     # Narrow down the DataFrame to these columns
@@ -302,7 +295,8 @@ def get_from_data_source(key):
         DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
         DATA_SOURCE['ZCTA_DF'] = _prepare_zcta_df()
         DATA_SOURCE['SVI_TRACT_DF'] = _prepare_svi_df(geographic_level='TRACT')
-        DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
+        # currently dashboard does not use county level SVI
+        # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
         DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
     return DATA_SOURCE[key]
