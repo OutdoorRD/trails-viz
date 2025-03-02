@@ -1,5 +1,10 @@
 <template>
-  <p v-html="compiledMarkdown"></p>
+  <div>
+    <div v-if="loading">
+      Loading, please wait...
+    </div>
+    <p v-else v-html="compiledMarkdown"></p>
+  </div>
 </template>
 
 <script>
@@ -12,11 +17,13 @@
     data: function () {
       return {
         info: undefined,
-        compiledMarkdown: undefined
+        compiledMarkdown: undefined,
+        loading: false
       }
     },
     methods: {
       renderInfo: function (type) {
+        this.loading = true
         let self = this;
         let url;
         let projectCode = self.$store.getters.getSelectedProjectCode;
@@ -32,7 +39,12 @@
           .then(res => {
             self.info = res.data;
             this.compiledMarkdown = marked(this.info)
-          });
+          })
+          .catch(err => {
+          })
+          .finally(() => {
+            this.loading = false
+          })
       }
     }
   }
