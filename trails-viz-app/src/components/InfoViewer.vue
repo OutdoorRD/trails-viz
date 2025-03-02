@@ -40,7 +40,7 @@
             self.info = res.data;
             this.compiledMarkdown = marked(this.info)
           })
-          .catch(err => {
+          .catch(() => {
           })
           .finally(() => {
             this.loading = false
