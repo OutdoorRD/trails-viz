@@ -115,7 +115,7 @@
           if (x['housing_cost_burden'] > 80) {
             housingCostBurdenVisitDays['> 80%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 60) {
-            housingCostBurdenVisitDays['> 86%'] += x['visit_days']
+            housingCostBurdenVisitDays['> 60%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 40) {
             housingCostBurdenVisitDays['> 40%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 20) {
