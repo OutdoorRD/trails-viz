@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="demographics-container">
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
     <b-row no-gutters>
       <b-col sm="6">
         <b-list-group>
@@ -43,7 +47,8 @@
         totalVisitDays: null,
         weightedHousingCostBurdenPercentage: null,
         weightedMinorityPercentage: null,
-        weightedSVI: null
+        weightedSVI: null,
+        loading: false,
       }
     },
     watch: {
@@ -67,6 +72,7 @@
       },
       renderDemographicsSummary: function () {
         let self = this;
+        self.loading = true
         let vizMode = self.$store.getters.getVizMode;
 
         self.projectName = self.$store.getters.getSelectedProjectName;
@@ -91,7 +97,10 @@
 
             self._calculateValues();
             self._makeCharts(housingCostBurdenPercentage, svi);
-          });
+          })
+          .finally(() => {
+            this.loading = false
+          })
       },
       _makeCharts: function (housingCostBurdenPercentage, svi) {
         let housingCostBurdenVisitDays = {
@@ -208,6 +217,11 @@
 </script>
 
 <style scoped>
+@import "../assets/styles/loading-spinner.css";
+  .demographics-container {
+    position: relative; /* so the overlay can be absolutely positioned */
+    min-height: 72vh;   /* or whatever is needed for your layout */
+  }
   .list-group-item {
     padding: 5px 10px 5px 10px;
   }

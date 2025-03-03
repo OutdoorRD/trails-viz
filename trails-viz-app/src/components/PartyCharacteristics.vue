@@ -1,4 +1,10 @@
 <template>
+  <div class="party-characteristics-container">
+  <!-- 1) Loading overlay -->
+  <div v-if="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading data...</p>
+  </div>
   <div>
     <!-- Number of Responses -->
     <div>
@@ -106,6 +112,7 @@
       </b-row>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
@@ -125,6 +132,7 @@ export default {
   data() {
     return {
       // Basic State
+      loading: false,
       projectName: null,
       projectCode: null,
       siteid: null,
@@ -180,7 +188,8 @@ export default {
     }
   },
   methods: {
-    async renderPartyCharacteristics() {
+    renderPartyCharacteristics() {
+      this.loading = true;
       this.projectName = this.$store.getters.getSelectedProjectName;
       this.projectCode = this.$store.getters.getSelectedProjectCode;
       this.siteid = this.$store.getters.getSelectedSite['siteid'];
@@ -189,100 +198,103 @@ export default {
       if (!this.projectCode && this.vizMode === VIZ_MODES.PROJECT) return;
       if (!this.siteid && this.vizMode !== VIZ_MODES.PROJECT) return;
 
-      // 1) Fetch bar (distribution) data for each characteristic
-      await this.fetchAllBarData();
-
-      // 2) Combine all bar data to build the table
-      this.generateTableData(this.combinedRawData);
-
-      // 3) Update the distribution charts
-      this.updateCharts();
-
-      // 4) Fetch time series data for each characteristic
-      await this.fetchAllTimeSeriesData();
-
-      // 5) Render the time-series charts
-      this.renderTimeSeriesCharts();
+      Promise.all([
+        this.fetchAllBarData(),
+        this.fetchAllTimeSeriesData()
+      ]).then(() => {
+        this.generateTableData(this.combinedRawData);
+        this.updateCharts();
+        this.renderTimeSeriesCharts();
+      })
+      .finally(() => {
+        this.loading = false;
+      });
     },
 
     // ------------------------------------------
     // FETCH BAR DATA FOR ALL CHARACTERISTICS
     // ------------------------------------------
-    async fetchAllBarData() {
-      const requests = this.characteristics.map((char) => this.fetchBarDataByCharacteristic(char));
-      await Promise.all(requests);
-
-      // Build "combinedRawData" from each characteristic's array
-      this.combinedRawData = [
-        ...this.rawData.PartyPeople,
-        ...this.rawData.PartyVehics,
-        ...this.rawData.TrailVisits,
-        ...this.rawData.PeoplePerVehics,
-      ];
+    fetchAllBarData: function() {
+      const requests = this.characteristics.map((char) =>
+        this.fetchBarDataByCharacteristic(char)
+      );
+      return Promise.all(requests).then(() => {
+        // Build "combinedRawData" from each characteristic's array
+        this.combinedRawData = [
+          ...this.rawData.PartyPeople,
+          ...this.rawData.PartyVehics,
+          ...this.rawData.TrailVisits,
+          ...this.rawData.PeoplePerVehics,
+        ];
+      });
     },
 
-    async fetchBarDataByCharacteristic(char) {
-      try {
-        const endpoint =
-          this.vizMode === VIZ_MODES.PROJECT
-            ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotData/${char}`
-            : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotData/${char}`;
 
-        const response = await axios.get(endpoint);
-        this.barDataFetchStatus[char] = response.status;
+    fetchBarDataByCharacteristic: function(char) {
+      const endpoint =
+        this.vizMode === VIZ_MODES.PROJECT
+          ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotData/${char}`
+          : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotData/${char}`;
 
-        if (response.status === 200) {
-          const aggregatedData = response.data[char];
-          const transformedData = [];
-          Object.keys(aggregatedData).forEach((year) => {
-            const counts = aggregatedData[year];
-            // Compute the total count for the year
-            const total = Object.values(counts).reduce((acc, count) => acc + count, 0);
-            transformedData.push({
-              characteristic: char,
-              year: year,
-              value: total,
-              counts: counts,
+      return axios
+        .get(endpoint)
+        .then((response) => {
+          this.barDataFetchStatus[char] = response.status;
+          if (response.status === 200) {
+            const aggregatedData = response.data[char];
+            const transformedData = [];
+            Object.keys(aggregatedData).forEach((year) => {
+              const counts = aggregatedData[year];
+              // Compute the total count for the year
+              const total = Object.values(counts).reduce((acc, count) => acc + count, 0);
+              transformedData.push({
+                characteristic: char,
+                year: year,
+                value: total,
+                counts: counts,
+              });
             });
-          });
-          this.rawData[char] = transformedData;
-        } else {
+            this.rawData[char] = transformedData;
+          } else {
+            this.rawData[char] = [];
+          }
+        })
+        .catch((err) => {
+          this.barDataFetchStatus[char] = err.response ? err.response.status : 500;
           this.rawData[char] = [];
-        }
-      } catch (err) {
-        this.barDataFetchStatus[char] = err.response ? err.response.status : 500;
-        this.rawData[char] = [];
-      }
+        });
     },
-
 
     // ------------------------------------------
     // FETCH TIME-SERIES DATA FOR ALL CHARACTERISTICS
     // ------------------------------------------
-    async fetchAllTimeSeriesData() {
-      const requests = this.characteristics.map((char) => this.fetchTimeSeriesDataByCharacteristic(char));
-      await Promise.all(requests);
+    fetchAllTimeSeriesData: function() {
+      const requests = this.characteristics.map((char) =>
+        this.fetchTimeSeriesDataByCharacteristic(char)
+      );
+      return Promise.all(requests);
     },
 
-    async fetchTimeSeriesDataByCharacteristic(char) {
-      try {
-        const endpoint =
-          this.vizMode === VIZ_MODES.PROJECT
-            ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotDataYearlyStatistics/${char}`
-            : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotDataYearlyStatistics/${char}`;
+    fetchTimeSeriesDataByCharacteristic: function(char) {
+      const endpoint =
+        this.vizMode === VIZ_MODES.PROJECT
+          ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotDataYearlyStatistics/${char}`
+          : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotDataYearlyStatistics/${char}`;
 
-        const response = await axios.get(endpoint);
-        this.timeSeriesFetchStatus[char] = response.status;
-
-        if (response.status === 200) {
-          this.timeSeriesData[char] = response.data;
-        } else {
+      return axios
+        .get(endpoint)
+        .then((response) => {
+          this.timeSeriesFetchStatus[char] = response.status;
+          if (response.status === 200) {
+            this.timeSeriesData[char] = response.data;
+          } else {
+            this.timeSeriesData[char] = null;
+          }
+        })
+        .catch((err) => {
+          this.timeSeriesFetchStatus[char] = err.response ? err.response.status : 500;
           this.timeSeriesData[char] = null;
-        }
-      } catch (err) {
-        this.timeSeriesFetchStatus[char] = err.response ? err.response.status : 500;
-        this.timeSeriesData[char] = null;
-      }
+        });
     },
 
     // ------------------------------------------
@@ -574,3 +586,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .party-characteristics-container {
+    position: relative;
+    min-height: 75vh; /* Enough height so overlay covers the entire area */
+  }
+ 
+</style>

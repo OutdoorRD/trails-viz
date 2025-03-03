@@ -68,7 +68,13 @@
         </v-card>
       </div>
 
-      <div class="map-div" ref="mapDiv"></div>
+      <div class="map-container">
+        <div class="map-div" ref="mapDiv"></div>
+        <div v-if="loading" class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading data...</p>
+        </div>
+      </div>
     </v-app>
   </div>
 </template>
@@ -188,6 +194,7 @@ export default {
       maxYear: undefined,
       legend: null,
       trailNamesInDropdown: [],
+      loading: false,
     };
   },
   computed: {
@@ -399,6 +406,7 @@ export default {
     },
 
     renderProjectSites: function() {
+      this.loading = true;
       let self = this;
       let projectSites = {};
       this.createPanes();
@@ -443,8 +451,10 @@ export default {
             self.initializeBubblesLayer(siteGroupsGeoJson);
           }
           self.$store.dispatch("setProjectSites", projectSites);
-        })
-      );
+        }))
+        .finally(() => {
+          this.loading = false;
+        });
     },
     createPanes: function() {
       this.mapDiv.createPane("basicSitesPane");

@@ -1,5 +1,11 @@
 <template>
-  <div id="chart" ref="chart"></div>
+  <div class="chart-container">
+    <div id="chart" ref="chart"></div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -16,7 +22,8 @@
         projectCode: null,
         siteid: null,
         homeLocations: null,
-        randomSeed: null
+        randomSeed: null,
+        loading: false
       }
     },
     watch: {
@@ -121,6 +128,7 @@
         return mergedTree
       },
       renderTreeMap: function () {
+        this.loading = true;
         // Initialize at this seed
         this.randomSeed = 12;
         let self = this;
@@ -142,6 +150,9 @@
           .then(response => {
             self.homeLocations = response.data;
             self._renderTreeMap();
+          })
+          .finally(() => {
+            self.loading = false;
           });
       },
       _renderTreeMap: function() {
@@ -215,6 +226,14 @@
 </script>
 
 <style scoped>
+@import "../assets/styles/loading-spinner.css";
+
+  .chart-container {
+    position: relative;
+    height: 72vh;
+  }
+
+
   #chart {
     height: 72vh;
     width: 100%;

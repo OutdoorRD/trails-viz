@@ -1,9 +1,13 @@
 <template>
-  <div>
-    <div v-if="loading">
-      Loading, please wait...
+  <div class="info-viewer-container">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
     </div>
-    <p v-else v-html="compiledMarkdown"></p>
+
+    <!-- Markdown Content -->
+    <div v-else class="markdown-content" v-html="compiledMarkdown"></div>
   </div>
 </template>
 
@@ -51,8 +55,9 @@
 </script>
 
 <style scoped>
-  p {
-    height: 75vh;
-    overflow: auto;
+  .info-viewer-container {
+    position: relative;
+    min-height: 75vh; /* Enough height so overlay covers the entire area */
   }
+ 
 </style>
