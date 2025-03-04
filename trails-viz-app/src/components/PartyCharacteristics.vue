@@ -384,20 +384,6 @@ export default {
       return result;
     },
 
-
-    groupAndCount(valuesArray) {
-      const counts = { '0': 0, '1': 0, '2': 0, '3+': 0 };
-      if (!Array.isArray(valuesArray)) return counts;
-
-      valuesArray.forEach((val) => {
-        if (val === 0) counts['0']++;
-        else if (val === 1) counts['1']++;
-        else if (val === 2) counts['2']++;
-        else counts['3+']++;
-      });
-      return counts;
-    },
-
     _makePartyVehiclesChart(data) {
       this._makeBarChart(data.PartyVehics, '#party-vehicles-chart', CHARACTERISTIC_DISPLAY_NAMES.PartyVehics);
     },
