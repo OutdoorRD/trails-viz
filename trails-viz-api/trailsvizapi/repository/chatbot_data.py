@@ -10,7 +10,11 @@ CONFIDENCE_LEVEL = 1.96
 
 def get_project_chatbot_data(project, characteristic):
     chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
-    aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
+    if characteristic == 'InfoSource':
+        aggregate_data = _prep_chatbot_aggregate_counts_from_list(df_long=chatbot_data_df_long,
+                                                            characteristic=characteristic)
+    else:
+        aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
                                                     characteristic=characteristic)
     if aggregate_data is None:
         return Response(status=204)
@@ -19,7 +23,11 @@ def get_project_chatbot_data(project, characteristic):
 
 def get_chatbot_data(siteid, characteristic):
     chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
-    aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
+    if characteristic == 'InfoSource':
+        aggregate_data = _prep_chatbot_aggregate_counts_from_list(df_long=chatbot_data_df_long,
+                                                                  characteristic=characteristic)
+    else:
+        aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
                                                     characteristic=characteristic)
     if aggregate_data is None:
         return Response(status=204)
@@ -100,6 +108,19 @@ def _prep_chatbot_site_long_df(siteid, characteristic):
     if chatbot_data_df_long.empty:
         return None
     return chatbot_data_df_long
+
+
+def _prep_chatbot_aggregate_counts_from_list(df_long, characteristic):
+    df_exploded = df_long.explode("value")
+    grouped = df_exploded.groupby(["year", "value"]).size().reset_index(name="count")
+    if grouped.empty:
+        return None
+    grouped = grouped.sort_values(by='year')
+    result = {characteristic: {}}
+    for year, group in grouped.groupby("year"):
+        source_counts = group.set_index("value")["count"].to_dict()
+        result[characteristic][str(int(year))] = source_counts
+    return result
 
 
 def _prep_chatbot_aggregate_stats(df_long, characteristic):
