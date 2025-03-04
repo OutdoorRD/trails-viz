@@ -744,11 +744,11 @@ export default {
 }
 
 .range-slider-container {
-  position: fixed;
-  bottom: 13vh;
-  left: 1vh;
+  position: absolute;
+  bottom: 19%;
+  left: 1%;
   z-index: 1000;
-  width: 30vw;
-  height: 4vh;
+  width: 50%;
+  height: 50px;
 }
 </style>
