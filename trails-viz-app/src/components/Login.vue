@@ -1,7 +1,7 @@
 <template>
   <b-row class="login-div" no-gutters>
     <b-col offset-xl="3" xl="6" offset-lg="3" lg="6" offset-md="2" md="8" sm="12">
-      <b-card header="Login to Social Trails" class="login-card">
+      <b-card header="Login to TrailTrends" class="login-card">
         <b-card-body>
           <b-form v-on:submit="login" v-on:reset="clear">
             <b-form-group label-for="userName">
