@@ -163,7 +163,9 @@
         let values = [];
         let colors = [];
         let worldLabel = 'World (' + data['visit_days'] + ' Visit Days)';
-        labels.push(worldLabel);
+        let usLabel = 'USA (' + data['visit_days'] + ' Visit Days)';
+        let topLabel = (self.selectedSource === 'flickr') ? worldLabel : usLabel;
+        labels.push(topLabel);
         values.push(data['visit_days']);
         parents.push('');
         colors.push(this._getRandomColor());
@@ -171,7 +173,7 @@
           let countryName = country['name'];
           labels.push(countryName);
           values.push(country['visit_days']);
-          parents.push(worldLabel);
+          parents.push(topLabel);
           colors.push(this._getRandomColor());
 
           for (let state of country['states']) {
