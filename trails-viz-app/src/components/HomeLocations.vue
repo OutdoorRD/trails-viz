@@ -1,5 +1,11 @@
 <template>
-  <div id="chart" ref="chart"></div>
+  <div class="chart-container">
+    <div id="chart" ref="chart"></div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -9,13 +15,20 @@
 
   export default {
     name: "HomeLocations",
+    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
         projectCode: null,
         siteid: null,
         homeLocations: null,
-        randomSeed: null
+        randomSeed: null,
+        loading: false
+      }
+    },
+    watch: {
+      selectedSource() {
+        this.renderTreeMap();
       }
     },
     methods: {
@@ -115,6 +128,7 @@
         return mergedTree
       },
       renderTreeMap: function () {
+        this.loading = true;
         // Initialize at this seed
         this.randomSeed = 12;
         let self = this;
@@ -127,15 +141,18 @@
 
         let homeLocationsUrl;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
-          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocations'
+          homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocations'
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
-          homeLocationsUrl = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocations'
+          homeLocationsUrl = this.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocations'
         }
 
         axios.get(homeLocationsUrl)
           .then(response => {
             self.homeLocations = response.data;
             self._renderTreeMap();
+          })
+          .finally(() => {
+            self.loading = false;
           });
       },
       _renderTreeMap: function() {
@@ -146,7 +163,9 @@
         let values = [];
         let colors = [];
         let worldLabel = 'World (' + data['visit_days'] + ' Visit Days)';
-        labels.push(worldLabel);
+        let usLabel = 'USA (' + data['visit_days'] + ' Visit Days)';
+        let topLabel = (self.selectedSource === 'flickr') ? worldLabel : usLabel;
+        labels.push(topLabel);
         values.push(data['visit_days']);
         parents.push('');
         colors.push(this._getRandomColor());
@@ -154,7 +173,7 @@
           let countryName = country['name'];
           labels.push(countryName);
           values.push(country['visit_days']);
-          parents.push(worldLabel);
+          parents.push(topLabel);
           colors.push(this._getRandomColor());
 
           for (let state of country['states']) {
@@ -209,6 +228,14 @@
 </script>
 
 <style scoped>
+@import "../assets/styles/loading-spinner.css";
+
+  .chart-container {
+    position: relative;
+    height: 72vh;
+  }
+
+
   #chart {
     height: 72vh;
     width: 100%;

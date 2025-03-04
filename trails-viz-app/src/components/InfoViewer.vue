@@ -1,5 +1,14 @@
 <template>
-  <p v-html="compiledMarkdown"></p>
+  <div class="info-viewer-container">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
+
+    <!-- Markdown Content -->
+    <div v-else class="markdown-content" v-html="compiledMarkdown"></div>
+  </div>
 </template>
 
 <script>
@@ -12,11 +21,13 @@
     data: function () {
       return {
         info: undefined,
-        compiledMarkdown: undefined
+        compiledMarkdown: undefined,
+        loading: false
       }
     },
     methods: {
       renderInfo: function (type) {
+        this.loading = true
         let self = this;
         let url;
         let projectCode = self.$store.getters.getSelectedProjectCode;
@@ -32,15 +43,21 @@
           .then(res => {
             self.info = res.data;
             this.compiledMarkdown = marked(this.info)
-          });
+          })
+          .catch(() => {
+          })
+          .finally(() => {
+            this.loading = false
+          })
       }
     }
   }
 </script>
 
 <style scoped>
-  p {
-    height: 75vh;
-    overflow: auto;
+  .info-viewer-container {
+    position: relative;
+    min-height: 75vh; /* Enough height so overlay covers the entire area */
   }
+ 
 </style>

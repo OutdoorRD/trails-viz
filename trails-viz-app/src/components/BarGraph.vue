@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div class="bar-graph-container">
+    <!-- 1) Loading overlay -->
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
     <b-row no-gutters>
       <b-col sm="6">
         <b-form-group>
@@ -29,6 +34,7 @@
     name: "BarGraph",
     data: function() {
       return {
+        loading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -58,7 +64,7 @@
       renderDefaultGraph: function () {
         let self = this;
         let vizMode = self.$store.getters.getVizMode;
-
+        self.loading = true
         // If mode is compare, fetch the data for comparing sites,
         // render plot and return without overwriting current site data
         if (vizMode === VIZ_MODES.COMPARE) {
@@ -72,7 +78,10 @@
             self.comparingSiteMonthlyEstimates = monthlyEstimateRes.data;
 
             self.renderSelectedGraph();
-          }));
+          }))
+          .finally(() => {
+            self.loading = false
+          })
           return
         }
 
@@ -114,7 +123,10 @@
             }
           }
           self.renderSelectedGraph();
-        }));
+        }))
+        .finally(() => {
+          this.loading = false
+        })
       },
       _addLabelToArray: function(arr, label) {
         arr.unshift(label);
@@ -331,4 +343,9 @@
 
 <style scoped>
   @import "~c3/c3.css";
+
+  .bar-graph-container {
+    position: relative; /* so overlay can be absolutely placed on top */
+    min-height: 480px;  /* ensures there's enough space for the overlay */
+  }
 </style>

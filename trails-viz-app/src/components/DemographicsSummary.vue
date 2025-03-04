@@ -1,22 +1,26 @@
 <template>
-  <div>
+  <div class="demographics-container">
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
     <b-row no-gutters>
       <b-col sm="6">
         <b-list-group>
           <b-list-group-item class="list-group-item">Total Visit Days <span>{{totalVisitDays}}</span></b-list-group-item>
-          <b-list-group-item class="list-group-item">Weighted Median Income <span>${{weightedMedianIncome}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Weighted Housing Cost Burden <span>{{weightedHousingCostBurdenPercentage}}%</span></b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Weighted Minority Percentage <span>{{weightedMinorityPercentage}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Weighted Minority <span>{{weightedMinorityPercentage}}%</span></b-list-group-item>
           <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span>{{weightedSVI}}</span></b-list-group-item>
         </b-list-group>
       </b-col>
     </b-row>
     <b-row no-gutters>
       <b-col sm="12">
-        <div id="income-chart"></div>
+        <div id="housing-cost-burden-chart"></div>
       </b-col>
       <b-col sm="12">
         <div id="svi-chart"></div>
@@ -32,6 +36,7 @@
 
   export default {
     name: "DemographicsSummary",
+    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
@@ -40,9 +45,15 @@
         demographicData: null,
         totalPopulation: null,
         totalVisitDays: null,
-        weightedMedianIncome: null,
+        weightedHousingCostBurdenPercentage: null,
         weightedMinorityPercentage: null,
-        weightedSVI: null
+        weightedSVI: null,
+        loading: false,
+      }
+    },
+    watch: {
+      selectedSource() {
+        this.renderDemographicsSummary();
       }
     },
     methods: {
@@ -61,6 +72,7 @@
       },
       renderDemographicsSummary: function () {
         let self = this;
+        self.loading = true
         let vizMode = self.$store.getters.getVizMode;
 
         self.projectName = self.$store.getters.getSelectedProjectName;
@@ -69,9 +81,9 @@
 
         let url;
         if (vizMode === VIZ_MODES.PROJECT) {
-          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsDemographics';
         } else if (vizMode === VIZ_MODES.SITE) {
-          url = self.$apiEndpoint + '/sites/' + self.siteid + '/homeLocationsDemographics';
+          url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsDemographics';
         }
 
         axios.get(url)
@@ -80,36 +92,36 @@
 
             // There is a weired bug in either axios or Vue which changes the last element of the array
             // Thus using toString to make a copy of the array
-            let income = self.demographicData.filter(o => this._nanToZero(o['median_income']) > 0);
+            let housingCostBurdenPercentage = self.demographicData.filter(o => this._nanToZero(o['housing_cost_burden']) > 0);
             let svi = self.demographicData.filter(o => this._nanToZero(o['svi']) > 0);
 
             self._calculateValues();
-            self._makeCharts(income, svi);
-          });
+            self._makeCharts(housingCostBurdenPercentage, svi);
+          })
+          .finally(() => {
+            this.loading = false
+          })
       },
-      _makeCharts: function (income, svi) {
-        let incomeVisitDays = {
-          '> 0': 0,
-          '> 20000': 0,
-          '> 40000': 0,
-          '> 60000': 0,
-          '> 80000': 0,
-          '> 100000': 0
+      _makeCharts: function (housingCostBurdenPercentage, svi) {
+        let housingCostBurdenVisitDays = {
+          '> 0%': 0,
+          '> 20%': 0,
+          '> 40%': 0,
+          '> 60%': 0,
+          '> 80%': 0
         };
 
-        for (const x of income) {
-          if (x['median_income'] > 100000) {
-            incomeVisitDays['> 100000'] += x['visit_days']
-          } else if (x['median_income'] > 80000) {
-            incomeVisitDays['> 80000'] += x['visit_days']
-          } else if (x['median_income'] > 60000) {
-            incomeVisitDays['> 60000'] += x['visit_days']
-          } else if (x['median_income'] > 40000) {
-            incomeVisitDays['> 40000'] += x['visit_days']
-          } else if (x['median_income'] > 20000) {
-            incomeVisitDays['> 20000'] += x['visit_days']
+        for (const x of housingCostBurdenPercentage) {
+          if (x['housing_cost_burden'] > 80) {
+            housingCostBurdenVisitDays['> 80%'] += x['visit_days']
+          } else if (x['housing_cost_burden'] > 60) {
+            housingCostBurdenVisitDays['> 60%'] += x['visit_days']
+          } else if (x['housing_cost_burden'] > 40) {
+            housingCostBurdenVisitDays['> 40%'] += x['visit_days']
+          } else if (x['housing_cost_burden'] > 20) {
+            housingCostBurdenVisitDays['> 20%'] += x['visit_days']
           } else {
-            incomeVisitDays['> 0'] += x['visit_days']
+            housingCostBurdenVisitDays['> 0%'] += x['visit_days']
           }
         }
 
@@ -135,17 +147,17 @@
           }
         }
 
-        this._makeBarChart(incomeVisitDays, '#income-chart', 'Income');
+        this._makeBarChart(housingCostBurdenVisitDays, '#housing-cost-burden-chart', 'Housing Cost Burden');
         this._makeBarChart(sviVisitDays, '#svi-chart', 'Social Vulnerability Index');
 
       },
       _calculateValues: function () {
         let self = this;
-        let population = 0, income = 0, minorityPercentage = 0, svi = 0, totalVisitDays = 0;
+        let population = 0, housingCostBurdenPercentage = 0, minorityPercentage = 0, svi = 0, totalVisitDays = 0;
         for (const t of self.demographicData) {
           const visitDays = self._nanToZero(t['visit_days']);
           population += self._nanToZero(t['population']);
-          income += self._nanToZero(t['median_income']) * visitDays;
+          housingCostBurdenPercentage += self._nanToZero(t['housing_cost_burden']) * visitDays;
           minorityPercentage += self._nanToZero(t['minority_percentage']) * visitDays;
           svi += self._nanToZero(t['svi']) * visitDays;
           totalVisitDays += visitDays;
@@ -156,7 +168,7 @@
         }
         self.totalPopulation = population;
         self.totalVisitDays = totalVisitDays;
-        self.weightedMedianIncome = self._nDecimalPlaces(income / totalVisitDays, 0);
+        self.weightedHousingCostBurdenPercentage = self._nDecimalPlaces(housingCostBurdenPercentage / totalVisitDays, 2);
         self.weightedMinorityPercentage = self._nDecimalPlaces(minorityPercentage / totalVisitDays, 2);
         self.weightedSVI = self._nDecimalPlaces(svi / totalVisitDays, 3);
       },
@@ -205,6 +217,11 @@
 </script>
 
 <style scoped>
+@import "../assets/styles/loading-spinner.css";
+  .demographics-container {
+    position: relative; /* so the overlay can be absolutely positioned */
+    min-height: 72vh;   /* or whatever is needed for your layout */
+  }
   .list-group-item {
     padding: 5px 10px 5px 10px;
   }

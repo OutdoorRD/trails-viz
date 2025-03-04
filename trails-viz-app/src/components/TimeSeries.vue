@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="time-series-container">
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data...</p>
+    </div>
     <b-row no-gutters>
       <b-col class="text-right">
         <b-form-group>
@@ -33,6 +37,7 @@
     name: "TimeSeries",
     data: function() {
       return {
+        loading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -222,7 +227,7 @@
       },
       renderTimeSeries: function () {
         let self = this;
-
+        self.loading = true
         if (self.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
           let comparingSiteId = self.$store.getters.getComparingSite['siteid'];
           self.comparingSite = self.$store.getters.getComparingSite;
@@ -233,7 +238,10 @@
             self.comparingSiteMonthlyVisitation = monthlyVisitationRes.data;
             self.comparingSiteWeeklyVisitation = weeklyVisitationRes.data;
             self._renderTimeSeries();
-          }));
+          }))
+          .finally(() => {
+            this.loading = false
+          })
           return
         }
 
@@ -260,7 +268,10 @@
           self.monthlyVisitation = monthlyVisitationRes.data;
           self.weeklyVisitation = weeklyVisitationRes.data;
           self._renderTimeSeries();
-        }));
+        }))
+        .finally(() => {
+          this.loading = false
+        })
       },
       _renderTimeSeries: function() {
         let self = this;
@@ -360,6 +371,11 @@
 </script>
 
 <style scoped>
+  .time-series-container {
+    position: relative; /* ensures the overlay can be placed on top */
+    min-height: 50vh;   /* or however tall you want the container to be */
+  }
+
   .disclaimer {
     font-size: 12px;
   }

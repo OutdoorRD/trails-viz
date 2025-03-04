@@ -68,7 +68,13 @@
         </v-card>
       </div>
 
-      <div class="map-div" ref="mapDiv"></div>
+      <div class="map-container">
+        <div class="map-div" ref="mapDiv"></div>
+        <div v-if="loading" class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading data...</p>
+        </div>
+      </div>
     </v-app>
   </div>
 </template>
@@ -79,7 +85,6 @@ import axios from "axios";
 import { MAPBOX_CONSTS } from "../store/constants";
 import { EventBus } from "../event-bus";
 import * as turf from "@turf/turf";
-import { TAB_CONFIG } from "../store/constants";
 
 // The following two statements are required because of an issue with leaflet and webpack
 // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
@@ -102,14 +107,14 @@ L.Icon.Default.prototype.options.shadowSize = [20, 20];
 // });
 
 const defaultStyle = {
-  color: "#C04000", //EC5800
+  color: "#C04000",
   weight: 1,
   fillColor: "#C04000",
   fillOpacity: 0.2,
 };
 
 const solidDefaultStyle = {
-  color: "#EC5800", //EC5800
+  color: "#EC5800",
   weight: 1,
   fillColor: "#EC5800",
   fillOpacity: 0.2,
@@ -144,10 +149,10 @@ const compareStyle = {
 };
 
 const bubbleDefaultStyle = {
-  color: "#C04000", // Border color
-  weight: 1, // Border width
-  fillColor: "#C04000", // Fill color
-  fillOpacity: 0.2, // Transparency
+  color: "#C04000",
+  weight: 1,
+  fillColor: "#C04000",
+  fillOpacity: 0.2,
 };
 
 const highlightStyle = {
@@ -167,48 +172,47 @@ const bubbleHighlightStyle = {
 export default {
   name: "MapDiv",
   props: {
-    activeSubTab: {
-      type: String,
-      required: true,
-    },
     visibleTabGroup: {
       type: String,
       required: true,
     },
+    selectedSource: {
+      type: String,
+      required: true,
+    }
   },
   data: function() {
     return {
       dismissSecs: 5,
       dismissCountDown: 0,
       sitesLayer: [],
-      // chatbotSitesLayer : [],
       bubblesLayer: [],
-      // lastYearEstimates: undefined,
       chatbotResponseCounts: undefined,
       chatbotResData: [],
-      yearRange: [], // Default range
+      yearRange: [],
       minYear: undefined,
       maxYear: undefined,
       legend: null,
       trailNamesInDropdown: [],
+      loading: false,
     };
   },
   computed: {
     showChatbotMapCondition() {
       return (
         this.visibleTabGroup === "visitorCharacteristics" &&
-        TAB_CONFIG.chatbotMapTabs.includes(this.activeSubTab) &&
+        this.selectedSource === "chatbot" &&
         this.chatbotResData.length > 0
       );
     },
   },
   watch: {
-    activeSubTab() {
-      this.onTabChange();
-    },
     visibleTabGroup() {
       this.onTabChange();
     },
+    selectedSource() {
+      this.onTabChange();
+    }
   },
   mounted() {
     let self = this;
@@ -402,6 +406,7 @@ export default {
     },
 
     renderProjectSites: function() {
+      this.loading = true;
       let self = this;
       let projectSites = {};
       this.createPanes();
@@ -446,8 +451,10 @@ export default {
             self.initializeBubblesLayer(siteGroupsGeoJson);
           }
           self.$store.dispatch("setProjectSites", projectSites);
-        })
-      );
+        }))
+        .finally(() => {
+          this.loading = false;
+        });
     },
     createPanes: function() {
       this.mapDiv.createPane("basicSitesPane");
@@ -594,7 +601,6 @@ export default {
           const num_responses = this.chatbotResponseCounts[siteid] || 0;
           layer.eachLayer((circleMarker) => {
             if (circleMarker instanceof L.CircleMarker) {
-              // const siteid = circleMarker.feature.properties.siteid;
               const radius = Math.sqrt(num_responses) * 2;
               circleMarker.setRadius(radius);
               if (num_responses == 0) {
@@ -602,9 +608,6 @@ export default {
               } else {
                 circleMarker.setStyle({ fill: true, stroke: true });
               }
-              // circleMarker.bindTooltip(
-              //   `${trailName}: ${num_responses} responses`
-              // );
             }
           });
           layer.bindTooltip(`${trailName}: ${num_responses} responses`);
@@ -742,10 +745,10 @@ export default {
 
 .range-slider-container {
   position: absolute;
-  bottom: 19vh;
-  left: 1vh;
+  bottom: 19%;
+  left: 1%;
   z-index: 1000;
   width: 50%;
-  height: 4vh;
+  height: 50px;
 }
 </style>

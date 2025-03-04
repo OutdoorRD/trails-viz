@@ -17,6 +17,7 @@ _CHATBOT_DATA_FILE = 'chatbot_data.csv'
 _STATE_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/state/'
 _COUNTY_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/county/'
 _CENSUS_TRACT_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/census-tract/'
+_CENSUS_ZCTA_GEOGRAPHIES_DIR = config.DATA_FILES_ROOT + 'geographies/zcta/'
 _README_DIR = config.DATA_FILES_ROOT + 'readme/'
 _SVI_DIR = config.DATA_FILES_ROOT + 'SVI/'
 _CHATBOT_DIR = config.DATA_FILES_ROOT + 'chatbot/'
@@ -164,10 +165,10 @@ def _prepare_home_locations_df():
             home_locations_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_HOME_LOCATIONS_FILE
             if Path(home_locations_file).exists():
                 if home_locations is not None:
-                    df = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
+                    df = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str, 'zcta': str})
                     home_locations = home_locations.append(df, sort=False)
                 else:
-                    home_locations = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str})
+                    home_locations = pd.read_csv(home_locations_file, dtype={'siteid': str, 'tract': str, 'zcta': str})
 
     # the census tract id is in the format STATEFP COUNTFP TRACTCE. Thus the state code
     # and county code can be extracted by doing a simple substring
@@ -179,16 +180,17 @@ def _prepare_home_locations_df():
 
 
 def _prepare_geographies_df(root):
-    geographies_df = None
+    geographies_list = []
     for item in os.listdir(root):
-        if item.endswith('.geojson'):
-            geojson_file = root + item
-            if geographies_df is None:
-                geographies_df = gpd.read_file(geojson_file)
-            else:
-                geographies_df = geographies_df.append(gpd.read_file(geojson_file), sort=False)
+        file_path = os.path.join(root, item)
+        # Check if the file is a .geojson or .shp
+        if item.endswith('.geojson') or item.endswith('.shp'):
+            gdf = gpd.read_file(file_path)
+            geographies_list.append(gdf)
+    assert geographies_list
+    # Combine all GeoDataFrames
+    geographies_df = gpd.GeoDataFrame(pd.concat(geographies_list, ignore_index=True, sort=False))
 
-    assert geographies_df is not None
     return geographies_df
 
 
@@ -208,36 +210,51 @@ def _prepare_counties_df():
 
 def _prepare_census_tract_df():
     census_tract_df = _prepare_geographies_df(_CENSUS_TRACT_GEOGRAPHIES_DIR)
-
-    # keep only required columns
-    census_tract_df = census_tract_df[['STATEFP', 'COUNTYFP', 'GEOID', 'geometry']]
-    census_tract_df.rename(columns={'STATEFP': 'state_code',
-                                    'COUNTYFP': 'county_code',
-                                    'GEOID': 'tract'}, inplace=True)
+    census_tract_df = census_tract_df[['zcta', 'fips', 'geometry']]
     return census_tract_df
 
 
-def _prepare_svi_df():
+def _prepare_zcta_df():
+    zcta_df = _prepare_geographies_df(_CENSUS_ZCTA_GEOGRAPHIES_DIR)
+    return zcta_df
+
+
+def _prepare_svi_df(geographic_level):
+    # extract only required columns
+    renamed_columns = {
+        'ST': 'state_code',
+        'E_TOTPOP': 'population',
+        'EP_MINRTY': 'minority_percentage',
+        'RPL_THEMES': 'svi'
+    }
+    if geographic_level == 'TRACT':
+        _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "census-tract/")
+        renamed_columns['FIPS'] = 'tract'
+    elif geographic_level == 'ZCTA':
+        _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "zcta/")
+        renamed_columns['FIPS'] = 'zcta'
+    # currently dashboard does not use county level SVI
+    # elif geographic_level == 'COUNTY':
+    #     _SVI_DIR_LEVEL = os.path.join(_SVI_DIR, "county/")
+    #     renamed_columns['FIPS'] = 'county'
     # read the SVI data and merge to it
     svi_df = None
-    for item in os.listdir(_SVI_DIR):
+    for item in os.listdir(_SVI_DIR_LEVEL):
         if item.endswith('.csv'):
-            file = _SVI_DIR + item
+            file = _SVI_DIR_LEVEL + item
             if svi_df is None:
                 svi_df = pd.read_csv(file, dtype={'ST': str, 'FIPS': str})
             else:
                 svi_df = svi_df.append(pd.read_csv(file, dtype={'ST': str, 'FIPS': str}), sort=False)
-
-    # extract only required columns
-    renamed_columns = {
-        'ST': 'state_code',
-        'FIPS': 'tract',
-        'E_TOTPOP': 'population',
-        'EP_PCI': 'median_income',
-        'EP_MINRTY': 'minority_percentage',
-        'RPL_THEMES': 'svi'
-    }
-    svi_df = svi_df[list(renamed_columns.keys())]
+    # Conditionally choose 'EP_PCI' if present, otherwise 'EP_HBURD'
+    if 'EP_PCI' in svi_df.columns:
+        renamed_columns['EP_PCI'] = 'median_income'
+    elif 'EP_HBURD' in svi_df.columns:
+        renamed_columns['EP_HBURD'] = 'housing_cost_burden'
+    # Select only columns that exist in the DataFrame
+    existing_cols = [col for col in renamed_columns.keys() if col in svi_df.columns]
+    # Narrow down the DataFrame to these columns
+    svi_df = svi_df[existing_cols]
     svi_df.rename(columns=renamed_columns, inplace=True)
 
     assert svi_df is not None
@@ -277,6 +294,10 @@ def get_from_data_source(key):
         DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
         DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
         DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
-        DATA_SOURCE['SVI_DF'] = _prepare_svi_df()
+        DATA_SOURCE['ZCTA_DF'] = _prepare_zcta_df()
+        DATA_SOURCE['SVI_TRACT_DF'] = _prepare_svi_df(geographic_level='TRACT')
+        # currently dashboard does not use county level SVI
+        # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
+        DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
     return DATA_SOURCE[key]
