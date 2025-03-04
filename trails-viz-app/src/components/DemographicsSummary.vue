@@ -147,7 +147,7 @@
           }
         }
 
-        this._makeBarChart(housingCostBurdenVisitDays, '#housing-cost-burden-chart', 'Housing Cost Buden');
+        this._makeBarChart(housingCostBurdenVisitDays, '#housing-cost-burden-chart', 'Housing Cost Burden');
         this._makeBarChart(sviVisitDays, '#svi-chart', 'Social Vulnerability Index');
 
       },
