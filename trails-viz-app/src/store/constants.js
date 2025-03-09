@@ -34,3 +34,20 @@ export const VIZ_MODES = {
   SITE: 'site',
   COMPARE: 'compare',
 };
+
+export const DATA_SOURCES = {
+  'West Cascades': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Middle Fork': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  // 'Okanogan-Wenatchee Wilderness (Archived)': [],
+  // 'Okanogan-Wenatchee General Forest (Archived)': [],
+  'Northern New Mexico': ['Flickr (2005 - 2019)'],
+  'King County Parks': ['Chatbot (2018 - 2024)', 'Reveal (2023)'],
+  'US National Forests': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Mount Baker-Snoqualmie Wilderness': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'South Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  // 'Mount Baker-Snoqualmie General Forest': [],
+  'East Cascades': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Coronado': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Bridger-Teton': [] //should not show Visitor Characteristics
+}

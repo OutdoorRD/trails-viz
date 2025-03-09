@@ -4,8 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 const state = {
-  allProjects: undefined,
-  projectCodeToName: undefined,
+  allProjects: {},
+  projectCodeToName: {},
   selectedProjectName: '',
   selectedProjectCode: '',
   selectedProjectDataSources: [],

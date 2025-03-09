@@ -25,6 +25,7 @@
               >Visitation</b-button
             >
             <b-button
+              v-if="availableDataSources.length > 0"
               v-on:click="showSelectedTab('visitorCharacteristics')"
               class="app-button"
               v-bind:class="{
@@ -38,7 +39,19 @@
         </b-col>
       </b-row>
       <!-- Radio Button Row -->
-      <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics'">
+      <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics' && availableDataSources.length">
+        <label class="mr-2 font-weight-bold">Select Data Source:</label>
+        <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary" size="sm">
+          <b-form-radio 
+            v-for="source in availableDataSources" 
+            :key="source" 
+            :value="source.split(' ')[0].toLowerCase()"
+            :disabled="activeSubTab === 'Party Characteristics' && !source.toLowerCase().includes('chatbot')">
+            {{ source }}
+          </b-form-radio>
+        </b-form-radio-group>
+      </b-form>
+      <!-- <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics'">
         <label class="mr-2 font-weight-bold">Select Data Source:</label>
         <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary" size="sm">
           <b-form-radio value="chatbot">Chatbot (2018 - 2024)</b-form-radio>
@@ -46,7 +59,7 @@
             Flickr (2005 - 2019)
           </b-form-radio>
         </b-form-radio-group>
-    </b-form>
+      </b-form> -->
       <b-row no-gutters>
         <b-col sm="12">
           <info-viewer
@@ -118,20 +131,29 @@ import InfoViewer from "../components/InfoViewer";
 import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
 
-import { VIZ_MODES } from "../store/constants";
+import { VIZ_MODES, DATA_SOURCES } from "../store/constants";
 import { EventBus } from "../event-bus";
 
 export default {
   name: "Dashboard",
   data: function() {
+    const projectCode = this.$route.params.project;
+    const projectName = this.$store.getters.getProjectCodeToName[projectCode];
+    const sources = DATA_SOURCES[projectName] || [];
     return {
       breadcrumbItems: [],
       trailName: "",
       comparingTrailName: "",
       visibleTabGroup: "project-info",
       activeSubTab: "",
-      selectedSource: "chatbot",
+      selectedSource: sources.length > 0 ? sources[0].split(" ")[0].toLowerCase() : "",
     };
+  },
+  computed: {
+    availableDataSources() {
+      const projectCode = this.$route.params.project;
+      return DATA_SOURCES[this.$store.getters.getProjectCodeToName[projectCode]] || [];
+    }
   },
   mounted() {
     // This part of code has been duplicated from App

@@ -35,10 +35,7 @@ def _treefy_home_locations(id_, home_locations):
 def get_project_home_locations_df(project, source):
     project_sites = get_project_sites(project)
     project_site_ids = set(project_sites['siteid'].drop_duplicates())
-    if source == 'flickr':
-        home_locations = get_from_data_source('HOME_LOCATIONS_DF')
-        project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
-    elif source == 'chatbot':
+    if source == 'chatbot':
         chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
         # Add a 'trail' feature that contains the project assoicated site id.
         # 'trail' value set to None if no site ids in 'SiteID' are not included in the list of project siteids.
@@ -47,17 +44,21 @@ def get_project_home_locations_df(project, source):
         # keep observations with non-missing 'trail' values
         chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
         project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
+    else:
+        home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+        project_home_locations = home_locations[home_locations['siteid'].isin(project_site_ids)]
     return project_home_locations
 
 
 def get_site_home_locations_df(siteid, source):
-    if source == 'flickr':
-        home_locations = get_from_data_source('HOME_LOCATIONS_DF')
-        site_home_locations = home_locations[home_locations['siteid'] == siteid]
-    elif source == 'chatbot':
+
+    if source == 'chatbot':
         chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
         chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
         site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
+    else:
+        home_locations = get_from_data_source('HOME_LOCATIONS_DF')
+        site_home_locations = home_locations[home_locations['siteid'] == siteid]
     return site_home_locations
 
 
@@ -265,7 +266,7 @@ def get_project_demographic_summary(project, source):
         project_home_locations = project_home_locations.groupby(by=['zcta'], as_index=False).sum()
         svi_df = get_from_data_source('SVI_ZCTA_DF')
         demographics_data = project_home_locations.merge(svi_df, on='zcta', how='inner')
-    elif source == 'flickr':
+    else:
         project_home_locations = project_home_locations.groupby(by=['tract'], as_index=False).sum()
         svi_df = get_from_data_source('SVI_TRACT_DF')
         demographics_data = project_home_locations.merge(svi_df, on='tract', how='inner')
