@@ -36,7 +36,7 @@
         } else if (type === 'visitation') {
           url = self.$apiEndpoint + '/projects/' + projectCode + '/readme?type=VISITS'
         } else if (type === 'homeLocations') {
-          url = self.$apiEndpoint + '/readme?type=HOMELOCATIONS_INFO'
+          url = self.$apiEndpoint + '/projects/' + projectCode + '/readme?type=HOMELOCATIONS_INFO'
         }
 
         axios.get(url)

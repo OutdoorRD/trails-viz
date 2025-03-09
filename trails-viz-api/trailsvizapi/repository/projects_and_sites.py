@@ -16,11 +16,11 @@ def get_project_from_site(siteid):
     return project_list
 
 
-def get_project_readme(readme_type, project=None):
+def get_project_readme(readme_type, project):
     project_readme_cache = get_from_data_source('PROJECT_README')
     if readme_type == 'VISITS':
         return project_readme_cache[project + '_VISITS']
     elif readme_type == 'INFO':
         return project_readme_cache[project]
     else:
-        return project_readme_cache[readme_type]
+        return project_readme_cache[project + '_HOMELOCATIONS_INFO']
