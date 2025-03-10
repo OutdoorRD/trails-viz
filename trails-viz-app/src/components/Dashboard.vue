@@ -160,7 +160,7 @@ export default {
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
     let self = this;
-    if (self.$store.getters.getAllProjects === undefined) {
+    if (Object.keys(self.$store.getters.getAllProjects).length === 0) {
       axios.get(self.$apiEndpoint + "/projects").then((response) => {
         let allProjects = response.data;
         let projectCodeToName = {};
