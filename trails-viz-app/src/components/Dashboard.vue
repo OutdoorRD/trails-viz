@@ -104,10 +104,9 @@
             <b-tab
               title="Party Characteristics"
               @click="handleSubTabClick('Party Characteristics')"
+              v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
             >
-              <party-characteristics
-                ref="party-characteristics"
-              ></party-characteristics>
+              <party-characteristics ref="party-characteristics"></party-characteristics>
             </b-tab>
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
               <info-viewer ref="home-locations-info"></info-viewer>
@@ -171,6 +170,11 @@ export default {
         self.$store.dispatch("setProjectCodeToName", projectCodeToName);
 
         this.renderProjectLevelPlots();
+        if (!this.selectedSource || this.selectedSource === "") {
+          this.selectedSource = this.availableDataSources.length > 0
+            ? this.availableDataSources[0].split(" ")[0].toLowerCase()
+            : "";
+        }
       });
     } else {
       this.renderProjectLevelPlots();
