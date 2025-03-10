@@ -35,6 +35,7 @@ export const VIZ_MODES = {
   COMPARE: 'compare',
 };
 
+// ensure values maintain space seperated format: ['{source} {year range}']
 export const DATA_SOURCES = {
   'West Cascades': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'Middle Fork': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
