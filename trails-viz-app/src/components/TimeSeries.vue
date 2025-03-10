@@ -4,7 +4,7 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
-    <b-row no-gutters class="align-items-center justify-content-end mt-2">
+    <b-row no-gutters class="align-items-top justify-content-end mt-2">
       <b-col cols="auto">
         <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
       </b-col>

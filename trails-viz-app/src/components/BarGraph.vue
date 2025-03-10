@@ -5,46 +5,47 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
-    <b-row no-gutters class="align-items-center justify-content-end mt-2">
-      <!-- Radio groups container -->
-      <b-col>
-        <b-row no-gutters>
-          <b-col sm="6">
-            <b-form-group>
-              <b-radio-group
-                v-model="timePeriod"
-                :options="timePeriodOptions"
-                stacked
-                @input="renderSelectedGraph"
-              ></b-radio-group>
-            </b-form-group>
-          </b-col>
-          <b-col sm="6">
-            <b-form-group>
-              <b-radio-group
-                v-model="dataSource"
-                :options="dataSourceOptions"
-                stacked
-                @input="renderSelectedGraph"
-                :disabled="noEstimates"
-              ></b-radio-group>
-            </b-form-group>
-          </b-col>
-        </b-row>
+    <b-row no-gutters class="align-items-top justify-content-between mt-2">
+  <!-- Radio groups container on the left -->
+  <b-col>
+    <b-row no-gutters>
+      <b-col sm="6">
+        <b-form-group>
+          <b-radio-group
+            v-model="timePeriod"
+            :options="timePeriodOptions"
+            stacked
+            @input="renderSelectedGraph"
+          ></b-radio-group>
+        </b-form-group>
       </b-col>
-
-      <!-- Download button on the right -->
-      <b-col cols="auto">
-        <b-button
-          variant="outline-primary"
-          size="sm"
-          @click="downloadData"
-          :disabled="isDownloading"
-        >
-          <i class="fas fa-download mr-1"></i> Download Data
-        </b-button>
+      <b-col sm="6">
+        <b-form-group>
+          <b-radio-group
+            v-model="dataSource"
+            :options="dataSourceOptions"
+            stacked
+            @input="renderSelectedGraph"
+            :disabled="noEstimates"
+          ></b-radio-group>
+        </b-form-group>
       </b-col>
     </b-row>
+  </b-col>
+
+  <!-- Download button column on the right -->
+  <b-col cols="auto">
+    <b-button
+      variant="outline-primary"
+      size="sm"
+      @click="downloadData"
+      :disabled="isDownloading"
+    >
+      <i class="fas fa-download mr-1"></i> Download Data
+    </b-button>
+  </b-col>
+</b-row>
+
     <b-row no-gutters id="chart-area"></b-row>
   </div>
 </template>
