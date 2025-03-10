@@ -5,17 +5,44 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
-    <b-row no-gutters>
-      <b-col sm="6">
-        <b-form-group>
-          <b-radio-group v-model="timePeriod" :options="timePeriodOptions" stacked v-on:input="renderSelectedGraph"></b-radio-group>
-        </b-form-group>
+    <b-row no-gutters class="align-items-center justify-content-end mt-2">
+      <!-- Radio groups container -->
+      <b-col>
+        <b-row no-gutters>
+          <b-col sm="6">
+            <b-form-group>
+              <b-radio-group
+                v-model="timePeriod"
+                :options="timePeriodOptions"
+                stacked
+                @input="renderSelectedGraph"
+              ></b-radio-group>
+            </b-form-group>
+          </b-col>
+          <b-col sm="6">
+            <b-form-group>
+              <b-radio-group
+                v-model="dataSource"
+                :options="dataSourceOptions"
+                stacked
+                @input="renderSelectedGraph"
+                :disabled="noEstimates"
+              ></b-radio-group>
+            </b-form-group>
+          </b-col>
+        </b-row>
       </b-col>
-      <b-col sm="6">
-        <b-form-group>
-          <b-radio-group v-model="dataSource" :options="dataSourceOptions" stacked
-                         v-on:input="renderSelectedGraph" :disabled="noEstimates"></b-radio-group>
-        </b-form-group>
+
+      <!-- Download button on the right -->
+      <b-col cols="auto">
+        <b-button
+          variant="outline-primary"
+          size="sm"
+          @click="downloadData"
+          :disabled="isDownloading"
+        >
+          <i class="fas fa-download mr-1"></i> Download Data
+        </b-button>
       </b-col>
     </b-row>
     <b-row no-gutters id="chart-area"></b-row>
@@ -26,6 +53,8 @@
   import {COLORS, VIZ_MODES} from '../store/constants'
   import c3 from 'c3'
   import axios from 'axios'
+  import JSZip from "jszip";
+  import FileSaver from "file-saver";
 
   const MONTH_DICT = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
     7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'};
@@ -35,6 +64,7 @@
     data: function() {
       return {
         loading: false,
+        isDownloading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -336,9 +366,94 @@
         this.selectedSite = null;
         this.monthlyEstimates = null;
         this.annualEstimates = null;
-      }
-    }
-  }
+      },
+      downloadData: function() {
+        this.isDownloading = true;
+
+        try {
+          const zip = new JSZip();
+          const filename = this.getDownloadFilename();
+
+          // Always add monthly estimates if available
+          if (this.monthlyEstimates && this.monthlyEstimates.length > 0) {
+            // Prepare primary trail modelled data
+            let [monthlyModelledData, modelledColors] = this._prepareMonthlyModelledData(this.trailName, this.monthlyEstimates);
+            // In compare mode, also prepare and concatenate comparing trail data
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareMonthlyData, compareModelledColors] = this._prepareMonthlyModelledData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              monthlyModelledData = monthlyModelledData.concat(compareMonthlyData);
+            }
+            const monthlyModelledCSV = this.convertToCSV(monthlyModelledData);
+            zip.file(`${filename}_monthly_modelled.csv`, monthlyModelledCSV);
+
+            // Prepare primary trail social media data
+            let [monthlySocialData, socialColors] = this._prepareMonthlySocialMediaData(this.trailName, this.monthlyEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareMonthlySocialData, compareSocialColors] = this._prepareMonthlySocialMediaData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              monthlySocialData = monthlySocialData.concat(compareMonthlySocialData);
+            }
+            const monthlySocialCSV = this.convertToCSV(monthlySocialData);
+            zip.file(`${filename}_monthly_socialMedia.csv`, monthlySocialCSV);
+          }
+
+          // Always add annual estimates if available
+          if (this.annualEstimates && this.annualEstimates.length > 0) {
+            // Annual modelled data
+            let [annualModelledData, annualModelledColors] = this._prepareAnnualModelledData(this.trailName, this.annualEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareAnnualData, compareAnnualColors] = this._prepareAnnualModelledData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              annualModelledData = annualModelledData.concat(compareAnnualData);
+            }
+            const annualModelledCSV = this.convertToCSV(annualModelledData);
+            zip.file(`${filename}_annual_modelled.csv`, annualModelledCSV);
+
+            // Annual social media data
+            let [annualSocialData, annualSocialColors] = this._prepareAnnualSocialMediaData(this.trailName, this.annualEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareAnnualSocialData, compareAnnualSocialColors] = this._prepareAnnualSocialMediaData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              annualSocialData = annualSocialData.concat(compareAnnualSocialData);
+            }
+            const annualSocialCSV = this.convertToCSV(annualSocialData);
+            zip.file(`${filename}_annual_socialMedia.csv`, annualSocialCSV);
+          }
+
+          // Generate the zip file and trigger the download
+          zip.generateAsync({ type: "blob" }).then((content) => {
+            FileSaver.saveAs(content, `${filename}.zip`);
+            this.isDownloading = false;
+          });
+        } catch (error) {
+          console.error("Error downloading data:", error);
+          this.isDownloading = false;
+        }
+      },
+      getDownloadFilename: function() {
+        const date = new Date();
+        const timestamp = `${date.getFullYear()}-${(date.getMonth() + 1).pad(2)}-${date.getDate().pad(2)}`;
+        if (this.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          return `trailtrends_bar_graph_project_${this.projectCode}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          return `trailtrends_bar_graph_site_${this.siteid}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          return `trailtrends_bar_graph_site_compare_${this.siteid}_${this.comparingSite.siteid}_${timestamp}`;
+        }
+        return `trails_data_${timestamp}`;
+      },
+      convertToCSV: function(dataColumns) {
+        if (!dataColumns || dataColumns.length === 0) return "";
+        // Extract headers from column names (first item in each array)
+        const headers = dataColumns.map((col) => col[0]);
+        const csvRows = [headers.join(",")];
+        // First column is dates - get the number of rows from it
+        const rowCount = dataColumns[0].length - 1; // -1 because first item is header
+        for (let i = 1; i <= rowCount; i++) {
+          const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
+          csvRows.push(rowValues.join(","));
+        }
+        return csvRows.join("\n");
+      },
+    },
+  };
 </script>
 
 <style scoped>

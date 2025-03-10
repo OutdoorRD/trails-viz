@@ -4,12 +4,20 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
-    <b-row no-gutters>
-      <b-col class="text-right">
-        <b-form-group>
-          <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
-        </b-form-group>
+    <b-row no-gutters class="align-items-center justify-content-end mt-2">
+      <b-col cols="auto">
+        <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
       </b-col>
+      <b-col cols="auto">
+      <b-button
+        variant="outline-primary"
+        size="sm"
+        @click="downloadData"
+        :disabled="isDownloading"
+      >
+        <i class="fas fa-download mr-1"></i> Download Data
+      </b-button>
+    </b-col>
     </b-row>
     <div id="time-series"></div>
     <div class="text-center disclaimer">
@@ -26,6 +34,8 @@
   import {COLORS, VIZ_MODES} from '../store/constants'
   import axios from 'axios'
   import c3 from 'c3'
+  import JSZip from "jszip";
+  import FileSaver from "file-saver";
 
   Number.prototype.pad = function (size) {
     let s = String(this);
@@ -38,6 +48,7 @@
     data: function() {
       return {
         loading: false,
+        isDownloading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -365,9 +376,63 @@
         this.comparingSiteMonthlyVisitation = null;
         this.comparingSiteWeeklyVisitation = null;
         this.dataRange = '';
-      }
-    }
-  }
+      },
+      downloadData: function() {
+        this.isDownloading = true;
+
+        try {
+          const zip = new JSZip();
+          const filename = this.getDownloadFilename();
+
+          // Always add the monthly CSV if available
+          if (this.timeseriesMonthlyData && this.timeseriesMonthlyData.length > 0) {
+            const monthlyCSV = this.convertToCSV(this.timeseriesMonthlyData);
+            zip.file(`${filename}_monthly.csv`, monthlyCSV);
+          }
+
+          // Always add the weekly CSV if available
+          if (this.timeseriesWeeklyData && this.timeseriesWeeklyData.length > 0) {
+            const weeklyCSV = this.convertToCSV(this.timeseriesWeeklyData);
+            zip.file(`${filename}_weekly.csv`, weeklyCSV);
+          }
+
+          // Generate the zip file and trigger the download
+          zip.generateAsync({ type: "blob" }).then((content) => {
+            FileSaver.saveAs(content, `${filename}.zip`);
+            this.isDownloading = false;
+          });
+        } catch (error) {
+          console.error("Error downloading data:", error);
+          this.isDownloading = false;
+        }
+      },
+      getDownloadFilename: function() {
+        const date = new Date();
+        const timestamp = `${date.getFullYear()}-${(date.getMonth() + 1).pad(2)}-${date.getDate().pad(2)}`;
+        if (this.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          return `trailtrends_time_series_project_${this.projectCode}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          return `trailtrends_time_series_site_${this.siteid}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          return `trailtrends_time_series_site_compare_${this.siteid}_${this.comparingSite.siteid}_${timestamp}`;
+        }
+        return `trails_data_${timestamp}`;
+      },
+      convertToCSV: function(dataColumns) {
+        if (!dataColumns || dataColumns.length === 0) return "";
+        // Extract headers from column names (first item in each array)
+        const headers = dataColumns.map((col) => col[0]);
+        const csvRows = [headers.join(",")];
+        // First column is dates - get the number of rows from it
+        const rowCount = dataColumns[0].length - 1; // -1 because first item is header
+        for (let i = 1; i <= rowCount; i++) {
+          const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
+          csvRows.push(rowValues.join(","));
+        }
+        return csvRows.join("\n");
+      },
+    },
+  };
 </script>
 
 <style scoped>
