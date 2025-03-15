@@ -24,7 +24,8 @@ _ANON_ENDPOINTS = {
     'get_project_weekly_visitation',
     'get_monthly_visitation',
     'get_weekly_visitation',
-    'authenticate_user'
+    'authenticate_user',
+    'get_visitation_readme'
 }
 
 _MANAGER_ENDPOINTS = set(_ANON_AUTH_HEADER)

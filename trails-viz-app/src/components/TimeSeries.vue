@@ -363,9 +363,8 @@
         this.comparingSiteWeeklyVisitation = null;
         this.dataRange = '';
       },
-      downloadData: function() {
+      async downloadData() {
         this.isDownloading = true;
-
         try {
           const zip = new JSZip();
           const filename = this.getDownloadFilename();
@@ -377,11 +376,11 @@
             const weeklyCSV = this.convertToCSV(this.timeseriesWeeklyData);
             zip.file(`${filename}_weekly.csv`, weeklyCSV);
           }
-          zip.generateAsync({ type: "blob" }).then((content) => {
-            FileSaver.saveAs(content, `${filename}.zip`);
-            this.isDownloading = false;
-          });
-        } catch (error) {
+          const response = await axios.get(this.$apiEndpoint + '/visitation/timeseries/download/readme');
+          zip.file('readme.txt', response.data);
+          const content = await zip.generateAsync({ type: "blob" });
+          FileSaver.saveAs(content, `${filename}.zip`);
+        } finally {
           this.isDownloading = false;
         }
       },

@@ -368,7 +368,7 @@
         this.monthlyEstimates = null;
         this.annualEstimates = null;
       },
-      downloadData: function() {
+      async downloadData() {
         this.isDownloading = true;
         try {
           const zip = new JSZip();
@@ -422,11 +422,12 @@
             const annualSocialCSV = this.convertToCSV(annualSocialData);
             zip.file(`${filename}_annual_socialMedia.csv`, annualSocialCSV);
           }
-          zip.generateAsync({ type: "blob" }).then((content) => {
-            FileSaver.saveAs(content, `${filename}.zip`);
-            this.isDownloading = false;
-          });
-        } catch (error) {
+          const response = await axios.get(this.$apiEndpoint + '/visitation/bargraph/download/readme');
+          zip.file('readme.txt', response.data);
+          const content = await zip.generateAsync({ type: "blob" });
+          FileSaver.saveAs(content, `${filename}.zip`);
+        }
+        finally {
           this.isDownloading = false;
         }
       },

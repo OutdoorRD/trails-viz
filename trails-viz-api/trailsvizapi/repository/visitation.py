@@ -40,3 +40,8 @@ def get_project_monthly_visitation(project):
 
 def get_project_weekly_visitation(project):
     return _get_project_visitation_data(project, 'weekly')
+
+
+def get_visitation_download_readme(graph):
+    visitation_download_readme_cache = get_from_data_source('VISITATION_DOWNLOAD_README')
+    return visitation_download_readme_cache[graph]

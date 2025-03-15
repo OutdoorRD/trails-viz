@@ -26,3 +26,9 @@ def get_monthly_visitation(siteid):
 def get_weekly_visitation(siteid):
     data = visitation.get_weekly_visitation(siteid)
     return Response(data.to_json(orient='records'), mimetype='application/json')
+
+
+@app.route('/api/visitation/<string:graph>/download/readme')
+def get_visitation_readme(graph):
+    data = visitation.get_visitation_download_readme(graph)
+    return Response(data, mimetype='text/plain')
