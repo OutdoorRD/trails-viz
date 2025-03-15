@@ -369,26 +369,19 @@
         try {
           const zip = new JSZip();
           const filename = this.getDownloadFilename();
-
-          // Always add the monthly CSV if available
           if (this.timeseriesMonthlyData && this.timeseriesMonthlyData.length > 0) {
             const monthlyCSV = this.convertToCSV(this.timeseriesMonthlyData);
             zip.file(`${filename}_monthly.csv`, monthlyCSV);
           }
-
-          // Always add the weekly CSV if available
           if (this.timeseriesWeeklyData && this.timeseriesWeeklyData.length > 0) {
             const weeklyCSV = this.convertToCSV(this.timeseriesWeeklyData);
             zip.file(`${filename}_weekly.csv`, weeklyCSV);
           }
-
-          // Generate the zip file and trigger the download
           zip.generateAsync({ type: "blob" }).then((content) => {
             FileSaver.saveAs(content, `${filename}.zip`);
             this.isDownloading = false;
           });
         } catch (error) {
-          console.error("Error downloading data:", error);
           this.isDownloading = false;
         }
       },
@@ -406,10 +399,8 @@
       },
       convertToCSV: function(dataColumns) {
         if (!dataColumns || dataColumns.length === 0) return "";
-        // Extract headers from column names (first item in each array)
         const headers = dataColumns.map((col) => col[0]);
         const csvRows = [headers.join(",")];
-        // First column is dates - get the number of rows from it
         const rowCount = dataColumns[0].length - 1; // -1 because first item is header
         for (let i = 1; i <= rowCount; i++) {
           const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
