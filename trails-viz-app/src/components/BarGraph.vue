@@ -370,61 +370,63 @@
       },
       downloadData: function() {
         this.isDownloading = true;
-
         try {
           const zip = new JSZip();
           const filename = this.getDownloadFilename();
-
-          // Always add monthly estimates if available
           if (this.monthlyEstimates && this.monthlyEstimates.length > 0) {
-            // Prepare primary trail modelled data
-            let [monthlyModelledData, modelledColors] = this._prepareMonthlyModelledData(this.trailName, this.monthlyEstimates);
-            // In compare mode, also prepare and concatenate comparing trail data
+            // Create a "month" column based on the monthlyEstimates data.
+            let monthColumn = ['month'];
+            this.monthlyEstimates.forEach(x => {
+              monthColumn.push(x.month);
+            });
+            let [monthlyModelledData] = this._prepareMonthlyModelledData(this.trailName, this.monthlyEstimates);
             if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
-              let [compareMonthlyData, compareModelledColors] = this._prepareMonthlyModelledData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              let [compareMonthlyData] = this._prepareMonthlyModelledData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
               monthlyModelledData = monthlyModelledData.concat(compareMonthlyData);
             }
+            // Prepend the month column.
+            monthlyModelledData.unshift(monthColumn);
             const monthlyModelledCSV = this.convertToCSV(monthlyModelledData);
             zip.file(`${filename}_monthly_modelled.csv`, monthlyModelledCSV);
-
-            // Prepare primary trail social media data
-            let [monthlySocialData, socialColors] = this._prepareMonthlySocialMediaData(this.trailName, this.monthlyEstimates);
+            let [monthlySocialData] = this._prepareMonthlySocialMediaData(this.trailName, this.monthlyEstimates);
             if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
-              let [compareMonthlySocialData, compareSocialColors] = this._prepareMonthlySocialMediaData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              let [compareMonthlySocialData] = this._prepareMonthlySocialMediaData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
               monthlySocialData = monthlySocialData.concat(compareMonthlySocialData);
             }
+            monthlySocialData.unshift(monthColumn);
             const monthlySocialCSV = this.convertToCSV(monthlySocialData);
             zip.file(`${filename}_monthly_socialMedia.csv`, monthlySocialCSV);
           }
 
-          // Always add annual estimates if available
           if (this.annualEstimates && this.annualEstimates.length > 0) {
-            // Annual modelled data
-            let [annualModelledData, annualModelledColors] = this._prepareAnnualModelledData(this.trailName, this.annualEstimates);
+            // Create a "year" column based on the annualEstimates data.
+            let yearColumn = ['year'];
+            this.annualEstimates.forEach(x => {
+              yearColumn.push(x.year);
+            });
+            let [annualModelledData] = this._prepareAnnualModelledData(this.trailName, this.annualEstimates);
             if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
-              let [compareAnnualData, compareAnnualColors] = this._prepareAnnualModelledData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              let [compareAnnualData] = this._prepareAnnualModelledData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
               annualModelledData = annualModelledData.concat(compareAnnualData);
             }
+            // Prepend the year column.
+            annualModelledData.unshift(yearColumn);
             const annualModelledCSV = this.convertToCSV(annualModelledData);
             zip.file(`${filename}_annual_modelled.csv`, annualModelledCSV);
-
-            // Annual social media data
-            let [annualSocialData, annualSocialColors] = this._prepareAnnualSocialMediaData(this.trailName, this.annualEstimates);
+            let [annualSocialData] = this._prepareAnnualSocialMediaData(this.trailName, this.annualEstimates);
             if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
-              let [compareAnnualSocialData, compareAnnualSocialColors] = this._prepareAnnualSocialMediaData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              let [compareAnnualSocialData] = this._prepareAnnualSocialMediaData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
               annualSocialData = annualSocialData.concat(compareAnnualSocialData);
             }
+            annualSocialData.unshift(yearColumn);
             const annualSocialCSV = this.convertToCSV(annualSocialData);
             zip.file(`${filename}_annual_socialMedia.csv`, annualSocialCSV);
           }
-
-          // Generate the zip file and trigger the download
           zip.generateAsync({ type: "blob" }).then((content) => {
             FileSaver.saveAs(content, `${filename}.zip`);
             this.isDownloading = false;
           });
         } catch (error) {
-          console.error("Error downloading data:", error);
           this.isDownloading = false;
         }
       },
@@ -442,10 +444,8 @@
       },
       convertToCSV: function(dataColumns) {
         if (!dataColumns || dataColumns.length === 0) return "";
-        // Extract headers from column names (first item in each array)
         const headers = dataColumns.map((col) => col[0]);
         const csvRows = [headers.join(",")];
-        // First column is dates - get the number of rows from it
         const rowCount = dataColumns[0].length - 1; // -1 because first item is header
         for (let i = 1; i <= rowCount; i++) {
           const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
@@ -461,7 +461,7 @@
   @import "~c3/c3.css";
 
   .bar-graph-container {
-    position: relative; /* so overlay can be absolutely placed on top */
-    min-height: 480px;  /* ensures there's enough space for the overlay */
+    position: relative;
+    min-height: 480px;
   }
 </style>
