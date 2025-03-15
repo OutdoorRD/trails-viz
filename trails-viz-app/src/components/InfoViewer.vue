@@ -17,12 +17,17 @@
 
   export default {
     name: "InfoViewer",
-
+    props: ['selectedSource'],
     data: function () {
       return {
         info: undefined,
         compiledMarkdown: undefined,
         loading: false
+      }
+    },
+    watch: {
+      selectedSource() {
+        this.renderInfo('homeLocations');
       }
     },
     methods: {
@@ -36,7 +41,7 @@
         } else if (type === 'visitation') {
           url = self.$apiEndpoint + '/projects/' + projectCode + '/readme?type=VISITS'
         } else if (type === 'homeLocations') {
-          url = self.$apiEndpoint + '/projects/' + projectCode + '/readme?type=HOMELOCATIONS_INFO'
+          url = self.$apiEndpoint + '/datasources/' + this.selectedSource + '/readme'
         }
 
         axios.get(url)

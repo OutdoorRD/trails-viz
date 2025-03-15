@@ -261,13 +261,27 @@ def _prepare_svi_df(geographic_level):
     return svi_df
 
 
+def _prepare_data_source_readme():
+    data_source_readme_cache = dict()
+    datasource_dir = os.path.join(_README_DIR, 'datasource')
+    data_source_readme_files = [f for f in os.listdir(datasource_dir) if f.endswith('.md')]
+    print(data_source_readme_files)
+    for filename in data_source_readme_files:
+        print(filename)
+        key = filename.rsplit('.', 1)[0].lower()
+        print(key)
+        file_path = os.path.join(datasource_dir, filename)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data_source_readme_cache[key] = f.read()
+    return data_source_readme_cache
+
+
 def _prepare_project_readme():
     project_readme_cache = dict()
 
     info_readme_files = [f for f in os.listdir(os.path.join(_README_DIR, 'info')) if f.endswith('.md')]
     visitation_readme_files = [f for f in os.listdir(os.path.join(_README_DIR, 'visitation')) if f.endswith('.md')]
     homelocations_readme_files = [f for f in os.listdir(os.path.join(_README_DIR, 'info')) if f.endswith('.md')]
-    
     # read project info file
     for project in config.PROJECT_NAMES.values():
         info_readme_file = list(filter(lambda x: x.split('.')[0] in project, info_readme_files))[0]
@@ -298,4 +312,5 @@ def get_from_data_source(key):
         # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
         DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
+        DATA_SOURCE['DATA_SOURCE_README'] = _prepare_data_source_readme()
     return DATA_SOURCE[key]
