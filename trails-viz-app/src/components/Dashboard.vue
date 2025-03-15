@@ -51,15 +51,6 @@
           </b-form-radio>
         </b-form-radio-group>
       </b-form>
-      <!-- <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics'">
-        <label class="mr-2 font-weight-bold">Select Data Source:</label>
-        <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary" size="sm">
-          <b-form-radio value="chatbot">Chatbot (2018 - 2024)</b-form-radio>
-          <b-form-radio value="flickr" :disabled="activeSubTab === 'Party Characteristics'">
-            Flickr (2005 - 2019)
-          </b-form-radio>
-        </b-form-radio-group>
-      </b-form> -->
       <b-row no-gutters>
         <b-col sm="12">
           <info-viewer
@@ -109,7 +100,7 @@
               <party-characteristics ref="party-characteristics"></party-characteristics>
             </b-tab>
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
-              <info-viewer ref="home-locations-info"></info-viewer>
+              <info-viewer ref="home-locations-info" :selected-source="selectedSource"></info-viewer>
             </b-tab>
           </b-tabs>
         </b-col>
