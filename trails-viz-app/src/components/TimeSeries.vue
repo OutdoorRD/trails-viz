@@ -377,7 +377,7 @@
             zip.file(`${filename}_weekly.csv`, weeklyCSV);
           }
           const response = await axios.get(this.$apiEndpoint + '/visitation/timeseries/download/readme');
-          zip.file('readme.txt', response.data);
+          zip.file('README.txt', response.data);
           const content = await zip.generateAsync({ type: "blob" });
           FileSaver.saveAs(content, `${filename}.zip`);
         } finally {
