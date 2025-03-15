@@ -25,7 +25,7 @@ def _get_project_visitation_data(project, period):
         group_by_cols = ['year', 'month']
     else:
         df = get_from_data_source('WEEKLY_VISITATION_DF')
-        group_by_cols = ['year', 'month', 'week']
+        group_by_cols = ['weekstart']
 
     project_sites_data = df[df['trail'].isin(project_site_ids)]
     project_sites_data = project_sites_data.drop('trail', axis=1)

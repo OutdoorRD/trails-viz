@@ -69,18 +69,6 @@
       }
     },
     methods: {
-      _getNthSunday: function(year, n) {
-        let date = new Date(year, 0);
-        let firstSunday;
-        if (date.getDay() === 0) {
-          firstSunday = date.getDate();
-        } else {
-          firstSunday = date.getDate() + 7 - date.getDay()
-        }
-        let dayOfYear = (n - 1) * 7 + firstSunday;
-        date.setDate(dayOfYear);
-        return date.getDate();
-      },
       _getColors: function(trailName, comparing=false) {
         let colors = {};
         colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
@@ -181,8 +169,7 @@
 
 
         weeklyVisitation.forEach(x => {
-          let sunday = self._getNthSunday(x.year, x.week);
-          weeklyDates.push(x.year + '-' + x.month + '-' + sunday);
+          weeklyDates.push(x.weekstart);
           weeklyModelled.push(Math.round(x.estimate, 2));
           weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
@@ -315,7 +302,6 @@
           bindto: '#time-series',
           data: {
             x: 'date',
-            xFormat: '%Y-%m-%d', // 'xFormat' can be used as custom format of 'x'
             columns: data,
             colors: Object.assign({}, colors)
           },

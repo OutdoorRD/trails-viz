@@ -133,15 +133,15 @@ def _prepare_estimates_and_visitation_df(period):
 
     assert estimates_df is not None and estimates_onsite is not None
 
-    id_cols = ['trail', 'month', 'year'] if period == 'monthly' else ['trail', 'week', 'month', 'year']
+    id_cols = ['trail', 'month', 'year'] if period == 'monthly' else ['trail', 'weekstart']
 
     estimates_df.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
     estimates_onsite.rename(columns={'resp.ss': 'onsite',
                                      'resplg': 'log_onsite',
                                      'resp.ll': 'data_days'}, inplace=True)
 
-    estimates_df.drop(columns='d2p', inplace=True)
-    estimates_onsite.drop(columns='d2p', inplace=True)
+    estimates_df.drop(columns='d2p', inplace=True, errors='ignore')
+    estimates_onsite.drop(columns='d2p', inplace=True, errors='ignore')
 
     # convert site id to string, would be helpful later
     estimates_df['trail'] = estimates_df['trail'].astype(str)
