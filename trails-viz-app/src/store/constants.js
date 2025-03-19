@@ -42,13 +42,16 @@ export const DATA_SOURCES = {
   // 'Okanogan-Wenatchee Wilderness (Archived)': [],
   // 'Okanogan-Wenatchee General Forest (Archived)': [],
   'Northern New Mexico': ['Flickr (2005 - 2019)'],
-  'King County Parks': ['Chatbot (2018 - 2024)', 'Reveal (2023)'],
+  'King County Parks': ['Chatbot (2023 - 2024)', 'Reveal (2021 - 2024)'],
   'US National Forests': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'Mount Baker-Snoqualmie Wilderness': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'South Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   // 'Mount Baker-Snoqualmie General Forest': [],
-  'East Cascades': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
-  'Coronado': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'East Cascades': ['Chatbot (2020 - 2024)', 'Flickr (2005 - 2019)'],
+  'Coronado': ['Chatbot (2022 - 2024)', 'Flickr (2005 - 2019)'],
   'Bridger-Teton': [] //should not show Visitor Characteristics
 }
+
+
+trails-viz-app/src/store/constants.js
