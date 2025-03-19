@@ -7,14 +7,18 @@
     <b-row no-gutters>
       <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Total Visit Days <span>{{totalVisitDays}}</span></b-list-group-item>
-          <b-list-group-item class="list-group-item">Weighted Housing Cost Burden <span>{{weightedHousingCostBurdenPercentage}}%</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Total Visit Days <span class="value">{{totalVisitDays}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span class="value">{{weightedSVI}}</span></b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Weighted Minority <span>{{weightedMinorityPercentage}}%</span></b-list-group-item>
-          <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span>{{weightedSVI}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Weighted Minority <span class="value">{{weightedMinorityPercentage}}%</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Weighted Housing Cost Burden <span v-b-tooltip.hover
+            title="Percentage of housing cost-burdened occupied housing units with annual income less than $75,000 (30%+ of income spent on housing costs)."
+            class="info-icon">&#8505;</span>
+            <span class="value">{{weightedHousingCostBurdenPercentage}}%</span>
+          </b-list-group-item>
         </b-list-group>
       </b-col>
     </b-row>
@@ -218,6 +222,7 @@
 
 <style scoped>
 @import "../assets/styles/loading-spinner.css";
+@import "../assets/styles/info-icon.css";
   .demographics-container {
     position: relative; /* so the overlay can be absolutely positioned */
     min-height: 72vh;   /* or whatever is needed for your layout */
@@ -225,7 +230,7 @@
   .list-group-item {
     padding: 5px 10px 5px 10px;
   }
-  .list-group-item span {
+  .list-group-item .value {
     float: right;
     padding-right: 15px;
     font-weight: bold;

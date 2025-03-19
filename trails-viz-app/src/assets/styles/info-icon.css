@@ -1,0 +1,14 @@
+.info-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border: 1px solid #007BFF;
+    border-radius: 50%;
+    color: #007BFF;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 5px;
+    background-color: #fff;
+  }
