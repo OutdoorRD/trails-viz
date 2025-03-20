@@ -42,8 +42,8 @@ export const DATA_SOURCES = {
   // 'Okanogan-Wenatchee Wilderness (Archived)': [],
   // 'Okanogan-Wenatchee General Forest (Archived)': [],
   'Northern New Mexico': ['Flickr (2005 - 2019)'],
-  'King County Parks': ['Chatbot (2023 - 2024)', 'Reveal (2021 - 2024)'],
-  'US National Forests': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'King County Parks': ['Chatbot (2023-2024)', 'Reveal (2021 - 2024)'],
+  'US National Forests': [], //should not show Visitor Characteristics
   'Mount Baker-Snoqualmie Wilderness': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'South Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
