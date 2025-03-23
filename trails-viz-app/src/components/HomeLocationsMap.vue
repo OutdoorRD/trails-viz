@@ -34,22 +34,32 @@
     computed: {
       selectedSource() {
         return this.$store.getters.getSelectedSource;
+      },
+      yearRange() {
+        return this.$store.getters.getYearRange;
       }
     },
     watch: {
-      selectedSource() {
-        if (this.level === 'state') {
-          this.renderHomeLocationsMap();
-        } else if (this.level === 'county') {
-          this._renderCountyLevel(this.clickedState);
-        } else if (this.level === 'zcta') {
-          this._renderZCTALevel(this.clickedState, this.clickedCounty);
-        } else if (this.level === 'censusTract') {
-          this._renderCensusTractLevel(this.clickedState, this.clickedCounty, this.clickedZCTA);
-        }
-      }
+      selectedSource: 'updateMap',
+      yearRange: 'updateMap'
     },
     methods: {
+      updateMap() {
+        switch (this.level) {
+          case 'state':
+            this.renderHomeLocationsMap();
+            break;
+          case 'county':
+            this._renderCountyLevel(this.clickedState);
+            break;
+          case 'zcta':
+            this._renderZCTALevel(this.clickedState, this.clickedCounty);
+            break;
+          case 'censusTract':
+            this._renderCensusTractLevel(this.clickedState, this.clickedCounty, this.clickedZCTA);
+            break;
+        }
+      },
       _mountMap: function() {
         return new Promise((resolve) => {
           let self = this;
@@ -122,7 +132,12 @@
           self.siteid = self.$store.getters.getSelectedSite['siteid'];
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsState';
         }
-
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          url += `?year_start=${yearStart}&year_end=${yearEnd}`;
+        }
         axios.get(url)
           .then(response => {
             self.homeLocationsGeoJson = response.data;
@@ -147,6 +162,12 @@
           url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsCounty/' + stateCode;
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsCounty/' + stateCode;
+        }
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          url += `?year_start=${yearStart}&year_end=${yearEnd}`;
         }
         axios.get(url)
           .then(response => {
@@ -176,6 +197,12 @@
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsZCTA/' + stateCode + '/' + countyCode;
         }
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          url += `?year_start=${yearStart}&year_end=${yearEnd}`;
+        }
         axios.get(url)
           .then(response => {
             // If data is present, render
@@ -204,6 +231,12 @@
           url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode + '/' + zctaCode;
         } else if (self.$store.getters.getVizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsCensusTract/' + stateCode + '/' + countyCode + '/' + zctaCode;
+        }
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          url += `?year_start=${yearStart}&year_end=${yearEnd}`;
         }
         axios.get(url)
           .then(response => {

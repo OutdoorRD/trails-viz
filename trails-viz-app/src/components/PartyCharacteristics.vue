@@ -185,6 +185,14 @@ export default {
   computed: {
     vizMode() {
       return this.$store.getters.getVizMode;
+    },
+    yearRange() {
+      return this.$store.getters.getYearRange;
+    }
+  },
+  watch: {
+    yearRange() {
+      this.renderPartyCharacteristics();
     }
   },
   methods: {
@@ -235,6 +243,12 @@ export default {
         this.vizMode === VIZ_MODES.PROJECT
           ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotData/${char}`
           : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotData/${char}`;
+      
+      const yearRange = this.yearRange;
+      if (yearRange && yearRange.length === 2) {
+        const [yearStart, yearEnd] = yearRange;
+        endpoint += `?year_start=${yearStart}&year_end=${yearEnd}`;
+      }
 
       return axios
         .get(endpoint)
@@ -280,7 +294,11 @@ export default {
         this.vizMode === VIZ_MODES.PROJECT
           ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotDataYearlyStatistics/${char}`
           : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotDataYearlyStatistics/${char}`;
-
+      const yearRange = this.yearRange;
+      if (yearRange && yearRange.length === 2) {
+        const [yearStart, yearEnd] = yearRange;
+        endpoint += `?year_start=${yearStart}&year_end=${yearEnd}`;
+      }
       return axios
         .get(endpoint)
         .then((response) => {

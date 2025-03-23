@@ -165,6 +165,7 @@
         console.log('axios:', homeLocationsUrl)
         console.log('hello')
         console.log('yoo')
+        console.log('ayooo')
         axios.get(homeLocationsUrl)
           .then(response => {
             self.homeLocations = response.data;

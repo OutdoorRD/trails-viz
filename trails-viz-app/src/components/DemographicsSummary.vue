@@ -57,10 +57,16 @@
     computed: {
       selectedSource() {
         return this.$store.getters.getSelectedSource;
+      },
+      yearRange() {
+        return this.$store.getters.getYearRange;
       }
     },
     watch: {
       selectedSource() {
+        this.renderDemographicsSummary();
+      },
+      yearRange() {
         this.renderDemographicsSummary();
       }
     },
@@ -92,6 +98,13 @@
           url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsDemographics';
         } else if (vizMode === VIZ_MODES.SITE) {
           url = self.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocationsDemographics';
+        }
+
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          url += `?year_start=${yearStart}&year_end=${yearEnd}`;
         }
 
         axios.get(url)
