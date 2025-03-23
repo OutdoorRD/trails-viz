@@ -52,6 +52,3 @@ export const DATA_SOURCES = {
   'Coronado': ['Chatbot (2022 - 2024)', 'Flickr (2005 - 2019)'],
   'Bridger-Teton': [] //should not show Visitor Characteristics
 }
-
-
-trails-viz-app/src/store/constants.js
