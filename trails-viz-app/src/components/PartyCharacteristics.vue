@@ -190,13 +190,9 @@ export default {
       return this.$store.getters.getYearRange;
     }
   },
-  watch: {
-    yearRange() {
-      this.renderPartyCharacteristics();
-    }
-  },
   methods: {
     renderPartyCharacteristics() {
+      console.log('cmonnnnn')
       this.loading = true;
       this.projectName = this.$store.getters.getSelectedProjectName;
       this.projectCode = this.$store.getters.getSelectedProjectCode;
@@ -239,7 +235,7 @@ export default {
 
 
     fetchBarDataByCharacteristic: function(char) {
-      const endpoint =
+      let endpoint =
         this.vizMode === VIZ_MODES.PROJECT
           ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotData/${char}`
           : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotData/${char}`;
@@ -290,7 +286,7 @@ export default {
     },
 
     fetchTimeSeriesDataByCharacteristic: function(char) {
-      const endpoint =
+      let endpoint =
         this.vizMode === VIZ_MODES.PROJECT
           ? `${this.$apiEndpoint}/projects/${this.projectCode}/chatbotDataYearlyStatistics/${char}`
           : `${this.$apiEndpoint}/sites/${this.siteid}/chatbotDataYearlyStatistics/${char}`;
@@ -582,6 +578,9 @@ export default {
     },
     showTotal() {
       this.updateCharts();
+    },
+    yearRange() {
+      this.renderPartyCharacteristics();
     }
   },
 
