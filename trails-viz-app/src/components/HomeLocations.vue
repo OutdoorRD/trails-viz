@@ -28,10 +28,16 @@
     computed: {
       selectedSource() {
         return this.$store.getters.getSelectedSource;
+      },
+      yearRange() {
+        return this.$store.getters.getYearRange;
       }
     },
     watch: {
       selectedSource() {
+        this.renderTreeMap();
+      },
+      yearRange() {
         this.renderTreeMap();
       }
     },
@@ -150,6 +156,15 @@
           homeLocationsUrl = this.$apiEndpoint + '/sites/' + self.siteid + '/source/' + this.selectedSource + '/homeLocations'
         }
 
+        const yearRange = this.$store.getters.getYearRange;
+        if (yearRange && yearRange.length === 2) {
+          const yearStart = yearRange[0];
+          const yearEnd = yearRange[1];
+          homeLocationsUrl += `?year_start=${yearStart}&year_end=${yearEnd}`;
+        }
+        console.log('axios:', homeLocationsUrl)
+        console.log('hello')
+        console.log('yoo')
         axios.get(homeLocationsUrl)
           .then(response => {
             self.homeLocations = response.data;

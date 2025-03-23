@@ -18,6 +18,7 @@ const state = {
   authHeader: 'anon',
   userRole: 'anon',
   selectedSource: '',
+  yearRange: [],
 };
 
 const mutations = {
@@ -78,6 +79,9 @@ const mutations = {
   setSelectedSource(state, selectedSource) {
     state.selectedSource = selectedSource;
   },
+  setYearRange(state, range) {
+    state.yearRange = range;
+  },
 };
 
 const actions = {
@@ -126,6 +130,9 @@ const actions = {
   setSelectedSource(context, selectedSource) {
     context.commit('setSelectedSource', selectedSource);
   },
+  setYearRange({ commit }, range) {
+    commit('setYearRange', range);
+  },
 };
 
 const getters = {
@@ -171,6 +178,7 @@ const getters = {
   getSelectedSource(state) {
     return state.selectedSource;
   },
+  getYearRange: (state) => state.yearRange,
 };
 
 const store = new Vuex.Store({

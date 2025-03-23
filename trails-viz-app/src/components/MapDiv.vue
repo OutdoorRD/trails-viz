@@ -185,7 +185,6 @@ export default {
       bubblesLayer: [],
       chatbotResponseCounts: undefined,
       chatbotResData: [],
-      yearRange: [],
       minYear: undefined,
       maxYear: undefined,
       legend: null,
@@ -203,6 +202,14 @@ export default {
     },
     selectedSource() {
       return this.$store.getters.getSelectedSource;
+    },
+    yearRange: {
+      get() {
+        return this.$store.getters.getYearRange;
+      },
+      set(newRange) {
+        this.$store.dispatch('setYearRange', newRange);
+      }
     },
   },
   watch: {
