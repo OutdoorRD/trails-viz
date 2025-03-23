@@ -40,7 +40,6 @@
 
   export default {
     name: "DemographicsSummary",
-    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
@@ -53,6 +52,11 @@
         weightedMinorityPercentage: null,
         weightedSVI: null,
         loading: false,
+      }
+    },
+    computed: {
+      selectedSource() {
+        return this.$store.getters.getSelectedSource;
       }
     },
     watch: {

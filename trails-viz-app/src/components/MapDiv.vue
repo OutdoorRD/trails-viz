@@ -176,10 +176,6 @@ export default {
       type: String,
       required: true,
     },
-    selectedSource: {
-      type: String,
-      required: true,
-    }
   },
   data: function() {
     return {
@@ -204,6 +200,9 @@ export default {
         this.selectedSource === "chatbot" &&
         this.chatbotResData.length > 0
       );
+    },
+    selectedSource() {
+      return this.$store.getters.getSelectedSource;
     },
   },
   watch: {

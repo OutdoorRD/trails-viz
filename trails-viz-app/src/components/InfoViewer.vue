@@ -17,12 +17,16 @@
 
   export default {
     name: "InfoViewer",
-    props: ['selectedSource'],
     data: function () {
       return {
         info: undefined,
         compiledMarkdown: undefined,
         loading: false
+      }
+    },
+    computed: {
+      selectedSource() {
+        return this.$store.getters.getSelectedSource;
       }
     },
     watch: {

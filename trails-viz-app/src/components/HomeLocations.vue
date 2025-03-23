@@ -15,7 +15,6 @@
 
   export default {
     name: "HomeLocations",
-    props: ["selectedSource"],
     data: function () {
       return {
         projectName: null,
@@ -24,6 +23,11 @@
         homeLocations: null,
         randomSeed: null,
         loading: false
+      }
+    },
+    computed: {
+      selectedSource() {
+        return this.$store.getters.getSelectedSource;
       }
     },
     watch: {

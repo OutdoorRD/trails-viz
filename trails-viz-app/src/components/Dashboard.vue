@@ -5,7 +5,6 @@
         ref="map-div"
         id="mapDiv"
         :visible-tab-group="visibleTabGroup"
-        :selected-source="selectedSource"
       ></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
@@ -74,14 +73,14 @@
               title="Home Locations"
               @click="handleSubTabClick('Home Locations')"
             >
-              <home-locations ref="home-locations" :selected-source="selectedSource"></home-locations>
+              <home-locations ref="home-locations"></home-locations>
             </b-tab>
             <b-tab
               title="Home Locations Map"
               v-on:update:active="activateHomeLocationsMap"
               @click="handleSubTabClick('Home Locations Map')"
             >
-              <home-locations-map ref="home-locations-map" :selected-source="selectedSource"></home-locations-map>
+              <home-locations-map ref="home-locations-map"></home-locations-map>
             </b-tab>
             <b-tab
               title="Demographics"
@@ -89,7 +88,6 @@
             >
               <demographics-summary
                 ref="demographics-summary"
-                :selected-source="selectedSource"
               ></demographics-summary>
             </b-tab>
             <b-tab
@@ -100,7 +98,7 @@
               <party-characteristics ref="party-characteristics"></party-characteristics>
             </b-tab>
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
-              <info-viewer ref="home-locations-info" :selected-source="selectedSource"></info-viewer>
+              <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
           </b-tabs>
         </b-col>
@@ -136,19 +134,30 @@ export default {
       comparingTrailName: "",
       visibleTabGroup: "project-info",
       activeSubTab: "",
-      selectedSource: sources.length > 0 ? sources[0].split(" ")[0].toLowerCase() : "",
     };
   },
   computed: {
     availableDataSources() {
       const projectCode = this.$route.params.project;
       return DATA_SOURCES[this.$store.getters.getProjectCodeToName[projectCode]] || [];
+    },
+    selectedSource: {
+      get() {
+        return this.$store.getters.getSelectedSource;
+      },
+      set(value) {
+        this.$store.dispatch('setSelectedSource', value);
+      }
     }
   },
   mounted() {
     // This part of code has been duplicated from App
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
+    if (!this.$store.getters.getSelectedSource && this.availableDataSources.length > 0) {
+      const initialSource = this.availableDataSources[0].split(" ")[0].toLowerCase();
+      this.$store.dispatch('setSelectedSource', initialSource);
+    }
     let self = this;
     if (Object.keys(self.$store.getters.getAllProjects).length === 0) {
       axios.get(self.$apiEndpoint + "/projects").then((response) => {

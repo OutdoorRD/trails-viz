@@ -17,7 +17,6 @@
 
   export default {
     name: "HomeLocationsMap",
-    props: ["selectedSource"],
     data: function () {
       return {
         mapDiv: null,
@@ -30,6 +29,11 @@
         level: 'state',  // allowed values are ['state', 'county', 'censusTract']
         activated: false,
         loading: false,
+      }
+    },
+    computed: {
+      selectedSource() {
+        return this.$store.getters.getSelectedSource;
       }
     },
     watch: {

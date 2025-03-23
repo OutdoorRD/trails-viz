@@ -16,7 +16,8 @@ const state = {
   comparingSite: '',
   loggedInUser: 'anon',
   authHeader: 'anon',
-  userRole: 'anon'
+  userRole: 'anon',
+  selectedSource: '',
 };
 
 const mutations = {
@@ -73,7 +74,10 @@ const mutations = {
     state.weeklyVisitation = [];
 
     state.homeLocations = [];
-  }
+  },
+  setSelectedSource(state, selectedSource) {
+    state.selectedSource = selectedSource;
+  },
 };
 
 const actions = {
@@ -118,7 +122,10 @@ const actions = {
   },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
-  }
+  },
+  setSelectedSource(context, selectedSource) {
+    context.commit('setSelectedSource', selectedSource);
+  },
 };
 
 const getters = {
@@ -160,7 +167,10 @@ const getters = {
   },
   getUserRole(state) {
     return state.userRole
-  }
+  },
+  getSelectedSource(state) {
+    return state.selectedSource;
+  },
 };
 
 const store = new Vuex.Store({
