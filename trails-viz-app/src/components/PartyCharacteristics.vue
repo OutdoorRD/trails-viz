@@ -192,7 +192,6 @@ export default {
   },
   methods: {
     renderPartyCharacteristics() {
-      console.log('cmonnnnn')
       this.loading = true;
       this.projectName = this.$store.getters.getSelectedProjectName;
       this.projectCode = this.$store.getters.getSelectedProjectCode;

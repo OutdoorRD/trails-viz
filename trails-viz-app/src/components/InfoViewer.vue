@@ -27,11 +27,16 @@
     computed: {
       selectedSource() {
         return this.$store.getters.getSelectedSource;
+      },
+      visibleTabGroup() {
+        return this.$store.getters.getVisibleTabGroup;
       }
     },
     watch: {
       selectedSource() {
-        this.renderInfo('homeLocations');
+        if (this.visibleTabGroup === 'visitorCharacteristics') {
+          this.renderInfo('homeLocations');
+        }
       }
     },
     methods: {

@@ -19,6 +19,7 @@ const state = {
   userRole: 'anon',
   selectedSource: '',
   yearRange: [],
+  visibleTabGroup: 'project-info',
 };
 
 const mutations = {
@@ -82,6 +83,9 @@ const mutations = {
   setYearRange(state, range) {
     state.yearRange = range;
   },
+  setVisibleTabGroup(state, newTabGroup) {
+    state.visibleTabGroup = newTabGroup;
+  },
 };
 
 const actions = {
@@ -133,6 +137,9 @@ const actions = {
   setYearRange({ commit }, range) {
     commit('setYearRange', range);
   },
+  setVisibleTabGroup({ commit }, newTabGroup) {
+    commit('setVisibleTabGroup', newTabGroup);
+  },
 };
 
 const getters = {
@@ -179,6 +186,7 @@ const getters = {
     return state.selectedSource;
   },
   getYearRange: (state) => state.yearRange,
+  getVisibleTabGroup: (state) => state.visibleTabGroup,
 };
 
 const store = new Vuex.Store({

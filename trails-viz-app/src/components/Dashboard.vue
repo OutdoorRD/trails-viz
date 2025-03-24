@@ -4,7 +4,6 @@
       <map-div
         ref="map-div"
         id="mapDiv"
-        :visible-tab-group="visibleTabGroup"
       ></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
@@ -125,18 +124,22 @@ import { EventBus } from "../event-bus";
 export default {
   name: "Dashboard",
   data: function() {
-    const projectCode = this.$route.params.project;
-    const projectName = this.$store.getters.getProjectCodeToName[projectCode];
-    const sources = DATA_SOURCES[projectName] || [];
     return {
       breadcrumbItems: [],
       trailName: "",
       comparingTrailName: "",
-      visibleTabGroup: "project-info",
       activeSubTab: "",
     };
   },
   computed: {
+    visibleTabGroup: {
+      get() {
+        return this.$store.getters.getVisibleTabGroup;
+      },
+      set(newTab) {
+        this.$store.dispatch('setVisibleTabGroup', newTab);
+      }
+    },
     availableDataSources() {
       const projectCode = this.$route.params.project;
       return DATA_SOURCES[this.$store.getters.getProjectCodeToName[projectCode]] || [];
@@ -154,6 +157,7 @@ export default {
     // This part of code has been duplicated from App
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
+    this.$store.dispatch('setVisibleTabGroup', 'project-info');
     if (!this.$store.getters.getSelectedSource && this.availableDataSources.length > 0) {
       const initialSource = this.availableDataSources[0].split(" ")[0].toLowerCase();
       this.$store.dispatch('setSelectedSource', initialSource);
@@ -288,9 +292,6 @@ export default {
       if (subTabName === 'Party Characteristics') {
         this.selectedSource = 'chatbot';
       }
-    },
-    handleSelectedSource(selectedSource) {
-      this.selectedSource = selectedSource
     },
     activateHomeLocationsMap: function(event) {
       // The event here is a boolean variable which tell if the

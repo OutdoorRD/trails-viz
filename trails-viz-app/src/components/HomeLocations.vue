@@ -162,10 +162,6 @@
           const yearEnd = yearRange[1];
           homeLocationsUrl += `?year_start=${yearStart}&year_end=${yearEnd}`;
         }
-        console.log('axios:', homeLocationsUrl)
-        console.log('hello')
-        console.log('yoo')
-        console.log('ayooo')
         axios.get(homeLocationsUrl)
           .then(response => {
             self.homeLocations = response.data;
