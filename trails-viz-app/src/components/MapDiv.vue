@@ -44,14 +44,14 @@
           <v-range-slider
             id="year-range-slider"
             v-if="yearRange && minYear !== undefined && maxYear !== undefined"
-            v-model="yearRange"
+            v-model="tempYearRange"
             :min="minYear"
             :max="maxYear"
             ticks="always"
             tick-size="4"
             thumb-label
             hide-details
-            @change="onYearRangeChange"
+            @end="onYearRangeChange"
             style="
             width: 100%;
             margin: 0;
@@ -171,12 +171,6 @@ const bubbleHighlightStyle = {
 
 export default {
   name: "MapDiv",
-  props: {
-    visibleTabGroup: {
-      type: String,
-      required: true,
-    },
-  },
   data: function() {
     return {
       dismissSecs: 5,
@@ -190,18 +184,22 @@ export default {
       legend: null,
       trailNamesInDropdown: [],
       loading: false,
+      tempYearRange: [this.$store.getters.getYearRange[0], this.$store.getters.getYearRange[1]],
     };
   },
   computed: {
+    visibleTabGroup() {
+      return this.$store.getters.getVisibleTabGroup;
+    },
+    selectedSource() {
+      return this.$store.getters.getSelectedSource;
+    },
     showChatbotMapCondition() {
       return (
         this.visibleTabGroup === "visitorCharacteristics" &&
         this.selectedSource === "chatbot" &&
         this.chatbotResData.length > 0
       );
-    },
-    selectedSource() {
-      return this.$store.getters.getSelectedSource;
     },
     yearRange: {
       get() {
@@ -360,6 +358,7 @@ export default {
       this.legend.addTo(this.mapDiv);
     },
     onYearRangeChange() {
+      this.$store.dispatch('setYearRange', this.tempYearRange);
       this.chatbotResponseCounts = this.filterChatbotData();
       this.updateBubblesLayer();
       // this.changeToChatbotSites();
@@ -477,6 +476,7 @@ export default {
       this.minYear = Math.min(...allYears);
       this.maxYear = Math.max(...allYears);
       this.yearRange = [this.minYear, this.maxYear];
+      this.tempYearRange = [this.minYear, this.maxYear];
     },
     getCentroidFeatures: function(geoJsonData) {
       let centroidFeatures = [];

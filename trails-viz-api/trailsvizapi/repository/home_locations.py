@@ -1,5 +1,6 @@
 from trailsvizapi.repository.prepare_data import get_from_data_source
 from trailsvizapi.repository.projects_and_sites import get_project_sites
+import pandas as pd
 
 
 def _treefy_home_locations(id_, home_locations):
@@ -32,7 +33,7 @@ def _treefy_home_locations(id_, home_locations):
     return tree
 
 
-def get_project_home_locations_df(project, source):
+def get_project_home_locations_df(project, source, year_start=None, year_end=None):
     project_sites = get_project_sites(project)
     project_site_ids = set(project_sites['siteid'].drop_duplicates())
     if source == 'chatbot':
@@ -43,6 +44,15 @@ def get_project_home_locations_df(project, source):
             lambda lst: next((x for x in lst if x in project_site_ids), None))
         # keep observations with non-missing 'trail' values
         chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
+
+        # If a 'date' column exists, convert it to datetime and filter by year_start and year_end if provided.
+        if 'date' in chatbot_data_df.columns:
+            chatbot_data_df['date'] = pd.to_datetime(chatbot_data_df['date'], errors='coerce')
+            if year_start is not None:
+                chatbot_data_df = chatbot_data_df[chatbot_data_df['date'].dt.year >= int(year_start)]
+            if year_end is not None:
+                chatbot_data_df = chatbot_data_df[chatbot_data_df['date'].dt.year <= int(year_end)]
+
         project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
     else:
         home_locations = get_from_data_source('HOME_LOCATIONS_DF')
@@ -50,11 +60,18 @@ def get_project_home_locations_df(project, source):
     return project_home_locations
 
 
-def get_site_home_locations_df(siteid, source):
+def get_site_home_locations_df(siteid, source, year_start=None, year_end=None):
 
     if source == 'chatbot':
         chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
         chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
+        # If a 'date' column exists, convert to datetime and filter by year range
+        if 'date' in chatbot_site_data_df.columns:
+            chatbot_site_data_df['date'] = pd.to_datetime(chatbot_site_data_df['date'], errors='coerce')
+            if year_start is not None:
+                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['date'].dt.year >= int(year_start)]
+            if year_end is not None:
+                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['date'].dt.year <= int(year_end)]
         site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     else:
         home_locations = get_from_data_source('HOME_LOCATIONS_DF')
@@ -80,13 +97,13 @@ def get_chatbot_home_locations_df(df):
     return home_locations
 
 
-def get_home_locations(siteid, source):
-    site_home_locations = get_site_home_locations_df(siteid, source)
+def get_home_locations(siteid, source, year_start=None, year_end=None):
+    site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     return _treefy_home_locations(siteid, site_home_locations)
 
 
-def get_project_home_locations(project, source):
-    project_home_locations = get_project_home_locations_df(project, source)
+def get_project_home_locations(project, source, year_start=None, year_end=None):
+    project_home_locations = get_project_home_locations_df(project, source, year_start, year_end)
     # International doesn't have state and counties and hence a three column group by will exclude it
     # extra effort to include international
     international_visits = project_home_locations[project_home_locations['country'] == 'International']
@@ -96,8 +113,8 @@ def get_project_home_locations(project, source):
     return _treefy_home_locations(project, project_home_locations)
 
 
-def get_home_locations_by_state(siteid, source):
-    site_home_locations = get_site_home_locations_df(siteid, source)
+def get_home_locations_by_state(siteid, source, year_start=None, year_end=None):
+    site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
     site_home_locations = site_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
     site_home_locations = site_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
@@ -105,17 +122,17 @@ def get_home_locations_by_state(siteid, source):
     return site_home_state_data
 
 
-def get_project_home_locations_by_state(project, source):
+def get_project_home_locations_by_state(project, source, year_start=None, year_end=None):
     state_boundaries = get_from_data_source('STATE_BOUNDARIES_DF')
-    project_home_locations = get_project_home_locations_df(project, source)
+    project_home_locations = get_project_home_locations_df(project, source, year_start, year_end)
     project_home_locations = project_home_locations[['state_code', 'state', 'visit_days', 'visitors_unq']]
     project_home_locations = project_home_locations.groupby(by=['state_code', 'state'], as_index=False).sum()
     project_home_state_data = state_boundaries.merge(project_home_locations, on=['state_code', 'state'], how='inner')
     return project_home_state_data
 
 
-def get_home_locations_by_county(siteid, source, state_code):
-    site_home_locations = get_site_home_locations_df(siteid, source)
+def get_home_locations_by_county(siteid, source, state_code, year_start=None, year_end=None):
+    site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     site_home_locations = site_home_locations[site_home_locations['state_code'] == state_code]
     county_geographies = get_from_data_source('COUNTIES_DF')
     county_geographies = county_geographies[county_geographies['state_code'] == state_code]
@@ -125,10 +142,10 @@ def get_home_locations_by_county(siteid, source, state_code):
     return site_home_county_data
 
 
-def get_project_home_locations_by_county(project, source, state_code):
+def get_project_home_locations_by_county(project, source, state_code, year_start=None, year_end=None):
     county_geographies = get_from_data_source('COUNTIES_DF')
     county_geographies = county_geographies[county_geographies['state_code'] == state_code]
-    project_home_locations = get_project_home_locations_df(project, source)
+    project_home_locations = get_project_home_locations_df(project, source, year_start, year_end)
     project_home_locations = project_home_locations[project_home_locations['state_code'] == state_code]
     project_home_locations = project_home_locations[['county_code', 'county', 'visit_days', 'visitors_unq']]
     project_home_locations = project_home_locations.groupby(by=['county_code', 'county'], as_index=False).sum()
@@ -163,8 +180,8 @@ def get_home_locations_by_census_tract(siteid, source, state_code, county_code, 
     return site_home_census_data
 
 
-def get_home_locations_by_zcta(siteid, source, state_code, county_code):
-    site_home_locations = get_site_home_locations_df(siteid, source)
+def get_home_locations_by_zcta(siteid, source, state_code, county_code, year_start=None, year_end=None):
+    site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     site_home_locations = site_home_locations[(site_home_locations['state_code'] == state_code)
                                               & (site_home_locations['county_code'] == county_code)]
 
@@ -217,11 +234,11 @@ def get_project_home_locations_by_census_tract(project, source, state_code, coun
     return project_home_census_data
 
 
-def get_project_home_locations_by_zcta(project, source, state_code, county_code):
+def get_project_home_locations_by_zcta(project, source, state_code, county_code, year_start=None, year_end=None):
     zcta_geographies = get_from_data_source('ZCTA_DF')
     st_county = str(state_code) + str(county_code)
     zcta_geographies = zcta_geographies[zcta_geographies['st_county'] == st_county]
-    project_home_locations = get_project_home_locations_df(project, source)
+    project_home_locations = get_project_home_locations_df(project, source, year_start, year_end)
     project_home_locations = project_home_locations[(project_home_locations['state_code'] == state_code)
                                                     & (project_home_locations['county_code'] == county_code)]
     if 'zcta' not in project_home_locations.columns:
@@ -250,8 +267,8 @@ def get_project_home_locations_by_zcta(project, source, state_code, county_code)
     return project_home_census_data
 
 
-def get_demographic_summary(siteid, source):
-    site_home_locations = get_site_home_locations_df(siteid, source)
+def get_demographic_summary(siteid, source, year_start=None, year_end=None):
+    site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     if 'zcta' not in site_home_locations.columns:
         return None
     site_home_locations = site_home_locations.groupby(by=['zcta'], as_index=False).sum()
@@ -260,8 +277,8 @@ def get_demographic_summary(siteid, source):
     return demographics_data
 
 
-def get_project_demographic_summary(project, source):
-    project_home_locations = get_project_home_locations_df(project, source)
+def get_project_demographic_summary(project, source, year_start=None, year_end=None):
+    project_home_locations = get_project_home_locations_df(project, source, year_start, year_end)
     if source == 'chatbot':
         project_home_locations = project_home_locations.groupby(by=['zcta'], as_index=False).sum()
         svi_df = get_from_data_source('SVI_ZCTA_DF')

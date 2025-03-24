@@ -8,8 +8,9 @@ import numpy as np
 CONFIDENCE_LEVEL = 1.96
 
 
-def get_project_chatbot_data(project, characteristic):
-    chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
+def get_project_chatbot_data(project, characteristic, year_start=None, year_end=None):
+    chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic,
+                                                         year_start=year_start, year_end=year_end)
     aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
                                                     characteristic=characteristic)
     if aggregate_data is None:
@@ -17,8 +18,9 @@ def get_project_chatbot_data(project, characteristic):
     return jsonify(aggregate_data), 200
 
 
-def get_chatbot_data(siteid, characteristic):
-    chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
+def get_chatbot_data(siteid, characteristic, year_start=None, year_end=None):
+    chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic,
+                                                      year_start=year_start, year_end=year_end)
     aggregate_data = _prep_chatbot_aggregate_counts(df_long=chatbot_data_df_long,
                                                     characteristic=characteristic)
     if aggregate_data is None:
@@ -26,8 +28,9 @@ def get_chatbot_data(siteid, characteristic):
     return jsonify(aggregate_data), 200
 
 
-def get_project_chatbot_data_yearly_statistics(project, characteristic):
-    chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic)
+def get_project_chatbot_data_yearly_statistics(project, characteristic, year_start=None, year_end=None):
+    chatbot_data_df_long = _prep_chatbot_project_long_df(project=project, characteristic=characteristic,
+                                                         year_start=year_start, year_end=year_end)
     aggregate_data = _prep_chatbot_aggregate_stats(df_long=chatbot_data_df_long,
                                                    characteristic=characteristic)
     if aggregate_data is None:
@@ -35,8 +38,9 @@ def get_project_chatbot_data_yearly_statistics(project, characteristic):
     return jsonify(aggregate_data), 200
 
 
-def get_chatbot_data_yearly_statistics(siteid, characteristic):
-    chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic)
+def get_chatbot_data_yearly_statistics(siteid, characteristic, year_start=None, year_end=None):
+    chatbot_data_df_long = _prep_chatbot_site_long_df(siteid=siteid, characteristic=characteristic,
+                                                      year_start=year_start, year_end=year_end)
     aggregate_data = _prep_chatbot_aggregate_stats(df_long=chatbot_data_df_long,
                                                    characteristic=characteristic)
     if aggregate_data is None:
@@ -44,7 +48,7 @@ def get_chatbot_data_yearly_statistics(siteid, characteristic):
     return jsonify(aggregate_data), 200
 
 
-def _prep_chatbot_project_long_df(project, characteristic):
+def _prep_chatbot_project_long_df(project, characteristic, year_start=None, year_end=None):
     project_sites = get_project_sites(project)
     siteids = set(project_sites['siteid'].unique())
     chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
@@ -62,6 +66,11 @@ def _prep_chatbot_project_long_df(project, characteristic):
             return None
     # add year feature
     chatbot_data_df.loc[:, 'year'] = pd.to_datetime(chatbot_data_df['date']).dt.year
+    # Filter by year if parameters are provided.
+    if year_start is not None:
+        chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] >= int(year_start)]
+    if year_end is not None:
+        chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] <= int(year_end)]
     chatbot_data_df_long = chatbot_data_df.melt(
         id_vars=['date', 'year', 'trail'],
         value_vars=[characteristic],
@@ -74,7 +83,7 @@ def _prep_chatbot_project_long_df(project, characteristic):
     return chatbot_data_df_long
 
 
-def _prep_chatbot_site_long_df(siteid, characteristic):
+def _prep_chatbot_site_long_df(siteid, characteristic, year_start=None, year_end=None):
     chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF').copy()
     # Add a 'trail' feature that contains the given siteid.
     # 'trail' value set to None if 'SiteID' does not include siteid.
@@ -90,6 +99,11 @@ def _prep_chatbot_site_long_df(siteid, characteristic):
             return None
     # add year feature
     chatbot_data_df.loc[:, 'year'] = pd.to_datetime(chatbot_data_df['date']).dt.year
+    # Filter by year if parameters provided.
+    if year_start is not None:
+        chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] >= int(year_start)]
+    if year_end is not None:
+        chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] <= int(year_end)]
     chatbot_data_df_long = chatbot_data_df.melt(
         id_vars=['date', 'year', 'trail'],
         value_vars=[characteristic],
