@@ -44,11 +44,11 @@ export const DATA_SOURCES = {
   'Northern New Mexico': ['Flickr (2005 - 2019)'],
   'King County Parks': ['Chatbot (2023 - 2024)', 'Reveal (2021 - 2024)'],
   'US National Forests': [], //should not show Visitor Characteristics
-  'Mount Baker-Snoqualmie Wilderness': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
+  'Mount Baker-Snoqualmie Wilderness': ['Chatbot (2018 - 2024)'], // no Flickr data
   'Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   'South Mountain Loop': ['Chatbot (2018 - 2024)', 'Flickr (2005 - 2019)'],
   // 'Mount Baker-Snoqualmie General Forest': [],
-  'East Cascades': ['Chatbot (2020 - 2024)', 'Flickr (2005 - 2019)'],
-  'Coronado': ['Chatbot (2022 - 2024)', 'Flickr (2005 - 2019)'],
+  'East Cascades': ['Chatbot (2020 - 2024)'], // no Flickr data
+  'Coronado': ['Chatbot (2022 - 2024)'],
   'Bridger-Teton': [] //should not show Visitor Characteristics
 }
