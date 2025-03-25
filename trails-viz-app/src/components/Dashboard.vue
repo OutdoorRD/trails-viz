@@ -158,6 +158,7 @@ export default {
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
     this.$store.dispatch('setVisibleTabGroup', 'project-info');
+    this.$store.dispatch('setSelectedSource', '');
     if (!this.$store.getters.getSelectedSource && this.availableDataSources.length > 0) {
       const initialSource = this.availableDataSources[0].split(" ")[0].toLowerCase();
       this.$store.dispatch('setSelectedSource', initialSource);
