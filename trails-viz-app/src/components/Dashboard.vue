@@ -1,4 +1,15 @@
 <template>
+  <div>
+    <b-alert
+      :show="dismissCountDown"
+      dismissible
+      fade
+      variant="warning"
+      @dismiss-count-down="countDownChanged"
+      class="mb-0"
+    >
+      For full access to Visitor Characteristics and data downloads, please email <a href="mailto:outdoorrd@uw.edu">outdoorrd@uw.edu</a>.
+    </b-alert>
   <b-row no-gutters class="app-container">
     <b-col sm="6" class="map-col">
       <map-div
@@ -104,6 +115,8 @@
       </b-row>
     </b-col>
   </b-row>
+  </div>
+
 </template>
 
 <script>
@@ -125,10 +138,13 @@ export default {
   name: "Dashboard",
   data: function() {
     return {
+      dismissSecs: 30,
       breadcrumbItems: [],
+      dismissCountDown: 0,
       trailName: "",
       comparingTrailName: "",
       activeSubTab: "",
+      showBanner: false,
     };
   },
   computed: {
@@ -157,6 +173,7 @@ export default {
     // This part of code has been duplicated from App
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
+    this.showAlert();
     this.$store.dispatch('setVisibleTabGroup', 'project-info');
     this.$store.dispatch('setSelectedSource', '');
     if (!this.$store.getters.getSelectedSource && this.availableDataSources.length > 0) {
@@ -300,6 +317,12 @@ export default {
       if (event) {
         this.$refs["home-locations-map"].activateHomeLocationsMap();
       }
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    showAlert() {
+      this.dismissCountDown = this.dismissSecs;
     },
   },
 };
