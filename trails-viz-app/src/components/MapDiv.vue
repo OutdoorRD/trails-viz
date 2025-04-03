@@ -431,8 +431,8 @@ export default {
         ),
       ];
       // Conditionally include chatbot response count data based on user role
-      const userRole = this.$store.getters.getUserRole;
-      if (userRole === "admin" || userRole === "manager") {
+      const loggedInUser = this.$store.getters.getLoggedInUser;
+      if (loggedInUser !== "anon") {
         requests.push(
           axios.get(
             self.$apiEndpoint +
