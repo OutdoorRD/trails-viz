@@ -322,7 +322,9 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     showAlert() {
-      this.dismissCountDown = this.dismissSecs;
+      if (this.$store.getters.getLoggedInUser === 'anon') {
+        this.dismissCountDown = this.dismissSecs;
+      }
     },
   },
 };
