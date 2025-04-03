@@ -8,14 +8,22 @@
       <b-col sm="6">
         <b-list-group>
           <b-list-group-item class="list-group-item">Total Visit Days <span class="value">{{totalVisitDays}}</span></b-list-group-item>
-          <b-list-group-item class="list-group-item">Weighted Social Vulnerability Index <span class="value">{{weightedSVI}}</span></b-list-group-item>
+          <b-list-group-item class="list-group-item">Average Social Vulnerability Index <span v-b-tooltip.hover
+            title="Average vulnerability score of visitors' ZCTA/census tract. Social Vulnerability Index (SVI) uses 16 U.S. Census variables to identify communities vulnerable to stressors. SVI ranges from 0 (least vulnerable) to 1 (most vulnerable)."
+            class="info-icon">&#8505;</span>
+            <span class="value">{{weightedSVI}}</span>
+          </b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col sm="6">
         <b-list-group>
-          <b-list-group-item class="list-group-item">Weighted Minority <span class="value">{{weightedMinorityPercentage}}%</span></b-list-group-item>
-          <b-list-group-item class="list-group-item">Weighted Housing Cost Burden <span v-b-tooltip.hover
-            title="Percentage of housing cost-burdened occupied housing units with annual income less than $75,000 (30%+ of income spent on housing costs)."
+          <b-list-group-item class="list-group-item">Average Percent Minority <span v-b-tooltip.hover
+            title="Estimated percent of visit days that are from visitors who are racial and/or ethnic minorities (anything other than non-Hispanic white), based on their home ZIP Code/census tract."
+            class="info-icon">&#8505;</span>
+            <span class="value">{{weightedMinorityPercentage}}%</span>
+          </b-list-group-item>
+          <b-list-group-item class="list-group-item">Average Housing Cost Burden <span v-b-tooltip.hover
+            title="Estimated percent of visit days that are from visitors who are housing cost-burdened (spend 30% or more of their household income on housing), based on their home ZIP Code/census tract."
             class="info-icon">&#8505;</span>
             <span class="value">{{weightedHousingCostBurdenPercentage}}%</span>
           </b-list-group-item>
