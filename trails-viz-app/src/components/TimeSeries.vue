@@ -8,7 +8,7 @@
       <b-col cols="auto">
         <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
       </b-col>
-      <b-col cols="auto">
+      <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
       <b-button
         variant="outline-primary"
         size="sm"

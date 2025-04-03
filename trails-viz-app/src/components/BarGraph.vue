@@ -34,7 +34,7 @@
   </b-col>
 
   <!-- Download button column on the right -->
-  <b-col cols="auto">
+  <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
     <b-button
       variant="outline-primary"
       size="sm"
