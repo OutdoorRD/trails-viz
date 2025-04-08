@@ -114,15 +114,6 @@
 
             </b-tab>
           </div>
-            <b-tab
-              title="Info Source"
-              @click="handleSubTabClick('Info Source')"
-              v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
-            >
-              <info-source
-                ref="info-source"
-              ></info-source>
-            </b-tab>
             <div class="scrollable-tab-content">
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
               <info-viewer ref="home-locations-info"></info-viewer>
