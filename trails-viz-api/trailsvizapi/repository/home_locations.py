@@ -181,18 +181,33 @@ def get_home_locations_by_census_tract(siteid, source, state_code, county_code, 
 
 
 def get_home_locations_by_zcta(siteid, source, state_code, county_code, year_start=None, year_end=None):
+    zcta_geographies = get_from_data_source('ZCTA_DF')
+    st_county = str(state_code) + str(county_code)
+    zcta_geographies = zcta_geographies[zcta_geographies['st_county'] == st_county]
     site_home_locations = get_site_home_locations_df(siteid, source, year_start, year_end)
     site_home_locations = site_home_locations[(site_home_locations['state_code'] == state_code)
                                               & (site_home_locations['county_code'] == county_code)]
 
-    zcta_geographies = get_from_data_source('ZCTA_DF')
-    st_county = str(state_code) + str(county_code)
-    zcta_geographies = zcta_geographies[zcta_geographies['st_county'] == st_county]
+    if 'zcta' not in site_home_locations.columns:
+        return None
+    agg_dict = {
+        'visit_days': ('visit_days', 'sum'),
+        'visitors_unq': ('visitors_unq', 'sum'),
+    }
+    if {'age_sum', 'age_count'}.issubset(site_home_locations.columns):
+        agg_dict.update({
+            'age_sum': ('age_sum', 'sum'),
+            'age_count': ('age_count', 'sum')
+        })
 
-    keep_columns = ['zcta', 'visit_days', 'visitors_unq', 'state_code', 'county_code']
-    if 'reported_mean_age' in site_home_locations.columns:
-        keep_columns.append('reported_mean_age')
-    site_home_locations = site_home_locations[keep_columns]
+    site_home_locations = site_home_locations.groupby(
+        ['state_code', 'county_code', 'zcta']
+    ).agg(**agg_dict).reset_index()
+
+    if {'age_sum', 'age_count'}.issubset(site_home_locations.columns):
+        site_home_locations['reported_mean_age'] = (
+            site_home_locations['age_sum'] / site_home_locations['age_count']
+        )
 
     site_home_census_data = zcta_geographies.merge(site_home_locations, on='zcta', how='inner')
 
