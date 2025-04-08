@@ -62,10 +62,12 @@
       </b-form>
       <b-row no-gutters>
         <b-col sm="12">
+          <div class="scrollable-tab-content">
           <info-viewer
             ref="project-info"
             v-show="visibleTabGroup === 'project-info'"
           ></info-viewer>
+          </div>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
             <b-tab title="Time Series">
               <time-series ref="time-series"></time-series>
@@ -74,7 +76,9 @@
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
             <b-tab title="Methods">
-              <info-viewer ref="visitation-info"></info-viewer>
+              <div class="scrollable-tab-content">
+                <info-viewer ref="visitation-info"></info-viewer>
+              </div>
             </b-tab>
           </b-tabs>
 
@@ -100,16 +104,30 @@
                 ref="demographics-summary"
               ></demographics-summary>
             </b-tab>
+            <div class="scrollable-tab-content">
             <b-tab
               title="Party Characteristics"
               @click="handleSubTabClick('Party Characteristics')"
               v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
             >
               <party-characteristics ref="party-characteristics"></party-characteristics>
+
             </b-tab>
+          </div>
+            <b-tab
+              title="Info Source"
+              @click="handleSubTabClick('Info Source')"
+              v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
+            >
+              <info-source
+                ref="info-source"
+              ></info-source>
+            </b-tab>
+            <div class="scrollable-tab-content">
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
               <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
+            </div>
           </b-tabs>
         </b-col>
       </b-row>
@@ -359,4 +377,12 @@ export default {
 .tab-group {
   font-size: 0.95rem;
 }
+
+.scrollable-tab-content {
+  max-height: 74vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+}
 </style>
+
