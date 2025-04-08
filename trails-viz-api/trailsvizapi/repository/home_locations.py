@@ -46,12 +46,11 @@ def get_project_home_locations_df(project, source, year_start=None, year_end=Non
         chatbot_data_df = chatbot_data_df.dropna(subset=['trail'])
 
         # If a 'date' column exists, convert it to datetime and filter by year_start and year_end if provided.
-        if 'date' in chatbot_data_df.columns:
-            chatbot_data_df['date'] = pd.to_datetime(chatbot_data_df['date'], errors='coerce')
+        if 'year' in chatbot_data_df.columns:
             if year_start is not None:
-                chatbot_data_df = chatbot_data_df[chatbot_data_df['date'].dt.year >= int(year_start)]
+                chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] >= int(year_start)]
             if year_end is not None:
-                chatbot_data_df = chatbot_data_df[chatbot_data_df['date'].dt.year <= int(year_end)]
+                chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] <= int(year_end)]
 
         project_home_locations = get_chatbot_home_locations_df(chatbot_data_df)
     else:
@@ -66,12 +65,11 @@ def get_site_home_locations_df(siteid, source, year_start=None, year_end=None):
         chatbot_data_df = get_from_data_source('CHATBOT_DATA_DF')
         chatbot_site_data_df = chatbot_data_df[chatbot_data_df['SiteID'].apply(lambda x: siteid in x if x else False)]
         # If a 'date' column exists, convert to datetime and filter by year range
-        if 'date' in chatbot_site_data_df.columns:
-            chatbot_site_data_df['date'] = pd.to_datetime(chatbot_site_data_df['date'], errors='coerce')
+        if 'year' in chatbot_site_data_df.columns:
             if year_start is not None:
-                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['date'].dt.year >= int(year_start)]
+                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['year'] >= int(year_start)]
             if year_end is not None:
-                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['date'].dt.year <= int(year_end)]
+                chatbot_site_data_df = chatbot_site_data_df[chatbot_site_data_df['year'] <= int(year_end)]
         site_home_locations = get_chatbot_home_locations_df(chatbot_site_data_df)
     else:
         home_locations = get_from_data_source('HOME_LOCATIONS_DF')

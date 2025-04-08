@@ -64,8 +64,6 @@ def _prep_chatbot_project_long_df(project, characteristic, year_start=None, year
         chatbot_data_df = _add_additional_features(chatbot_data_df, characteristic)
         if characteristic not in chatbot_data_df.columns:
             return None
-    # add year feature
-    chatbot_data_df.loc[:, 'year'] = pd.to_datetime(chatbot_data_df['date']).dt.year
     # Filter by year if parameters are provided.
     if year_start is not None:
         chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] >= int(year_start)]
@@ -97,8 +95,6 @@ def _prep_chatbot_site_long_df(siteid, characteristic, year_start=None, year_end
         chatbot_data_df = _add_additional_features(chatbot_data_df, characteristic)
         if characteristic not in chatbot_data_df.columns:
             return None
-    # add year feature
-    chatbot_data_df.loc[:, 'year'] = pd.to_datetime(chatbot_data_df['date']).dt.year
     # Filter by year if parameters provided.
     if year_start is not None:
         chatbot_data_df = chatbot_data_df[chatbot_data_df['year'] >= int(year_start)]
