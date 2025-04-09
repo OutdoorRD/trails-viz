@@ -4,8 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 const state = {
-  allProjects: undefined,
-  projectCodeToName: undefined,
+  allProjects: {},
+  projectCodeToName: {},
   selectedProjectName: '',
   selectedProjectCode: '',
   selectedProjectDataSources: [],
@@ -16,7 +16,10 @@ const state = {
   comparingSite: '',
   loggedInUser: 'anon',
   authHeader: 'anon',
-  userRole: 'anon'
+  userRole: 'anon',
+  selectedSource: '',
+  yearRange: [],
+  visibleTabGroup: 'project-info',
 };
 
 const mutations = {
@@ -73,7 +76,16 @@ const mutations = {
     state.weeklyVisitation = [];
 
     state.homeLocations = [];
-  }
+  },
+  setSelectedSource(state, selectedSource) {
+    state.selectedSource = selectedSource;
+  },
+  setYearRange(state, range) {
+    state.yearRange = range;
+  },
+  setVisibleTabGroup(state, newTabGroup) {
+    state.visibleTabGroup = newTabGroup;
+  },
 };
 
 const actions = {
@@ -118,7 +130,16 @@ const actions = {
   },
   clearSelectedProjectData(context) {
     context.commit('clearSelectedProjectData')
-  }
+  },
+  setSelectedSource(context, selectedSource) {
+    context.commit('setSelectedSource', selectedSource);
+  },
+  setYearRange({ commit }, range) {
+    commit('setYearRange', range);
+  },
+  setVisibleTabGroup({ commit }, newTabGroup) {
+    commit('setVisibleTabGroup', newTabGroup);
+  },
 };
 
 const getters = {
@@ -160,7 +181,12 @@ const getters = {
   },
   getUserRole(state) {
     return state.userRole
-  }
+  },
+  getSelectedSource(state) {
+    return state.selectedSource;
+  },
+  getYearRange: (state) => state.yearRange,
+  getVisibleTabGroup: (state) => state.visibleTabGroup,
 };
 
 const store = new Vuex.Store({

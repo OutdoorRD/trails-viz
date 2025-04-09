@@ -1,11 +1,20 @@
 <template>
+  <!-- <div> -->
+    <!-- <b-alert
+      :show="dismissCountDown"
+      dismissible
+      fade
+      variant="warning"
+      @dismiss-count-down="countDownChanged"
+      class="mb-0"
+    >
+      For full access to Visitor Characteristics and data downloads, please email <a href="mailto:outdoorrd@uw.edu">outdoorrd@uw.edu</a>.
+    </b-alert> -->
   <b-row no-gutters class="app-container">
     <b-col sm="6" class="map-col">
       <map-div
         ref="map-div"
         id="mapDiv"
-        :visible-tab-group="visibleTabGroup"
-        :selected-source="selectedSource"
       ></map-div>
     </b-col>
     <b-col sm="6" class="charts-col">
@@ -25,6 +34,7 @@
               >Visitation</b-button
             >
             <b-button
+              v-if="availableDataSources.length > 0"
               v-on:click="showSelectedTab('visitorCharacteristics')"
               class="app-button"
               v-bind:class="{
@@ -38,21 +48,26 @@
         </b-col>
       </b-row>
       <!-- Radio Button Row -->
-      <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics'">
+      <b-form inline class="mb-2" v-if="visibleTabGroup === 'visitorCharacteristics' && availableDataSources.length">
         <label class="mr-2 font-weight-bold">Select Data Source:</label>
         <b-form-radio-group v-model="selectedSource" buttons button-variant="outline-primary" size="sm">
-          <b-form-radio value="chatbot">Chatbot (2018 - 2024)</b-form-radio>
-          <b-form-radio value="flickr" :disabled="activeSubTab === 'Party Characteristics'">
-            Flickr (2005 - 2019)
+          <b-form-radio 
+            v-for="source in availableDataSources" 
+            :key="source" 
+            :value="source.split(' ')[0].toLowerCase()"
+            :disabled="activeSubTab === 'Party Characteristics' && !source.toLowerCase().includes('chatbot')">
+            {{ source }}
           </b-form-radio>
         </b-form-radio-group>
-    </b-form>
+      </b-form>
       <b-row no-gutters>
         <b-col sm="12">
+          <div class="scrollable-tab-content">
           <info-viewer
             ref="project-info"
             v-show="visibleTabGroup === 'project-info'"
           ></info-viewer>
+          </div>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
             <b-tab title="Time Series">
               <time-series ref="time-series"></time-series>
@@ -61,7 +76,9 @@
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
             <b-tab title="Methods">
-              <info-viewer ref="visitation-info"></info-viewer>
+              <div class="scrollable-tab-content">
+                <info-viewer ref="visitation-info"></info-viewer>
+              </div>
             </b-tab>
           </b-tabs>
 
@@ -70,14 +87,14 @@
               title="Home Locations"
               @click="handleSubTabClick('Home Locations')"
             >
-              <home-locations ref="home-locations" :selected-source="selectedSource"></home-locations>
+              <home-locations ref="home-locations"></home-locations>
             </b-tab>
             <b-tab
               title="Home Locations Map"
               v-on:update:active="activateHomeLocationsMap"
               @click="handleSubTabClick('Home Locations Map')"
             >
-              <home-locations-map ref="home-locations-map" :selected-source="selectedSource"></home-locations-map>
+              <home-locations-map ref="home-locations-map"></home-locations-map>
             </b-tab>
             <b-tab
               title="Demographics"
@@ -85,25 +102,30 @@
             >
               <demographics-summary
                 ref="demographics-summary"
-                :selected-source="selectedSource"
               ></demographics-summary>
             </b-tab>
+            <div class="scrollable-tab-content">
             <b-tab
               title="Party Characteristics"
               @click="handleSubTabClick('Party Characteristics')"
+              v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
             >
-              <party-characteristics
-                ref="party-characteristics"
-              ></party-characteristics>
+              <party-characteristics ref="party-characteristics"></party-characteristics>
+
             </b-tab>
+          </div>
+            <div class="scrollable-tab-content">
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
               <info-viewer ref="home-locations-info"></info-viewer>
             </b-tab>
+            </div>
           </b-tabs>
         </b-col>
       </b-row>
     </b-col>
   </b-row>
+  <!-- </div> -->
+
 </template>
 
 <script>
@@ -118,27 +140,56 @@ import InfoViewer from "../components/InfoViewer";
 import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
 
-import { VIZ_MODES } from "../store/constants";
+import { VIZ_MODES, DATA_SOURCES } from "../store/constants";
 import { EventBus } from "../event-bus";
 
 export default {
   name: "Dashboard",
   data: function() {
     return {
+      dismissSecs: 30,
       breadcrumbItems: [],
+      // dismissCountDown: 0,
       trailName: "",
       comparingTrailName: "",
-      visibleTabGroup: "project-info",
       activeSubTab: "",
-      selectedSource: "chatbot",
     };
+  },
+  computed: {
+    visibleTabGroup: {
+      get() {
+        return this.$store.getters.getVisibleTabGroup;
+      },
+      set(newTab) {
+        this.$store.dispatch('setVisibleTabGroup', newTab);
+      }
+    },
+    availableDataSources() {
+      const projectCode = this.$route.params.project;
+      return DATA_SOURCES[this.$store.getters.getProjectCodeToName[projectCode]] || [];
+    },
+    selectedSource: {
+      get() {
+        return this.$store.getters.getSelectedSource;
+      },
+      set(value) {
+        this.$store.dispatch('setSelectedSource', value);
+      }
+    }
   },
   mounted() {
     // This part of code has been duplicated from App
     // because in case of hitting the project URL directly
     // app won't load in time to have these global variables populated
+    // this.showAlert();
+    this.$store.dispatch('setVisibleTabGroup', 'project-info');
+    this.$store.dispatch('setSelectedSource', '');
+    if (!this.$store.getters.getSelectedSource && this.availableDataSources.length > 0) {
+      const initialSource = this.availableDataSources[0].split(" ")[0].toLowerCase();
+      this.$store.dispatch('setSelectedSource', initialSource);
+    }
     let self = this;
-    if (self.$store.getters.getAllProjects === undefined) {
+    if (Object.keys(self.$store.getters.getAllProjects).length === 0) {
       axios.get(self.$apiEndpoint + "/projects").then((response) => {
         let allProjects = response.data;
         let projectCodeToName = {};
@@ -149,6 +200,11 @@ export default {
         self.$store.dispatch("setProjectCodeToName", projectCodeToName);
 
         this.renderProjectLevelPlots();
+        if (!this.selectedSource || this.selectedSource === "") {
+          this.selectedSource = this.availableDataSources.length > 0
+            ? this.availableDataSources[0].split(" ")[0].toLowerCase()
+            : "";
+        }
       });
     } else {
       this.renderProjectLevelPlots();
@@ -263,9 +319,6 @@ export default {
         this.selectedSource = 'chatbot';
       }
     },
-    handleSelectedSource(selectedSource) {
-      this.selectedSource = selectedSource
-    },
     activateHomeLocationsMap: function(event) {
       // The event here is a boolean variable which tell if the
       // tab was activated (true) or deactivated (false)
@@ -273,6 +326,14 @@ export default {
         this.$refs["home-locations-map"].activateHomeLocationsMap();
       }
     },
+    // countDownChanged(dismissCountDown) {
+    //   this.dismissCountDown = dismissCountDown;
+    // },
+    // showAlert() {
+    //   if (this.$store.getters.getLoggedInUser === 'anon') {
+    //     this.dismissCountDown = this.dismissSecs;
+    //   }
+    // },
   },
 };
 </script>
@@ -307,4 +368,12 @@ export default {
 .tab-group {
   font-size: 0.95rem;
 }
+
+.scrollable-tab-content {
+  max-height: 74vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+}
 </style>
+

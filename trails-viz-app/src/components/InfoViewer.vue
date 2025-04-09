@@ -17,12 +17,33 @@
 
   export default {
     name: "InfoViewer",
-
     data: function () {
       return {
         info: undefined,
         compiledMarkdown: undefined,
         loading: false
+      }
+    },
+    computed: {
+      selectedSource() {
+        return this.$store.getters.getSelectedSource;
+      },
+      visibleTabGroup() {
+        return this.$store.getters.getVisibleTabGroup;
+      }
+    },
+    watch: {
+      visibleTabGroup(newValue) {
+        if (newValue === 'visitation') {
+          this.renderInfo('visitation');
+        } else if (newValue === 'visitorCharacteristics') {
+          this.renderInfo('homeLocations');
+        }
+      },
+      selectedSource() {
+        if (this.visibleTabGroup === 'visitorCharacteristics') {
+          this.renderInfo('homeLocations');
+        }
       }
     },
     methods: {
@@ -36,7 +57,7 @@
         } else if (type === 'visitation') {
           url = self.$apiEndpoint + '/projects/' + projectCode + '/readme?type=VISITS'
         } else if (type === 'homeLocations') {
-          url = self.$apiEndpoint + '/readme?type=HOMELOCATIONS_INFO'
+          url = self.$apiEndpoint + '/datasources/' + this.selectedSource + '/readme'
         }
 
         axios.get(url)

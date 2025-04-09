@@ -133,15 +133,15 @@ def _prepare_estimates_and_visitation_df(period):
 
     assert estimates_df is not None and estimates_onsite is not None
 
-    id_cols = ['trail', 'month', 'year'] if period == 'monthly' else ['trail', 'week', 'month', 'year']
+    id_cols = ['trail', 'month', 'year'] if period == 'monthly' else ['trail', 'weekstart']
 
     estimates_df.rename(columns={'jjmm': 'estimate', 'jjmmlg': 'log_estimate'}, inplace=True)
     estimates_onsite.rename(columns={'resp.ss': 'onsite',
                                      'resplg': 'log_onsite',
                                      'resp.ll': 'data_days'}, inplace=True)
 
-    estimates_df.drop(columns='d2p', inplace=True)
-    estimates_onsite.drop(columns='d2p', inplace=True)
+    estimates_df.drop(columns='d2p', inplace=True, errors='ignore')
+    estimates_onsite.drop(columns='d2p', inplace=True, errors='ignore')
 
     # convert site id to string, would be helpful later
     estimates_df['trail'] = estimates_df['trail'].astype(str)
@@ -261,26 +261,43 @@ def _prepare_svi_df(geographic_level):
     return svi_df
 
 
+def _prepare_visitation_download_readme():
+    visitation_download_readme_cache = dict()
+    download_dir = os.path.join(_README_DIR, 'download')
+    visitation_download_readme_files = [f for f in os.listdir(download_dir) if f.endswith('.txt')]
+    for filename in visitation_download_readme_files:
+        key = filename.rsplit('.', 1)[0].split('_')[0].lower()
+        file_path = os.path.join(download_dir, filename)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            visitation_download_readme_cache[key] = f.read()
+    return visitation_download_readme_cache
+
+
+def _prepare_data_source_readme():
+    data_source_readme_cache = dict()
+    datasource_dir = os.path.join(_README_DIR, 'datasource')
+    data_source_readme_files = [f for f in os.listdir(datasource_dir) if f.endswith('.md')]
+    for filename in data_source_readme_files:
+        key = filename.rsplit('.', 1)[0].lower()
+        file_path = os.path.join(datasource_dir, filename)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data_source_readme_cache[key] = f.read()
+    return data_source_readme_cache
+
+
 def _prepare_project_readme():
     project_readme_cache = dict()
-    readme_files = os.listdir(_README_DIR)
-    readme_files = list(filter(lambda x: x.endswith('.md'), readme_files))
+
+    info_readme_files = [f for f in os.listdir(os.path.join(_README_DIR, 'info')) if f.endswith('.md')]
+    visitation_readme_files = [f for f in os.listdir(os.path.join(_README_DIR, 'visitation')) if f.endswith('.md')]
+    # read project info file
     for project in config.PROJECT_NAMES.values():
-        project_readme_file = list(filter(lambda x: x.split('.')[0] in project, readme_files))[0]
-        with open(_README_DIR + project_readme_file, 'r', encoding='utf-8') as f:
+        info_readme_file = list(filter(lambda x: x.split('.')[0] in project, info_readme_files))[0]
+        visitation_readme_file = list(filter(lambda x: x.split('.')[0] in project, visitation_readme_files))[0]
+        with open(os.path.join(_README_DIR, 'info', info_readme_file), 'r', encoding='utf-8') as f:
             project_readme_cache[project] = f.read()
-
-    # read the visitation info file
-    visit_readme_files = list(filter(lambda x: x.endswith('_visits.md'), readme_files))
-    for project in config.PROJECT_NAMES.values():
-        visit_readme = list(filter(lambda x: x.split('_')[0].upper() in project.upper(), visit_readme_files))[0]
-        with open(_README_DIR + visit_readme, 'r', encoding='utf-8') as f:
+        with open(os.path.join(_README_DIR, 'visitation', visitation_readme_file), 'r', encoding='utf-8') as f:
             project_readme_cache[project + '_VISITS'] = f.read()
-
-    # read the generic home locations info readme
-    with open(_README_DIR + 'homelocations_info.md', 'r', encoding='utf-8') as f:
-        project_readme_cache['HOMELOCATIONS_INFO'] = f.read()
-
     return project_readme_cache
 
 
@@ -300,4 +317,6 @@ def get_from_data_source(key):
         # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
         DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
         DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
+        DATA_SOURCE['DATA_SOURCE_README'] = _prepare_data_source_readme()
+        DATA_SOURCE['VISITATION_DOWNLOAD_README'] = _prepare_visitation_download_readme()
     return DATA_SOURCE[key]

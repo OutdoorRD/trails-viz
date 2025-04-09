@@ -5,19 +5,47 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
+    <b-row no-gutters class="align-items-top justify-content-between mt-2">
+  <!-- Radio groups container on the left -->
+  <b-col>
     <b-row no-gutters>
       <b-col sm="6">
         <b-form-group>
-          <b-radio-group v-model="timePeriod" :options="timePeriodOptions" stacked v-on:input="renderSelectedGraph"></b-radio-group>
+          <b-radio-group
+            v-model="timePeriod"
+            :options="timePeriodOptions"
+            stacked
+            @input="renderSelectedGraph"
+          ></b-radio-group>
         </b-form-group>
       </b-col>
       <b-col sm="6">
         <b-form-group>
-          <b-radio-group v-model="dataSource" :options="dataSourceOptions" stacked
-                         v-on:input="renderSelectedGraph" :disabled="noEstimates"></b-radio-group>
+          <b-radio-group
+            v-model="dataSource"
+            :options="dataSourceOptions"
+            stacked
+            @input="renderSelectedGraph"
+            :disabled="noEstimates"
+          ></b-radio-group>
         </b-form-group>
       </b-col>
     </b-row>
+  </b-col>
+
+  <!-- Download button column on the right -->
+  <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
+    <b-button
+      variant="outline-primary"
+      size="sm"
+      @click="downloadData"
+      :disabled="isDownloading"
+    >
+      <i class="fas fa-download mr-1"></i> Download Data
+    </b-button>
+  </b-col>
+</b-row>
+
     <b-row no-gutters id="chart-area"></b-row>
   </div>
 </template>
@@ -26,6 +54,8 @@
   import {COLORS, VIZ_MODES} from '../store/constants'
   import c3 from 'c3'
   import axios from 'axios'
+  import JSZip from "jszip";
+  import FileSaver from "file-saver";
 
   const MONTH_DICT = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
     7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'};
@@ -35,6 +65,7 @@
     data: function() {
       return {
         loading: false,
+        isDownloading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -336,16 +367,102 @@
         this.selectedSite = null;
         this.monthlyEstimates = null;
         this.annualEstimates = null;
-      }
-    }
-  }
+      },
+      async downloadData() {
+        this.isDownloading = true;
+        try {
+          const zip = new JSZip();
+          const filename = this.getDownloadFilename();
+          if (this.monthlyEstimates && this.monthlyEstimates.length > 0) {
+            // Create a "month" column based on the monthlyEstimates data.
+            let monthColumn = ['month'];
+            this.monthlyEstimates.forEach(x => {
+              monthColumn.push(x.month);
+            });
+            let [monthlyModelledData] = this._prepareMonthlyModelledData(this.trailName, this.monthlyEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareMonthlyData] = this._prepareMonthlyModelledData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              monthlyModelledData = monthlyModelledData.concat(compareMonthlyData);
+            }
+            // Prepend the month column.
+            monthlyModelledData.unshift(monthColumn);
+            const monthlyModelledCSV = this.convertToCSV(monthlyModelledData);
+            zip.file(`${filename}_monthly_modelled.csv`, monthlyModelledCSV);
+            let [monthlySocialData] = this._prepareMonthlySocialMediaData(this.trailName, this.monthlyEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareMonthlySocialData] = this._prepareMonthlySocialMediaData(this.comparingSite['trailName'], this.comparingSiteMonthlyEstimates, true);
+              monthlySocialData = monthlySocialData.concat(compareMonthlySocialData);
+            }
+            monthlySocialData.unshift(monthColumn);
+            const monthlySocialCSV = this.convertToCSV(monthlySocialData);
+            zip.file(`${filename}_monthly_socialMedia.csv`, monthlySocialCSV);
+          }
+
+          if (this.annualEstimates && this.annualEstimates.length > 0) {
+            // Create a "year" column based on the annualEstimates data.
+            let yearColumn = ['year'];
+            this.annualEstimates.forEach(x => {
+              yearColumn.push(x.year);
+            });
+            let [annualModelledData] = this._prepareAnnualModelledData(this.trailName, this.annualEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareAnnualData] = this._prepareAnnualModelledData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              annualModelledData = annualModelledData.concat(compareAnnualData);
+            }
+            // Prepend the year column.
+            annualModelledData.unshift(yearColumn);
+            const annualModelledCSV = this.convertToCSV(annualModelledData);
+            zip.file(`${filename}_annual_modelled.csv`, annualModelledCSV);
+            let [annualSocialData] = this._prepareAnnualSocialMediaData(this.trailName, this.annualEstimates);
+            if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+              let [compareAnnualSocialData] = this._prepareAnnualSocialMediaData(this.comparingSite['trailName'], this.comparingSiteAnnualEstimates, true);
+              annualSocialData = annualSocialData.concat(compareAnnualSocialData);
+            }
+            annualSocialData.unshift(yearColumn);
+            const annualSocialCSV = this.convertToCSV(annualSocialData);
+            zip.file(`${filename}_annual_socialMedia.csv`, annualSocialCSV);
+          }
+          const response = await axios.get(this.$apiEndpoint + '/visitation/bargraph/download/readme');
+          zip.file('README.txt', response.data);
+          const content = await zip.generateAsync({ type: "blob" });
+          FileSaver.saveAs(content, `${filename}.zip`);
+        }
+        finally {
+          this.isDownloading = false;
+        }
+      },
+      getDownloadFilename: function() {
+        const date = new Date();
+        const timestamp = `${date.getFullYear()}-${(date.getMonth() + 1).pad(2)}-${date.getDate().pad(2)}`;
+        if (this.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          return `trailtrends_bar_graph_project_${this.projectCode}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          return `trailtrends_bar_graph_site_${this.siteid}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          return `trailtrends_bar_graph_site_compare_${this.siteid}_${this.comparingSite.siteid}_${timestamp}`;
+        }
+        return `trails_data_${timestamp}`;
+      },
+      convertToCSV: function(dataColumns) {
+        if (!dataColumns || dataColumns.length === 0) return "";
+        const headers = dataColumns.map((col) => col[0]);
+        const csvRows = [headers.join(",")];
+        const rowCount = dataColumns[0].length - 1; // -1 because first item is header
+        for (let i = 1; i <= rowCount; i++) {
+          const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
+          csvRows.push(rowValues.join(","));
+        }
+        return csvRows.join("\n");
+      },
+    },
+  };
 </script>
 
 <style scoped>
   @import "~c3/c3.css";
 
   .bar-graph-container {
-    position: relative; /* so overlay can be absolutely placed on top */
-    min-height: 480px;  /* ensures there's enough space for the overlay */
+    position: relative;
+    min-height: 480px;
   }
 </style>

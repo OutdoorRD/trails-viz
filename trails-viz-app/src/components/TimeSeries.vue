@@ -4,12 +4,20 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
-    <b-row no-gutters>
-      <b-col class="text-right">
-        <b-form-group>
-          <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
-        </b-form-group>
+    <b-row no-gutters class="align-items-top justify-content-end mt-2">
+      <b-col cols="auto">
+        <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
       </b-col>
+      <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
+      <b-button
+        variant="outline-primary"
+        size="sm"
+        @click="downloadData"
+        :disabled="isDownloading"
+      >
+        <i class="fas fa-download mr-1"></i> Download Data
+      </b-button>
+    </b-col>
     </b-row>
     <div id="time-series"></div>
     <div class="text-center disclaimer">
@@ -26,6 +34,8 @@
   import {COLORS, VIZ_MODES} from '../store/constants'
   import axios from 'axios'
   import c3 from 'c3'
+  import JSZip from "jszip";
+  import FileSaver from "file-saver";
 
   Number.prototype.pad = function (size) {
     let s = String(this);
@@ -38,6 +48,7 @@
     data: function() {
       return {
         loading: false,
+        isDownloading: false,
         projectName: null,
         projectCode: null,
         siteid: null,
@@ -58,18 +69,6 @@
       }
     },
     methods: {
-      _getNthSunday: function(year, n) {
-        let date = new Date(year, 0);
-        let firstSunday;
-        if (date.getDay() === 0) {
-          firstSunday = date.getDate();
-        } else {
-          firstSunday = date.getDate() + 7 - date.getDay()
-        }
-        let dayOfYear = (n - 1) * 7 + firstSunday;
-        date.setDate(dayOfYear);
-        return date.getDate();
-      },
       _getColors: function(trailName, comparing=false) {
         let colors = {};
         colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
@@ -170,8 +169,7 @@
 
 
         weeklyVisitation.forEach(x => {
-          let sunday = self._getNthSunday(x.year, x.week);
-          weeklyDates.push(x.year + '-' + x.month + '-' + sunday);
+          weeklyDates.push(x.weekstart);
           weeklyModelled.push(Math.round(x.estimate, 2));
           weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
@@ -304,7 +302,6 @@
           bindto: '#time-series',
           data: {
             x: 'date',
-            xFormat: '%Y-%m-%d', // 'xFormat' can be used as custom format of 'x'
             columns: data,
             colors: Object.assign({}, colors)
           },
@@ -365,9 +362,53 @@
         this.comparingSiteMonthlyVisitation = null;
         this.comparingSiteWeeklyVisitation = null;
         this.dataRange = '';
-      }
-    }
-  }
+      },
+      async downloadData() {
+        this.isDownloading = true;
+        try {
+          const zip = new JSZip();
+          const filename = this.getDownloadFilename();
+          if (this.timeseriesMonthlyData && this.timeseriesMonthlyData.length > 0) {
+            const monthlyCSV = this.convertToCSV(this.timeseriesMonthlyData);
+            zip.file(`${filename}_monthly.csv`, monthlyCSV);
+          }
+          if (this.timeseriesWeeklyData && this.timeseriesWeeklyData.length > 0) {
+            const weeklyCSV = this.convertToCSV(this.timeseriesWeeklyData);
+            zip.file(`${filename}_weekly.csv`, weeklyCSV);
+          }
+          const response = await axios.get(this.$apiEndpoint + '/visitation/timeseries/download/readme');
+          zip.file('README.txt', response.data);
+          const content = await zip.generateAsync({ type: "blob" });
+          FileSaver.saveAs(content, `${filename}.zip`);
+        } finally {
+          this.isDownloading = false;
+        }
+      },
+      getDownloadFilename: function() {
+        const date = new Date();
+        const timestamp = `${date.getFullYear()}-${(date.getMonth() + 1).pad(2)}-${date.getDate().pad(2)}`;
+        if (this.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
+          return `trailtrends_time_series_project_${this.projectCode}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.SITE) {
+          return `trailtrends_time_series_site_${this.siteid}_${timestamp}`;
+        } else if (this.$store.getters.getVizMode === VIZ_MODES.COMPARE) {
+          return `trailtrends_time_series_site_compare_${this.siteid}_${this.comparingSite.siteid}_${timestamp}`;
+        }
+        return `trails_data_${timestamp}`;
+      },
+      convertToCSV: function(dataColumns) {
+        if (!dataColumns || dataColumns.length === 0) return "";
+        const headers = dataColumns.map((col) => col[0]);
+        const csvRows = [headers.join(",")];
+        const rowCount = dataColumns[0].length - 1; // -1 because first item is header
+        for (let i = 1; i <= rowCount; i++) {
+          const rowValues = dataColumns.map((col) => col[i] !== undefined ? col[i] : "");
+          csvRows.push(rowValues.join(","));
+        }
+        return csvRows.join("\n");
+      },
+    },
+  };
 </script>
 
 <style scoped>

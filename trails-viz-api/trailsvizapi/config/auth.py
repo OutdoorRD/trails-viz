@@ -24,7 +24,8 @@ _ANON_ENDPOINTS = {
     'get_project_weekly_visitation',
     'get_monthly_visitation',
     'get_weekly_visitation',
-    'authenticate_user'
+    'authenticate_user',
+    'get_visitation_readme'
 }
 
 _MANAGER_ENDPOINTS = set(_ANON_AUTH_HEADER)
@@ -54,7 +55,7 @@ _MANAGER_ENDPOINTS.update([
     'get_chatbot_home_locations_county',
     'get_chatbot_project_home_locations_state',
     'get_chatbot_home_project_locations_county',
-
+    'get_data_source_readme',
 ])
 
 _ROLE_ACCESS_MAPPING = {

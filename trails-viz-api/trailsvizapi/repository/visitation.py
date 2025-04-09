@@ -25,7 +25,7 @@ def _get_project_visitation_data(project, period):
         group_by_cols = ['year', 'month']
     else:
         df = get_from_data_source('WEEKLY_VISITATION_DF')
-        group_by_cols = ['year', 'month', 'week']
+        group_by_cols = ['weekstart']
 
     project_sites_data = df[df['trail'].isin(project_site_ids)]
     project_sites_data = project_sites_data.drop('trail', axis=1)
@@ -40,3 +40,8 @@ def get_project_monthly_visitation(project):
 
 def get_project_weekly_visitation(project):
     return _get_project_visitation_data(project, 'weekly')
+
+
+def get_visitation_download_readme(graph):
+    visitation_download_readme_cache = get_from_data_source('VISITATION_DOWNLOAD_README')
+    return visitation_download_readme_cache[graph]
