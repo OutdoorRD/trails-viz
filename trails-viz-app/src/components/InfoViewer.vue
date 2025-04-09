@@ -33,6 +33,13 @@
       }
     },
     watch: {
+      visibleTabGroup(newValue) {
+        if (newValue === 'visitation') {
+          this.renderInfo('visitation');
+        } else if (newValue === 'visitorCharacteristics') {
+          this.renderInfo('homeLocations');
+        }
+      },
       selectedSource() {
         if (this.visibleTabGroup === 'visitorCharacteristics') {
           this.renderInfo('homeLocations');
