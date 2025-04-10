@@ -344,6 +344,9 @@ export default {
 </script>
 
 <style scoped>
+@import "../assets/styles/c3-charts.css";
+@import "../assets/styles/loading-spinner.css";
+
 .app-container {
   height: calc(100vh - 60px);
 }
