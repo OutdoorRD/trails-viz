@@ -271,7 +271,7 @@ def _prepare_visitation_download_readme():
     download_dir = os.path.join(_README_DIR, 'download')
     visitation_download_readme_files = [f for f in os.listdir(download_dir) if f.endswith('.txt')]
     for filename in visitation_download_readme_files:
-        key = filename.rsplit('.', 1)[0].lower()
+        key = filename.rsplit('.', 1)[0].split('_')[0].lower()
         file_path = os.path.join(download_dir, filename)
         with open(file_path, 'r', encoding='utf-8') as f:
             visitation_download_readme_cache[key] = f.read()
