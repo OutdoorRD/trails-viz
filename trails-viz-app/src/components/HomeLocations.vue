@@ -244,7 +244,6 @@
 </script>
 
 <style scoped>
-@import "../assets/styles/loading-spinner.css";
 
   .chart-container {
     position: relative;
