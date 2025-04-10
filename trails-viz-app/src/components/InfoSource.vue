@@ -65,6 +65,15 @@
             // Render a simple bar chart with c3.
             c3.generate({
               bindto: '#info-source-chart',
+              size: {
+                height: 500
+              },
+              bar: {
+                ratio: 0.9
+              },
+              padding: {
+                top: 20
+              },
               data: {
                 columns: [
                   ['Count', ...counts]
@@ -75,12 +84,13 @@
                 show: false
               },
               axis: {
+                rotated: true,
                 x: {
                   type: 'category',
                   categories: categories,
                   label: {
                     text: 'Information Source',
-                    position: 'outer-center'
+                    position: 'outer-middle',
                   },
                   tick: {
                     rotate: 45,
@@ -90,7 +100,7 @@
                 y: {
                   label: {
                     text: 'Count',
-                    position: 'outer-middle'
+                    position: 'outer-center'
                   }
                 }
               }
@@ -108,11 +118,12 @@
   </script>
 
   <style scoped>
-  @import "../assets/styles/loading-spinner.css";
+
   @import "../assets/styles/info-icon.css";
+
     .info-source-container {
-      position: relative; /* so the overlay can be absolutely positioned */
-      min-height: 72vh;   /* or whatever is needed for your layout */
+      position: relative;
+      min-height: 72vh;
     }
     .list-group-item {
       padding: 5px 10px 5px 10px;
@@ -123,48 +134,8 @@
       font-weight: bold;
       opacity: 0.7;
     }
-  </style>
-  
-  <!-- <style scoped>
-  .chart-container {
-    position: relative;
-    height: 72vh;
-    max-width: 600px;
-    margin: 20px auto;
-  }
-  
-  .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .loading-spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: #777;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-  }
-  
-  .loading-text {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
+    ::v-deep #info-source-chart .c3-axis-x .tick line {
+      display: none;
     }
-  }
   </style>
-   -->
+  
