@@ -389,7 +389,6 @@
 <style scoped>
 @import "~leaflet/dist/leaflet.css";
 @import "../assets/styles/home-locations-map.css";
-@import "../assets/styles/loading-spinner.css";
 
 .map-container {
   position: relative;

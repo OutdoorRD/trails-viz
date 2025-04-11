@@ -246,7 +246,6 @@
 </script>
 
 <style scoped>
-@import "../assets/styles/loading-spinner.css";
 @import "../assets/styles/info-icon.css";
   .demographics-container {
     position: relative; /* so the overlay can be absolutely positioned */

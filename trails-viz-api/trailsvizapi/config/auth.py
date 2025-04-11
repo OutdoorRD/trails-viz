@@ -56,6 +56,8 @@ _MANAGER_ENDPOINTS.update([
     'get_chatbot_project_home_locations_state',
     'get_chatbot_home_project_locations_county',
     'get_data_source_readme',
+    'get_project_categorical_chatbot_data',
+    'get_categorical_chatbot_data'
 ])
 
 _ROLE_ACCESS_MAPPING = {
