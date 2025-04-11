@@ -62,11 +62,8 @@
       </b-form>
       <b-row no-gutters>
         <b-col sm="12">
-          <div class="scrollable-tab-content">
-          <info-viewer
-            ref="project-info"
-            v-show="visibleTabGroup === 'project-info'"
-          ></info-viewer>
+          <div class="scrollable-tab-content" v-show="visibleTabGroup === 'project-info'">
+          <info-viewer ref="project-info"></info-viewer>
           </div>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
             <b-tab title="Time Series">
@@ -356,7 +353,7 @@ export default {
 <style scoped>
 @import "../assets/styles/c3-charts.css";
 @import "../assets/styles/loading-spinner.css";
-
+/* @import "../assets/styles/visitor-characteristics-tabs.css"; */
 .app-container {
   height: calc(100vh - 60px);
 }
@@ -392,6 +389,11 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px;
+}
+
+::v-deep .nav.nav-tabs .nav-item .nav-link{
+    margin: 0px;
+    padding: 7px;
 }
 </style>
 
