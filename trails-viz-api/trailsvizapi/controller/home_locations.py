@@ -8,7 +8,7 @@ from trailsvizapi.repository import home_locations
 def get_home_locations(siteid, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
-    data = home_locations.get_home_locations(siteid, source, year_start, year_end, year_start, year_end)
+    data = home_locations.get_home_locations(siteid, source, year_start, year_end)
     return jsonify(data)
 
 
