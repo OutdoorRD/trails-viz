@@ -122,11 +122,13 @@
               ></info-source>
             </b-tab>
             
-            <div class="scrollable-tab-content">
+
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
+              <div class="scrollable-tab-content">
               <info-viewer ref="home-locations-info"></info-viewer>
-            </b-tab>
             </div>
+            </b-tab>
+
           </b-tabs>
         </b-col>
       </b-row>
