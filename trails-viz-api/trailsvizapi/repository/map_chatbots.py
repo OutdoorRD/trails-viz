@@ -1,6 +1,5 @@
 from trailsvizapi.repository.prepare_data import get_from_data_source
 from trailsvizapi.repository.projects_and_sites import get_project_sites
-import pandas as pd
 
 
 SURVEY_START = 'PartyPeople'

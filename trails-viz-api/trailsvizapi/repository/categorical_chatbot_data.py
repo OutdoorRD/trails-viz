@@ -1,4 +1,3 @@
-import pandas as pd
 from collections import Counter
 from flask import Response, jsonify
 from trailsvizapi.repository.prepare_data import get_from_data_source
