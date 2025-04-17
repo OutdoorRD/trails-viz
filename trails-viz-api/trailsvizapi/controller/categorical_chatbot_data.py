@@ -10,8 +10,8 @@ def get_project_categorical_chatbot_data(project, characteristic):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     return categorical_chatbot_data.get_project_categorical_chatbot_data(project, characteristic, year_start, year_end)
 
 
@@ -22,6 +22,6 @@ def get_categorical_chatbot_data(siteid, characteristic):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     return categorical_chatbot_data.get_categorical_chatbot_data(siteid, characteristic, year_start, year_end)

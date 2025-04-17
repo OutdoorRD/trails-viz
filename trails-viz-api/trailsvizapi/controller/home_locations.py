@@ -11,8 +11,8 @@ def get_home_locations(siteid, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_home_locations(siteid, source, year_start, year_end)
     return jsonify(data)
 
@@ -24,8 +24,8 @@ def get_home_locations_state(siteid, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_home_locations_by_state(siteid, source, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -37,8 +37,8 @@ def get_home_locations_county(siteid, state_code, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_home_locations_by_county(siteid, source, state_code, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -51,8 +51,8 @@ def get_home_locations_zcta(siteid, source, state_code, county_code):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_home_locations_by_zcta(
             siteid, source, state_code, county_code, year_start, year_end)
     if data is None:
@@ -77,8 +77,8 @@ def get_project_home_locations(project, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_project_home_locations(project, source, year_start, year_end)
     return jsonify(data)
 
@@ -90,8 +90,8 @@ def get_project_home_locations_state(project, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_project_home_locations_by_state(project, source, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -103,8 +103,8 @@ def get_home_project_locations_county(project, state_code, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_project_home_locations_by_county(project, source, state_code, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -117,8 +117,8 @@ def get_project_home_locations_zcta(project, source, state_code, county_code):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_project_home_locations_by_zcta(
             project, source, state_code, county_code, year_start, year_end)
     if data is None:
@@ -144,8 +144,8 @@ def get_home_locations_demographics(siteid, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_demographic_summary(siteid, source, year_start, year_end)
     return Response(data.to_json(orient='records'), mimetype='application/json')
 
@@ -157,7 +157,7 @@ def get_project_home_locations_demographics(project, source):
     try:
         year_start = int(year_start)
         year_end = int(year_end)
-    except ValueError:
-        abort(400, "Invalid year range")
+    except (ValueError, TypeError):
+        abort(400, "Must provide integer year_start and year_end")
     data = home_locations.get_project_demographic_summary(project, source, year_start, year_end)
     return Response(data.to_json(orient='records'), mimetype='application/json')
