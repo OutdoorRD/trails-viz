@@ -55,18 +55,15 @@
             v-for="source in availableDataSources" 
             :key="source" 
             :value="source.split(' ')[0].toLowerCase()"
-            :disabled="activeSubTab === 'Party Characteristics' && !source.toLowerCase().includes('chatbot')">
+            :disabled="(activeSubTab === 'Party Characteristics' || activeSubTab === 'Info Source') && !source.toLowerCase().includes('chatbot')">
             {{ source }}
           </b-form-radio>
         </b-form-radio-group>
       </b-form>
       <b-row no-gutters>
         <b-col sm="12">
-          <div class="scrollable-tab-content">
-          <info-viewer
-            ref="project-info"
-            v-show="visibleTabGroup === 'project-info'"
-          ></info-viewer>
+          <div class="scrollable-tab-content" v-show="visibleTabGroup === 'project-info'">
+          <info-viewer ref="project-info"></info-viewer>
           </div>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
             <b-tab title="Time Series">
@@ -113,12 +110,25 @@
               <party-characteristics ref="party-characteristics"></party-characteristics>
 
             </b-tab>
+            
           </div>
-            <div class="scrollable-tab-content">
-            <b-tab title="Methods" @click="handleSubTabClick('Methods')">
-              <info-viewer ref="home-locations-info"></info-viewer>
+            <b-tab
+              title="Info Source"
+              @click="handleSubTabClick('Info Source')"
+              v-if="availableDataSources.some(source => source.toLowerCase().includes('chatbot'))"
+            >
+              <info-source
+                ref="info-source"
+              ></info-source>
             </b-tab>
+            
+
+            <b-tab title="Methods" @click="handleSubTabClick('Methods')">
+              <div class="scrollable-tab-content">
+              <info-viewer ref="home-locations-info"></info-viewer>
             </div>
+            </b-tab>
+
           </b-tabs>
         </b-col>
       </b-row>
@@ -139,6 +149,7 @@ import HomeLocationsMap from "../components/HomeLocationsMap";
 import InfoViewer from "../components/InfoViewer";
 import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
+import InfoSource from "../components/InfoSource.vue";
 
 import { VIZ_MODES, DATA_SOURCES } from "../store/constants";
 import { EventBus } from "../event-bus";
@@ -227,6 +238,7 @@ export default {
     TimeSeries,
     BarGraph,
     MapDiv,
+    InfoSource,
   },
   methods: {
     renderProjectLevelPlots: function() {
@@ -268,6 +280,7 @@ export default {
           self.$refs["home-locations-info"].renderInfo("homeLocations");
           self.$refs["demographics-summary"].renderDemographicsSummary();
           self.$refs["party-characteristics"].renderPartyCharacteristics();
+          self.$refs["info-source"].renderInfoSource();
         });
     },
     renderSiteLevelPlots: function() {
@@ -289,6 +302,7 @@ export default {
       this.$refs["home-locations-map"].renderHomeLocationsMap();
       this.$refs["demographics-summary"].renderDemographicsSummary();
       this.$refs["party-characteristics"].renderPartyCharacteristics();
+      this.$refs["info-source"].renderInfoSource();
     },
     renderComparisionPlots: function() {
       this.$store.dispatch("setVizMode", VIZ_MODES.COMPARE);
@@ -315,7 +329,7 @@ export default {
     },
     handleSubTabClick(subTabName) {
       this.activeSubTab = subTabName;
-      if (subTabName === 'Party Characteristics') {
+      if (subTabName === 'Party Characteristics' || subTabName === 'Info Source') {
         this.selectedSource = 'chatbot';
       }
     },
@@ -339,6 +353,9 @@ export default {
 </script>
 
 <style scoped>
+@import "../assets/styles/c3-charts.css";
+@import "../assets/styles/loading-spinner.css";
+/* @import "../assets/styles/visitor-characteristics-tabs.css"; */
 .app-container {
   height: calc(100vh - 60px);
 }
@@ -374,6 +391,11 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px;
+}
+
+::v-deep .nav.nav-tabs .nav-item .nav-link{
+    margin: 0px;
+    padding: 7px;
 }
 </style>
 

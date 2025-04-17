@@ -101,9 +101,14 @@ def _prepare_chatbot_data_df():
         lambda x: x.split(',') if pd.notna(x) else None
     )
     # Convert InfoSource from comma-separated string to Python lists
-    chatbot_data_df['InfoSource'] = chatbot_data_df['InfoSource'].apply(
-        lambda x: x.split(',') if pd.notna(x) else None
-    )
+    if 'InfoSource' in chatbot_data_df.columns:
+        chatbot_data_df['InfoSource'] = chatbot_data_df['InfoSource'].apply(
+            lambda x: x.split(',') if pd.notna(x) else None
+        )
+    if 'date' in chatbot_data_df.columns:
+        chatbot_data_df['date'] = pd.to_datetime(chatbot_data_df['date'], errors='coerce')
+        chatbot_data_df['year'] = chatbot_data_df['date'].dt.year
+
     assert chatbot_data_df is not None, "Failed to prepare chatbot data."
     return chatbot_data_df
 

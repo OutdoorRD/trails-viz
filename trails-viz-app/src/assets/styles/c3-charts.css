@@ -1,0 +1,12 @@
+.c3-axis-x-label{
+    font-size: 13px;
+}
+.c3-axis-y-label{
+    font-size: 13px;
+}
+.c3-axis.c3-axis-y .tick{
+    font-size: 11px;
+}
+.c3-axis.c3-axis-x .tick{
+    font-size: 11px;
+}

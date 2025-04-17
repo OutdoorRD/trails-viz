@@ -18,3 +18,4 @@ from trailsvizapi.controller.users_controller import *
 from trailsvizapi.controller.chatbot_data import *
 from trailsvizapi.controller.map_chatbots import *
 from trailsvizapi.controller.data_source import *
+from trailsvizapi.controller.categorical_chatbot_data import *
