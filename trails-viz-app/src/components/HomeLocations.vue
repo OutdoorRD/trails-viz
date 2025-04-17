@@ -149,6 +149,10 @@
         self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
 
+        if (!this.selectedSource) {
+          self.loading = false;
+          return;
+        }
         let homeLocationsUrl;
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
           homeLocationsUrl = this.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocations'

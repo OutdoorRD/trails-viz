@@ -100,7 +100,10 @@
         self.projectName = self.$store.getters.getSelectedProjectName;
         self.projectCode = self.$store.getters.getSelectedProjectCode;
         self.siteid = self.$store.getters.getSelectedSite['siteid'];
-
+        if (!this.selectedSource) {
+          self.loading = false;
+          return;
+        }
         let url;
         if (vizMode === VIZ_MODES.PROJECT) {
           url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsDemographics';
