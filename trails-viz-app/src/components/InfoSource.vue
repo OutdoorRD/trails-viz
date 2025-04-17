@@ -109,9 +109,6 @@ export default {
           this.loading = false;
         });
     }
-  },
-  mounted() {
-    this.renderInfoSource();
   }
 };
 </script>

@@ -196,11 +196,6 @@ export default {
       this.projectName = this.$store.getters.getSelectedProjectName;
       this.projectCode = this.$store.getters.getSelectedProjectCode;
       this.siteid = this.$store.getters.getSelectedSite['siteid'];
-
-      // If projectCode or siteid not ready, skip
-      if (!this.projectCode && this.vizMode === VIZ_MODES.PROJECT) return;
-      if (!this.siteid && this.vizMode !== VIZ_MODES.PROJECT) return;
-
       Promise.all([
         this.fetchAllBarData(),
         this.fetchAllTimeSeriesData()
@@ -581,11 +576,7 @@ export default {
     yearRange() {
       this.renderPartyCharacteristics();
     }
-  },
-
-  mounted() {
-    this.renderPartyCharacteristics();
-  },
+  }
 };
 </script>
 
