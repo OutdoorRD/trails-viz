@@ -149,7 +149,7 @@ import HomeLocationsMap from "../components/HomeLocationsMap";
 import InfoViewer from "../components/InfoViewer";
 import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
-import InfoSource from "../components/InfoSource.vue";
+import InfoSource from "../components/InfoSource";
 
 import { VIZ_MODES, DATA_SOURCES } from "../store/constants";
 import { EventBus } from "../event-bus";

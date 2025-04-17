@@ -1,4 +1,4 @@
-from flask import jsonify, Response, request
+from flask import jsonify, Response, request, abort
 
 from trailsvizapi import app
 from trailsvizapi.repository import home_locations
@@ -8,6 +8,11 @@ from trailsvizapi.repository import home_locations
 def get_home_locations(siteid, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_home_locations(siteid, source, year_start, year_end)
     return jsonify(data)
 
@@ -16,6 +21,11 @@ def get_home_locations(siteid, source):
 def get_home_locations_state(siteid, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_home_locations_by_state(siteid, source, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -24,6 +34,11 @@ def get_home_locations_state(siteid, source):
 def get_home_locations_county(siteid, state_code, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_home_locations_by_county(siteid, source, state_code, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -33,6 +48,11 @@ def get_home_locations_county(siteid, state_code, source):
 def get_home_locations_zcta(siteid, source, state_code, county_code):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_home_locations_by_zcta(
             siteid, source, state_code, county_code, year_start, year_end)
     if data is None:
@@ -54,6 +74,11 @@ def get_home_locations_census_tract(siteid, source, state_code, county_code, zct
 def get_project_home_locations(project, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_project_home_locations(project, source, year_start, year_end)
     return jsonify(data)
 
@@ -62,6 +87,11 @@ def get_project_home_locations(project, source):
 def get_project_home_locations_state(project, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_project_home_locations_by_state(project, source, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -70,6 +100,11 @@ def get_project_home_locations_state(project, source):
 def get_home_project_locations_county(project, state_code, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_project_home_locations_by_county(project, source, state_code, year_start, year_end)
     return Response(data.to_json(), mimetype='application/json')
 
@@ -79,6 +114,11 @@ def get_home_project_locations_county(project, state_code, source):
 def get_project_home_locations_zcta(project, source, state_code, county_code):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_project_home_locations_by_zcta(
             project, source, state_code, county_code, year_start, year_end)
     if data is None:
@@ -101,6 +141,11 @@ def get_project_home_locations_census_tract(project, source, state_code, county_
 def get_home_locations_demographics(siteid, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_demographic_summary(siteid, source, year_start, year_end)
     return Response(data.to_json(orient='records'), mimetype='application/json')
 
@@ -109,5 +154,10 @@ def get_home_locations_demographics(siteid, source):
 def get_project_home_locations_demographics(project, source):
     year_start = request.args.get('year_start')
     year_end = request.args.get('year_end')
+    try:
+        year_start = int(year_start)
+        year_end = int(year_end)
+    except ValueError:
+        abort(400, "Invalid year range")
     data = home_locations.get_project_demographic_summary(project, source, year_start, year_end)
     return Response(data.to_json(orient='records'), mimetype='application/json')
