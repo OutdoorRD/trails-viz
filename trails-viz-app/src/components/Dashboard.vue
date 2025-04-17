@@ -276,11 +276,14 @@ export default {
           self.$refs["home-locations"].renderTreeMap();
           self.$refs["home-locations-map"].renderHomeLocationsMap();
           self.$refs["project-info"].renderInfo("project");
-          self.$refs["visitation-info"].renderInfo("visitation");
-          self.$refs["home-locations-info"].renderInfo("homeLocations");
           self.$refs["demographics-summary"].renderDemographicsSummary();
-          self.$refs["party-characteristics"].renderPartyCharacteristics();
-          self.$refs["info-source"].renderInfoSource();
+          if (self.$refs["party-characteristics"]) {
+            self.$refs["party-characteristics"].renderPartyCharacteristics()
+          }
+          if (self.$refs["info-source"]) {
+            self.$refs["info-source"].renderInfoSource();
+          }
+
         });
     },
     renderSiteLevelPlots: function() {
