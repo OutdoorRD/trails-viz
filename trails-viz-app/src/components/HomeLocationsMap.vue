@@ -125,6 +125,10 @@
         self.loading = true;
         let url;
         self.level = 'state';
+        if (!this.selectedSource) {
+          self.loading = false;
+          return;
+        }
         if (self.$store.getters.getVizMode === VIZ_MODES.PROJECT) {
           self.projectCode = self.$store.getters.getSelectedProjectCode;
           url = self.$apiEndpoint + '/projects/' + self.projectCode + '/source/' + this.selectedSource + '/homeLocationsState';
