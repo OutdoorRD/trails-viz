@@ -1,5 +1,8 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info" sticky>
+    <b-navbar-brand href="https://outdoorrd.org/"   target="_blank">
+      <img :src="logo" alt="Outdoor R&D Logo" class="navbar-logo" />
+    </b-navbar-brand>
     <b-navbar-brand to="/">TrailTrends</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -59,11 +62,13 @@
 <script>
 import { EventBus } from "../event-bus";
 import { Cookie } from "../cookie";
+import logo from "../assets/ORandD_Logo_white.png";
 
 export default {
   name: "TopBar",
   data: function() {
     return {
+      logo,
       siteSearchText: "",
       filteredSites: [],
     };
@@ -134,7 +139,17 @@ export default {
 </script>
 
 <style scoped>
+
 .form-input {
   margin: 0 10px 0 10px;
+}
+
+.navbar-logo {
+  max-height: 80px;      
+}
+
+.navbar.bg-info {
+  background-color: var(--color-primary) !important;
+  height: 80px
 }
 </style>
