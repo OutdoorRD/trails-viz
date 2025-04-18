@@ -7,8 +7,10 @@ import router from "./router"
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import {Cookie} from "./cookie"
-import axios from "axios";
+import axios from "axios"
 import vuetify from './plugins/vuetify'
+import './assets/styles/colors.css'
+import './assets/styles/layout.css'
 
 Vue.config.productionTip = false
 Vue.prototype.$apiEndpoint = process.env.VUE_APP_API_ENDPOINT
