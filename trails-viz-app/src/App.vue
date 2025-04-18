@@ -53,15 +53,20 @@ export default {
 </script>
 
 <style scoped>
-  #app {
+  /* #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding: 0;
     height: 100vh;
-  }
+  } */
 
-  .top-bar {
+  /* .top-bar {
     height: 60px;
+  } */
+
+  .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 </style>
