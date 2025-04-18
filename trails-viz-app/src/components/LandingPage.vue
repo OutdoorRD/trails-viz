@@ -68,7 +68,8 @@
   .landing-page {
     height: calc(100vh - 60px);
     /*background-image: linear-gradient(#17a2b8, #e1f9fc);*/
-    background-image: linear-gradient(#cce3e3, #ffffff);
+    background-image: linear-gradient(var(--color-secondary), var(--color-secondary));
+    /* background-color: var(--color-tertiary); */
     align-content: center !important;
   }
   h1 {
@@ -76,7 +77,7 @@
     font-size: 75px;
     text-align: center;
     padding: 7.5vh 20vh 4vh 20vh;
-    color: #292f30;
+    color: var(--color-dark-text);
   }
 
   h2 {
@@ -84,12 +85,13 @@
     font-size: 40px;
     text-align: center;
     padding: 4vh 12vh 4vh 12vh;
-    color: #292f30;
+    color: var(--color-dark-text);
   }
 
   p {
     font-size: large;
     padding: 0 12vh 2vh 12vh;
+    color: var(--color-dark-text);
   }
 
   a {
