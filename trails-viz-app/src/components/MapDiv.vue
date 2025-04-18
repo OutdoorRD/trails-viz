@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="map-root">
     <b-alert
       :show="dismissCountDown"
       dismissible
@@ -11,7 +11,6 @@
     </b-alert>
     <!-- Range Slider for Year Selection -->
 
-    <v-app>
       <div v-if="showChatbotMapCondition" class="range-slider-container">
         <v-card
           style="
@@ -75,7 +74,6 @@
           <p class="loading-text">Loading data...</p>
         </div>
       </div>
-    </v-app>
   </div>
 </template>
 
@@ -85,7 +83,7 @@ import axios from "axios";
 import { MAPBOX_CONSTS } from "../store/constants";
 import { EventBus } from "../event-bus";
 import * as turf from "@turf/turf";
-
+// import '../assets/styles/layout.css';
 // The following two statements are required because of an issue with leaflet and webpack
 // see https://github.com/Leaflet/Leaflet/issues/4968#issuecomment-483402699
 delete L.Icon.Default.prototype._getIconUrl;
@@ -741,12 +739,15 @@ export default {
 
 <style scoped>
 @import "~leaflet/dist/leaflet.css";
-.map-div {
-  height: 85vh;
-}
 
 .map-div .leaflet-tile {
   filter: brightness(0.5) contrast(1.1) saturate(0.8) !important;
+}
+
+.map-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .range-slider-container {
