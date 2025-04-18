@@ -1,0 +1,8 @@
+/* colors.css */
+:root {
+    --color-primary:#1f78b4;
+    --color-secondary:#a6cee3;
+    --color-tertiary:#b2df8a;
+    --color-quaternary:#33a02c;
+    --color-dark-text:#292f30;
+  }
