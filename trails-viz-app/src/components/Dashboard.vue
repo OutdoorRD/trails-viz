@@ -17,7 +17,7 @@
         id="mapDiv"
       ></map-div>
     </b-col>
-    <b-col sm="6" class="charts-col">
+    <b-col sm="6" class="charts-col d-flex flex-column h-100">
       <b-row no-gutters>
         <b-col sm="7">
           <b-breadcrumb
@@ -60,10 +60,11 @@
           </b-form-radio>
         </b-form-radio-group>
       </b-form>
-      <b-row no-gutters>
-        <b-col sm="12">
-          <div class="scrollable-tab-content" v-show="visibleTabGroup === 'project-info'">
-          <info-viewer ref="project-info"></info-viewer>
+      <!-- <b-row no-gutters>
+        <b-col sm="12" class="d-flex"> -->
+          <div class="flex-fill overflow-auto">
+          <div v-show="visibleTabGroup === 'project-info'">
+            <info-viewer ref="project-info"></info-viewer>
           </div>
           <b-tabs v-show="visibleTabGroup === 'visitation'">
             <b-tab title="Time Series">
@@ -73,9 +74,9 @@
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
             <b-tab title="Methods">
-              <div class="scrollable-tab-content">
+              <!-- <div class="scrollable-tab-content"> -->
                 <info-viewer ref="visitation-info"></info-viewer>
-              </div>
+              <!-- </div> -->
             </b-tab>
           </b-tabs>
 
@@ -101,7 +102,7 @@
                 ref="demographics-summary"
               ></demographics-summary>
             </b-tab>
-            <div class="scrollable-tab-content">
+            <!-- <div class="scrollable-tab-content"> -->
             <b-tab
               title="Party Characteristics"
               @click="handleSubTabClick('Party Characteristics')"
@@ -111,7 +112,7 @@
 
             </b-tab>
             
-          </div>
+          <!-- </div> -->
             <b-tab
               title="Info Source"
               @click="handleSubTabClick('Info Source')"
@@ -124,16 +125,17 @@
             
 
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
-              <div class="scrollable-tab-content">
+              <!-- <div class="scrollable-tab-content"> -->
               <info-viewer ref="home-locations-info"></info-viewer>
-            </div>
+            <!-- </div> -->
             </b-tab>
 
           </b-tabs>
+          </div>
         </b-col>
       </b-row>
-    </b-col>
-  </b-row>
+    <!-- </b-col>
+  </b-row> -->
   <!-- </div> -->
 
 </template>
@@ -369,6 +371,7 @@ export default {
 
 .charts-col {
   padding: 4px 4px 4px 4px !important;
+
 }
 
 .app-breadcrumb {
