@@ -155,10 +155,8 @@ export default {
 }
 
 .navbar-brand {
-  /* color: var(--color-secondary) !important; */
   font-size: 1.4rem !important; /* ~24px if base is 16px */
-  /* font-weight: 600 !important;   optional: make it a bit bolder */
-  letter-spacing: 0.02em !important; optional: a touch of spacing
+  letter-spacing: 0.02em !important;
 }
 /* .navbar-text  {
   color: var(--color-tertiary) !important; 

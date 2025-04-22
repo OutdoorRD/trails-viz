@@ -177,7 +177,7 @@
                 rotate: 60,
                 multiline: false
               },
-              height: 40
+              height: 45
             },
             y: {
               label: {

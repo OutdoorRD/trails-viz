@@ -94,9 +94,9 @@
           switchOptions.onAdd = function() {
             let div = L.DomUtil.create('div');
             div.innerHTML +=
-              "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to State Level</a>" +
-              "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to County Level</a>" + 
-              "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden' style='font-size:15px;'>Back to ZCTA Level</a>";
+              "<a href='javascript:void(0);' id='backToState' class='hl-switch-options hl-hidden' style='font-size:16px; font-weight:bold;'>Back to State Level</a>" +
+              "<a href='javascript:void(0);' id='backToCounty' class='hl-switch-options hl-hidden' style='font-size:16px; font-weight:bold;'>Back to County Level</a>" + 
+              "<a href='javascript:void(0);' id='backToZCTA' class='hl-switch-options hl-hidden' style='font-size:16px; font-weight:bold;'>Back to ZCTA Level</a>";
             return div;
           };
 

@@ -752,7 +752,7 @@ export default {
 
 .range-slider-container {
   position: absolute;
-  bottom: 19%;
+  bottom: 5%;
   left: 1%;
   z-index: 1000;
   width: 50%;

@@ -18,7 +18,7 @@
 <script>
 import axios from 'axios';
 import c3 from 'c3';
-import { VIZ_MODES } from '../store/constants';
+import { VIZ_MODES, BRAND_COLORS } from '../store/constants';
 
 export default {
   name: "InfoSource",
@@ -83,7 +83,8 @@ export default {
             padding: { top: 20 },
             data: {
               columns: [[yLabel, ...values]],
-              type: 'bar'
+              type: 'bar',
+              [ yLabel ]: BRAND_COLORS.primary
             },
             legend: { show: false },
             axis: {
