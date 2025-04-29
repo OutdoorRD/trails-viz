@@ -389,10 +389,12 @@ export default {
 .tab-group ::v-deep .tab-content {
   flex: 1 1 auto;
   overflow-y: auto;
-  overflow-x: hidden; 
+  overflow-x: hidden;
+  padding-left: 0;
 }
-
-
+::v-deep .nav {
+  padding-left: 0;
+}
 ::v-deep .nav-tabs .nav-link {
   font-size: 16px;       /* about 14px if root is 16px */
   padding: 0.4rem 0.28rem;    /* tighter vertical/horizontal padding */
