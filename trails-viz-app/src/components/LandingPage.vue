@@ -17,17 +17,21 @@
       are continuously updated and improved. If you have any comments, concerns, or corrections,
       please contact the <a href="https://www.outdoorrd.org/people/" target="_blank">Outdoor R&D Team</a>.
     </p>
-
+    <img :src="bear" alt="Walking bear" class="bear" />
   </div>
+
 </template>
 
 <script>
+import bear from "../assets/BearWalking.gif";
+
   export default {
     name: "LandingPage",
     data: function() {
       return {
         projectSearchText: '',
-        filteredProjects: []
+        filteredProjects: [],
+        bear
       }
     },
     mounted() {
@@ -65,6 +69,7 @@
 </script>
 
 <style scoped>
+
   .landing-page {
     height: calc(100vh - 60px);
     /*background-image: linear-gradient(#17a2b8, #e1f9fc);*/
@@ -100,6 +105,23 @@
 
   .form-para {
     margin: 0 200px 0 200px;
+  }
+
+
+  .bear {
+  position: absolute;
+  bottom: 0;
+  left: 0;                       /* anchor at the very left of the container */
+  transform: translateX(-100%);  /* shift it left by its own width so it’s fully hidden */
+  width: 75px;                  /* or whatever fixed size you like */
+  pointer-events: none;
+  animation: bear-walk 45s linear infinite;
+}
+
+  /* keyframes reference the viewport width + the bear’s own width */
+  @keyframes bear-walk {
+    /* 0%   */ from { transform: translateX(-100%); }
+    /* 100% */ to   { transform: translateX(calc(93vw + 100%)); }
   }
 
 </style>
