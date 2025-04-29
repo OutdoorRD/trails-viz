@@ -578,6 +578,7 @@ export default {
   .party-characteristics-container {
     position: relative;
     min-height: 75vh; /* Enough height so overlay covers the entire area */
+    font-family: 'Roboto Condensed', sans-serif;
   }
  
 </style>

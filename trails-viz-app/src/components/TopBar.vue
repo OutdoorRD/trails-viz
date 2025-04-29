@@ -31,7 +31,7 @@
           <b-button
             size="sm"
             class="my-2 my-sm-0"
-            variant="info"
+            variant="login-color"
             to="/login"
             v-show="this.$store.getters.getLoggedInUser === 'anon'"
             >Login</b-button
@@ -154,6 +154,10 @@ export default {
   height: 80px
 }
 
+.navbar {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
 .navbar-brand {
   font-size: 1.4rem !important; /* ~24px if base is 16px */
   letter-spacing: 0.02em !important;
@@ -161,5 +165,16 @@ export default {
 /* .navbar-text  {
   color: var(--color-tertiary) !important; 
 } */
+.btn-login-color {
+  background-color: #fff;  /* Bootstrap purple */
+  border-color:     #1f78b4;
+  color:            #1f78b4;
+}
+.btn-login-color:hover {
+  background-color: #a6cee3;  /* a tad darker for hover */
+  border-color:     #a6cee3;
+  color:            #000;
+}
+
 
 </style>

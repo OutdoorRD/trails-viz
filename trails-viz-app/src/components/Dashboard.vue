@@ -360,6 +360,7 @@ export default {
   flex: 1 1 auto;           /* fill whatever is left below the navbar */
   overflow: hidden;         /* prevent the page itself from growing */
   margin-bottom: 0.5%;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .map-col {

@@ -118,6 +118,7 @@ export default {
 .info-source-container {
   position: relative;
   min-height: 72vh;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 .controls-container {
   display: flex;

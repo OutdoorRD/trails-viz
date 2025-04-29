@@ -256,6 +256,7 @@
   .demographics-container {
     position: relative; /* so the overlay can be absolutely positioned */
     min-height: 72vh;   /* or whatever is needed for your layout */
+    font-family: 'Roboto Condensed', sans-serif;
   }
   .list-group-item {
     padding: 5px 10px 5px 10px;

@@ -76,6 +76,7 @@ import bear from "../assets/BearWalking.gif";
     background-image: linear-gradient(var(--color-secondary), var(--color-white));
     /* background-color: var(--color-tertiary); */
     align-content: center !important;
+    font-family: 'Roboto Condensed', sans-serif;
   }
   h1 {
     font-weight: 700;
