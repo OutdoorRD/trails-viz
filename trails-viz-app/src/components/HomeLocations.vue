@@ -6,7 +6,7 @@
       <p class="loading-text">Loading data...</p>
     </div>
     <p class="note" v-if="selectedSource === 'chatbot'">
-      <strong>Note:</strong> Chatbot data does not include internaitonal visitors.
+      <strong>Note:</strong> Chatbot data does not include international visitors.
     </p>
   </div>
 </template>

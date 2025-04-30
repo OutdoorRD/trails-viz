@@ -68,19 +68,19 @@ export default {
           const counts = sortedPairs.map(pair => pair[1]);
 
           let values = [...counts];
-          let yLabel = 'Count';
+          let yLabel = 'Number of Respondents';
 
           if (this.displayMode === 'percentage') {
             const total = counts.reduce((acc, val) => acc + val, 0);
             values = counts.map(count => ((count / total) * 100).toFixed(2));
-            yLabel = '%';
+            yLabel = 'Percent of Respondents';
           }
 
           c3.generate({
             bindto: '#info-source-chart',
             size: { height: 500 },
             bar: { ratio: 0.9 },
-            padding: { top: 20 },
+            padding: { top: 20, bottom: 40 },
             data: {
               columns: [[yLabel, ...values]],
               type: 'bar',
@@ -119,6 +119,7 @@ export default {
   position: relative;
   min-height: 72vh;
   font-family: 'Roboto Condensed', sans-serif;
+  margin-top: 1rem;
 }
 .controls-container {
   display: flex;

@@ -60,7 +60,7 @@
     <!-- Distribution of Responses -->
     <div>
       <b-row class="mt-4">
-        <b-col sm="12">
+        <b-col class="mb-2" sm="12">
           <h4 class="section-title">Distribution of Responses</h4>
           <div class="controls-container d-flex flex-column">
             <div class="d-flex align-items-center mb-2">
@@ -454,7 +454,7 @@ export default {
           },
           y: {
             label: {
-              text: displayMode === '%' ? '%' : 'Count',
+              text: displayMode === '%' ? 'Percent of Respondents' : 'Number of Respondents',
               position: 'outer-middle'
             }
           }
