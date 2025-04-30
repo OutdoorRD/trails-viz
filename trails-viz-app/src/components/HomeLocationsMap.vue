@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="map-container">
     <div id="mapHomeLocations" ref="mapHomeLocations"></div>
     <div v-if="loading" class="loading-overlay">
@@ -6,6 +7,10 @@
       <p class="loading-text">Loading data...</p>
     </div>
   </div>
+  <p class="note" v-if="selectedSource === 'chatbot'">
+    <strong>Note:</strong> Chatbot data does not include internaitonal visitors.
+  </p>
+</div>
 </template>
 
 
@@ -399,12 +404,12 @@
   height: 72vh;
 }
 
+.note {
+  font-family: 'Roboto Condensed', sans-serif;
+}
 
 #mapHomeLocations {
   width: 100%;
   height: 100%;
 }
-
-
-
 </style>

@@ -16,11 +16,11 @@ body {
   padding: 0;
 }
 
-/* .v-application--wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-} */
+.leaflet-control.info.legend {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
 
 .app-container {
   flex: 1;
