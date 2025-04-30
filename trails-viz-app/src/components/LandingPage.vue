@@ -17,9 +17,13 @@
       are continuously updated and improved. If you have any comments, concerns, or corrections,
       please contact the <a href="https://www.outdoorrd.org/people/" target="_blank">Outdoor R&D Team</a>.
     </p>
-    <img :src="bear" alt="Walking bear" class="bear" />
+    <img
+      :src="bear"
+      class="bear"
+      @click="randomizeBearColor"
+      :style="{ filter: bearFilter }"
+    />
   </div>
-
 </template>
 
 <script>
@@ -31,12 +35,25 @@ import bear from "../assets/BearWalking.gif";
       return {
         projectSearchText: '',
         filteredProjects: [],
-        bear
+        bear,
+        bearHue: null,
       }
     },
     mounted() {
       // clear the selected project info
       this.$store.dispatch('clearSelectedProjectData');
+    },
+    computed: {
+      bearFilter() {
+        if (this.bearHue === null) return ""; 
+        return [
+          "invert(100%)",
+          "sepia(100%)",
+          "saturate(500%)",
+          `hue-rotate(${this.bearHue}deg)`,
+          "brightness(0.9)",
+        ].join(" ");
+      },
     },
     methods: {
       autoCompleteProject: function () {
@@ -63,7 +80,10 @@ import bear from "../assets/BearWalking.gif";
           this.projectSearchText = '';
           this.$router.push({name: 'dashboard', params: {project: selectedProjectCode}});
         }
-      }
+      },
+      randomizeBearColor() {
+        this.bearHue = Math.floor(Math.random() * 360);
+      },
     }
   }
 </script>
@@ -108,21 +128,20 @@ import bear from "../assets/BearWalking.gif";
     margin: 0 200px 0 200px;
   }
 
-
   .bear {
-  position: absolute;
-  bottom: 0;
-  left: 0;                       /* anchor at the very left of the container */
-  transform: translateX(-100%);  /* shift it left by its own width so it’s fully hidden */
-  width: 75px;                  /* or whatever fixed size you like */
-  pointer-events: none;
-  animation: bear-walk 45s linear infinite;
-}
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 100px;
+    pointer-events: auto;
+    animation: bear-walk 35s linear infinite;
+    cursor: pointer;
+  }
 
-  /* keyframes reference the viewport width + the bear’s own width */
   @keyframes bear-walk {
-    /* 0%   */ from { transform: translateX(-100%); }
-    /* 100% */ to   { transform: translateX(calc(93vw + 100%)); }
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(calc(100vw)); }
   }
 
 </style>
