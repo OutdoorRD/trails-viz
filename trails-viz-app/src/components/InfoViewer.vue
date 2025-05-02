@@ -79,6 +79,8 @@
   .info-viewer-container {
     position: relative;
     min-height: 75vh; /* Enough height so overlay covers the entire area */
+    padding-top: 1rem;
+    font-family: 'Roboto Condensed', sans-serif;
   }
  
 </style>

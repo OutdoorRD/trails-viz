@@ -17,7 +17,7 @@
         id="mapDiv"
       ></map-div>
     </b-col>
-    <b-col sm="6" class="charts-col">
+    <b-col sm="6" class="charts-col d-flex flex-column h-100">
       <b-row no-gutters>
         <b-col sm="7">
           <b-breadcrumb
@@ -60,12 +60,14 @@
           </b-form-radio>
         </b-form-radio-group>
       </b-form>
-      <b-row no-gutters>
-        <b-col sm="12">
-          <div class="scrollable-tab-content" v-show="visibleTabGroup === 'project-info'">
-          <info-viewer ref="project-info"></info-viewer>
+        <div class="d-flex flex-column flex-fill overflow-hidden">
+
+          <!-- <div v-show="visibleTabGroup === 'project-info'"> -->
+          <div v-show="visibleTabGroup === 'project-info'" :class="{ 'tab-group d-flex flex-fill flex-column overflow-auto': visibleTabGroup === 'project-info' }">
+            <info-viewer ref="project-info"></info-viewer>
           </div>
-          <b-tabs v-show="visibleTabGroup === 'visitation'">
+          <b-tabs v-show="visibleTabGroup === 'visitation'" :class="{ 'tab-group d-flex flex-fill flex-column overflow-auto': visibleTabGroup === 'visitation' }">
+          <!-- <b-tabs v-show="visibleTabGroup === 'visitation'"> -->
             <b-tab title="Time Series">
               <time-series ref="time-series"></time-series>
             </b-tab>
@@ -73,13 +75,10 @@
               <bar-graph ref="bar-graph"></bar-graph>
             </b-tab>
             <b-tab title="Methods">
-              <div class="scrollable-tab-content">
                 <info-viewer ref="visitation-info"></info-viewer>
-              </div>
             </b-tab>
           </b-tabs>
-
-          <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'" class="tab-group">
+          <b-tabs v-show="visibleTabGroup === 'visitorCharacteristics'" :class="{ 'tab-group d-flex flex-fill flex-column overflow-auto': visibleTabGroup === 'visitorCharacteristics' }">
             <b-tab
               title="Home Locations"
               @click="handleSubTabClick('Home Locations')"
@@ -101,7 +100,6 @@
                 ref="demographics-summary"
               ></demographics-summary>
             </b-tab>
-            <div class="scrollable-tab-content">
             <b-tab
               title="Party Characteristics"
               @click="handleSubTabClick('Party Characteristics')"
@@ -111,7 +109,6 @@
 
             </b-tab>
             
-          </div>
             <b-tab
               title="Info Source"
               @click="handleSubTabClick('Info Source')"
@@ -122,18 +119,16 @@
               ></info-source>
             </b-tab>
             
-
             <b-tab title="Methods" @click="handleSubTabClick('Methods')">
-              <div class="scrollable-tab-content">
               <info-viewer ref="home-locations-info"></info-viewer>
-            </div>
             </b-tab>
 
           </b-tabs>
-        </b-col>
-      </b-row>
+          </div>
     </b-col>
   </b-row>
+    <!-- </b-col>
+  </b-row> -->
   <!-- </div> -->
 
 </template>
@@ -359,8 +354,13 @@ export default {
 @import "../assets/styles/c3-charts.css";
 @import "../assets/styles/loading-spinner.css";
 /* @import "../assets/styles/visitor-characteristics-tabs.css"; */
+
 .app-container {
-  height: calc(100vh - 60px);
+  display: flex;            /* so b-row stays a flex container */
+  flex: 1 1 auto;           /* fill whatever is left below the navbar */
+  overflow: hidden;         /* prevent the page itself from growing */
+  margin-bottom: 0.5%;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .map-col {
@@ -369,6 +369,7 @@ export default {
 
 .charts-col {
   padding: 4px 4px 4px 4px !important;
+
 }
 
 .app-breadcrumb {
@@ -385,20 +386,18 @@ export default {
   background-color: #e9ecef;
 }
 
-.tab-group {
-  font-size: 0.95rem;
-}
-
-.scrollable-tab-content {
-  max-height: 74vh;
+.tab-group ::v-deep .tab-content {
+  flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px;
+  padding-left: 0;
 }
-
-::v-deep .nav.nav-tabs .nav-item .nav-link{
-    margin: 0px;
-    padding: 7px;
+::v-deep .nav {
+  padding-left: 0;
+}
+::v-deep .nav-tabs .nav-link {
+  font-size: 16px;       /* about 14px if root is 16px */
+  padding: 0.4rem 0.28rem;    /* tighter vertical/horizontal padding */
 }
 </style>
 

@@ -31,7 +31,7 @@
     <div>
       <b-row class="mt-4">
         <b-col sm="12">
-          <h4 class="section-title">Yearly Average Response</h4>
+          <h4 class="section-title">Yearly Averages</h4>
         </b-col>
 
         <!-- Party People TimeSeries -->
@@ -60,7 +60,7 @@
     <!-- Distribution of Responses -->
     <div>
       <b-row class="mt-4">
-        <b-col sm="12">
+        <b-col class="mb-2" sm="12">
           <h4 class="section-title">Distribution of Responses</h4>
           <div class="controls-container d-flex flex-column">
             <div class="d-flex align-items-center mb-2">
@@ -106,7 +106,7 @@
         </b-col>
 
         <!-- Trail Visits Chart -->
-        <b-col sm="12" v-if="barDataFetchStatus.TrailVisits === 200">
+        <b-col sm="12" v-if="barDataFetchStatus.TrailVisits === 200" class="mb-4">
           <div id="trail-visits-chart" class="chart-container"></div>
         </b-col>
       </b-row>
@@ -118,7 +118,7 @@
 <script>
 import c3 from 'c3';
 import axios from 'axios';
-import { VIZ_MODES } from "../store/constants";
+import { BRAND_COLORS, VIZ_MODES, YEAR_COLORS  } from "../store/constants";
 
 const CHARACTERISTIC_DISPLAY_NAMES = {
   PartyVehics: "Number of Vehicles Per Party",
@@ -314,7 +314,7 @@ export default {
 
       // Create dynamic table fields (years as columns) + "Total"
       this.tableFields = [
-        { key: "characteristic", label: "Characteristic" },
+        { key: "characteristic", label: "Party Characteristics" },
         ...[...yearSet].sort().map((year) => ({
           key: year.toString(),
           label: year.toString(),
@@ -450,11 +450,11 @@ export default {
               position: 'outer-center'
             },
             tick: { multiline: false },
-            height: 40
+            height: 45
           },
           y: {
             label: {
-              text: displayMode === '%' ? '%' : 'Count',
+              text: displayMode === '%' ? 'Percent of Respondents' : 'Number of Respondents',
               position: 'outer-middle'
             }
           }
@@ -462,9 +462,7 @@ export default {
         data: {
           columns: columns,
           type: 'bar',
-          colors: {
-            'Total': '#FF5733'
-          }
+          colors: YEAR_COLORS
         },
         tooltip: {
           order: null,
@@ -534,18 +532,14 @@ export default {
             'Lower Bound (95%)': 'line'
           },
           colors: {
-            Mean: 'blue',
-            'Upper Bound (95%)': 'lightblue',
-            'Lower Bound (95%)': 'lightblue'
+            'Mean': BRAND_COLORS.primary,
+            'Upper Bound (95%)': BRAND_COLORS.secondary,
+            'Lower Bound (95%)': BRAND_COLORS.secondary,
           }
         },
         axis: {
           x: {
             type: 'category',
-            label: {
-              text: 'Year',
-              position: 'outer-center'
-            },
             tick: { multiline: false },
             height: 40
           },
@@ -584,6 +578,7 @@ export default {
   .party-characteristics-container {
     position: relative;
     min-height: 75vh; /* Enough height so overlay covers the entire area */
+    font-family: 'Roboto Condensed', sans-serif;
   }
  
 </style>

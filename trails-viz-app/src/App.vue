@@ -1,14 +1,16 @@
 <template>
-  <b-container fluid id="app">
+  <v-app>
+    <b-container fluid id="app">
     <top-bar class="top-bar"></top-bar>
     <router-view></router-view>
     <div>
       <b-modal id="unauthorizedModal" ref="unauthorizedModal" title="Unauthorized" centered ok-only
-               header-bg-variant="secondary" header-text-variant="light" ok-variant="danger">
+              header-bg-variant="secondary" header-text-variant="light" ok-variant="danger">
         <p>Your are not authorized to access this project!</p>
       </b-modal>
     </div>
   </b-container>
+  </v-app>
 </template>
 
 <script>
@@ -53,15 +55,8 @@ export default {
 </script>
 
 <style scoped>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    padding: 0;
-    height: 100vh;
-  }
-
-  .top-bar {
-    height: 60px;
+  .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 </style>

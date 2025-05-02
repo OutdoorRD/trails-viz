@@ -5,6 +5,9 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading data...</p>
     </div>
+    <p class="note" v-if="selectedSource === 'chatbot'">
+      <strong>Note:</strong> Chatbot data does not include international visitors.
+    </p>
   </div>
 </template>
 
@@ -252,8 +255,12 @@
   .chart-container {
     position: relative;
     height: 72vh;
+    font-family: 'Roboto Condensed', sans-serif;
   }
 
+  .note {
+    margin-left: 15px;
+  }
 
   #chart {
     height: 72vh;

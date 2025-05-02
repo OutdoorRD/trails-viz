@@ -97,8 +97,9 @@
 <style scoped>
   .profile-div {
     height: calc(100vh - 60px);
-    background-image: linear-gradient(#cce3e3, #ffffff);
+    background-image: linear-gradient(var(--color-secondary), var(--color-white));
     align-content: center !important;
+    font-family: 'Roboto Condensed', sans-serif;
   }
 
   .profile-card {

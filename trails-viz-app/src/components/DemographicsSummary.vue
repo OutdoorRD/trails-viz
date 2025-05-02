@@ -44,7 +44,7 @@
 <script>
   import c3 from 'c3'
   import axios from 'axios'
-  import {VIZ_MODES} from "../store/constants";
+  import { VIZ_MODES, BRAND_COLORS } from "../store/constants";
 
   export default {
     name: "DemographicsSummary",
@@ -136,46 +136,46 @@
       },
       _makeCharts: function (housingCostBurdenPercentage, svi) {
         let housingCostBurdenVisitDays = {
-          '> 0%': 0,
-          '> 20%': 0,
-          '> 40%': 0,
-          '> 60%': 0,
-          '> 80%': 0
+          '0 - 20%': 0,
+          '20 - 40%': 0,
+          '40 - 60%': 0,
+          '60 - 80%': 0,
+          '80 - 100%': 0
         };
 
         for (const x of housingCostBurdenPercentage) {
           if (x['housing_cost_burden'] > 80) {
-            housingCostBurdenVisitDays['> 80%'] += x['visit_days']
+            housingCostBurdenVisitDays['80-100%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 60) {
-            housingCostBurdenVisitDays['> 60%'] += x['visit_days']
+            housingCostBurdenVisitDays['60 - 80%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 40) {
-            housingCostBurdenVisitDays['> 40%'] += x['visit_days']
+            housingCostBurdenVisitDays['40 - 60%'] += x['visit_days']
           } else if (x['housing_cost_burden'] > 20) {
-            housingCostBurdenVisitDays['> 20%'] += x['visit_days']
+            housingCostBurdenVisitDays['20 - 40%'] += x['visit_days']
           } else {
-            housingCostBurdenVisitDays['> 0%'] += x['visit_days']
+            housingCostBurdenVisitDays['0 - 20%'] += x['visit_days']
           }
         }
 
         let sviVisitDays = {
-          '> 0': 0,
-          '> 0.2': 0,
-          '> 0.4': 0,
-          '> 0.6': 0,
-          '> 0.8': 0
+          '0 - 0.2': 0,
+          '0.2 - 0.4': 0,
+          '0.4 - 0.6': 0,
+          '0.6 - 0.8': 0,
+          '0.8 - 1': 0
         };
 
         for (const x of svi) {
           if (x['svi'] > 0.8) {
-            sviVisitDays['> 0.8'] += x['visit_days']
+            sviVisitDays['0.8 - 1'] += x['visit_days']
           } else if (x['svi'] > 0.6) {
-            sviVisitDays['> 0.6'] += x['visit_days']
+            sviVisitDays['0.6 - 0.8'] += x['visit_days']
           } else if (x['svi'] > 0.4) {
-            sviVisitDays['> 0.4'] += x['visit_days']
+            sviVisitDays['0.4 - 0.6'] += x['visit_days']
           } else if (x['svi'] > 0.2) {
-            sviVisitDays['> 0.2'] += x['visit_days']
+            sviVisitDays['0.2 - 0.4'] += x['visit_days']
           } else {
-            sviVisitDays['> 0'] += x['visit_days']
+            sviVisitDays['0 - 0.2'] += x['visit_days']
           }
         }
 
@@ -213,7 +213,7 @@
         c3.generate({
           bindto: htmlElemId,
           size: {
-            height: 200
+            height: 250
           },
           axis: {
             x: {
@@ -226,7 +226,7 @@
               tick: {
                 multiline: false
               },
-              height: 40
+              height: 45
             },
             y: {
               label: {
@@ -240,8 +240,11 @@
           },
           data: {
             columns: [values],
-            type: 'bar'
-          }
+            type: 'bar',
+          },
+          color: {
+            pattern: [ BRAND_COLORS.primary ]
+          },
         })
       }
     }
@@ -253,6 +256,7 @@
   .demographics-container {
     position: relative; /* so the overlay can be absolutely positioned */
     min-height: 72vh;   /* or whatever is needed for your layout */
+    font-family: 'Roboto Condensed', sans-serif;
   }
   .list-group-item {
     padding: 5px 10px 5px 10px;
