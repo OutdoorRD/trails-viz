@@ -20,7 +20,8 @@ PROJECT_NAMES = {
     # 'Mount Baker-Snoqualmie General Forest': 'MBS_GFA'
     'East Cascades': 'EastCascades',
     'Coronado': 'Coronado',
-    'Bridger-Teton': 'BT'
+    'Bridger-Teton': 'BT',
+    'Mount Baker-Snoqualmie': 'MtBakerSnoqualmie'
 }
 
 CENSUS_TRACT_STATES = {
@@ -34,7 +35,8 @@ CENSUS_TRACT_STATES = {
     'WestCascades_MtnLoop': ['53'],
     'WestCascades_SMtnLoop': ['53'],
     # 'MBS_GFA': ['53']
-    'EastCascades': ['53']
+    'EastCascades': ['53'],
+    'MtBakerSnoqualmie': ['53']
 }
 
 DATA_COLUMNS = {
@@ -51,5 +53,6 @@ DATA_COLUMNS = {
     # 'MBS_GFA': ['flickr', 'twitter', 'instag', 'wta', 'alltrails']
     'EastCascades': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'wta', 'onsite'],
     'Coronado': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite'],
-    'BT': ['flickr', 'twitter', 'alltrails', 'ebird', 'gravy', 'onsite']
+    'BT': ['flickr', 'twitter', 'alltrails', 'ebird', 'gravy', 'onsite'],
+    'MtBakerSnoqualmie': ['estimate', 'flickr', 'twitter', 'wta', 'alltrails', 'onsite', 'ebird']
 }
