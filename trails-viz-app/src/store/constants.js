@@ -16,6 +16,7 @@ export const COLORS = {
     FLICKR: '#7c4034',
     GRAVY: '#c8833d',
     EBIRD: '#cdb295',
+    CUEBIQ: '#4C78A8',
     ON_SITE: '#ccc242',
     COMPARE_MODELLED: '#566a32',
     COMPARE_REVEAL: '#85e54c',
@@ -26,6 +27,7 @@ export const COLORS = {
     COMPARE_FLICKR: '#552c66',
     COMPARE_GRAVY: '#bb8ec0',
     COMPARE_EBIRD: '#342c32',
+    COMPARE_CUEBIQ: '#1F3A5F',
     COMPARE_ON_SITE: '#ce4db8',
 };
 

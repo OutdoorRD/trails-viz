@@ -81,6 +81,7 @@
         colors[trailName + ' - eBird'] =  comparing ? COLORS.COMPARE_EBIRD : COLORS.EBIRD;
         colors[trailName + ' - Gravy Analytics'] =  comparing ? COLORS.COMPARE_GRAVY : COLORS.GRAVY;
         colors[trailName + ' - Reveal'] =  comparing ? COLORS.COMPARE_REVEAL : COLORS.REVEAL;
+        colors[trailName + ' - Cuebiq'] =  comparing ? COLORS.COMPARE_CUEBIQ : COLORS.CUEBIQ;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
@@ -96,6 +97,7 @@
         let monthlyeBird = [trailName + ' - eBird'];
         let monthlyGravy = [trailName + ' - Gravy Analytics'];
         let monthlyReveal = [trailName + ' - Reveal'];
+        let monthlyCuebiq = [trailName + ' - Cuebiq'];
 
 
         monthlyVisitation.forEach(x => {
@@ -110,6 +112,7 @@
           monthlyeBird.push(x.ebird);
           monthlyGravy.push(x.gravy);
           monthlyReveal.push(x.reveal);
+          monthlyCuebiq.push(x.cuebiq);
 
         });
         const projectDataSources = this.$store.getters.getSelectedProjectDataSources;
@@ -147,6 +150,9 @@
         if (projectDataSources.includes('reveal')  && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesMonthlyData.push(monthlyReveal);
         }
+        if (projectDataSources.includes('cuebiq')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyCuebiq);
+        }
         
         if (skipDate) {
           timeseriesMonthlyData.splice(0, 1)
@@ -166,6 +172,7 @@
         let weeklyeBird = [trailName + ' - eBird'];
         let weeklyGravy = [trailName + ' - Gravy Analytics'];
         let weeklyReveal = [trailName + ' - Reveal'];
+        let weeklyCuebiq = [trailName + ' - Cuebiq'];
 
 
         weeklyVisitation.forEach(x => {
@@ -180,6 +187,7 @@
           weeklyeBird.push(x.ebird);
           weeklyGravy.push(x.gravy);
           weeklyReveal.push(x.reveal);
+          weeklyCuebiq.push(x.cuebiq);
 
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
@@ -216,6 +224,9 @@
         }
         if (projectDataSources.includes('reveal') && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesWeeklyData.push(weeklyReveal);
+        }
+        if (projectDataSources.includes('cuebiq') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyCuebiq);
         }
 
         if (skipDate) {

@@ -31,14 +31,16 @@ def _load_geo_df(geo_df_path, geo_df_list):
         if geo_df_list is not None:
             geo_df_list = geo_df_list.append(gpd.read_file(geo_df_path), sort=False)
         else:
+            print('starting loading geo df', geo_df_path)
             geo_df_list = gpd.read_file(geo_df_path)
+            print('finished loaded geo df', geo_df_path)
     return geo_df_list
 
 
 def _prepare_geo_df(allsites, polygons, new_gdf):
     '''Helper function to merge a new geo df (lines or access points) into the allsites geo df'''
     # only keep required columns
-    new_gdf = new_gdf[['siteid', 'geometry']]
+    new_gdf = new_gdf[['siteid', 'geometry']].copy()
     # convert all site ids to string
     new_gdf.loc[:, 'siteid'] = new_gdf['siteid'].astype(str)
     # drop columns if required fields are null
@@ -58,6 +60,7 @@ def _prepare_geo_dfs():
     lines = None
     access_points = None
     for item in os.listdir(_PROJECT_FILES_ROOT):
+        print('starting loading for item', item)
         if Path(_PROJECT_FILES_ROOT + item).is_dir():
             polygons_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_POLYGONS_FILE
             polygons = _load_geo_df(polygons_file, polygons)
