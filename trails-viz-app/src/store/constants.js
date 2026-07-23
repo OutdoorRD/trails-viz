@@ -7,7 +7,7 @@ export const BRAND_COLORS = {
 
 
 export const COLORS = {
-    MODELLED: '#1f78b4',
+    MODELED: '#1f78b4',
     REVEAL: '#a6cee3',
     ALLTRAILS: '#b2df8a',
     WTA: '#33a02c',
@@ -16,9 +16,9 @@ export const COLORS = {
     FLICKR: '#7c4034',
     GRAVY: '#c8833d',
     EBIRD: '#cdb295',
-    CUEBIQ: '#4C78A8',
+    CUEBIQ: '#9F4BBD',
     ON_SITE: '#ccc242',
-    COMPARE_MODELLED: '#566a32',
+    COMPARE_MODELED: '#566a32',
     COMPARE_REVEAL: '#85e54c',
     COMPARE_ALLTRAILS: '#6dcfab',
     COMPARE_WTA: '#567977',
