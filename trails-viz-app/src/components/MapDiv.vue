@@ -443,6 +443,7 @@ export default {
       axios.all(requests).then(
         axios.spread((geoJsonRes, chatbotRes) => {
           const allSitesGeoJson = geoJsonRes.data;
+
           this.mapDiv.fitBounds(L.geoJson(allSitesGeoJson).getBounds());
           let siteGroupsGeoJson = self.groupGeoJsonBySite(allSitesGeoJson);
           self.initializeSitesLayer(siteGroupsGeoJson, projectSites);

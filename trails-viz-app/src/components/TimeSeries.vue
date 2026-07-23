@@ -71,7 +71,7 @@
     methods: {
       _getColors: function(trailName, comparing=false) {
         let colors = {};
-        colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
+        colors[trailName + ' - Modeled'] = comparing ? COLORS.COMPARE_MODELED : COLORS.MODELED;
         colors[trailName + ' - On Site'] = comparing ? COLORS.COMPARE_ON_SITE : COLORS.ON_SITE;
         colors[trailName + ' - Flickr'] =  comparing ? COLORS.COMPARE_FLICKR : COLORS.FLICKR;
         colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
@@ -87,7 +87,7 @@
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
         let self = this;
         let monthlyDates = ['date'];
-        let monthlyModelled = [trailName + ' - Modelled'];
+        let monthlyModeled = [trailName + ' - Modeled'];
         let monthlyOnsite = [trailName + ' - On Site'];
         let monthlyFlickr = [trailName + ' - Flickr'];
         let monthlyInstag = [trailName + ' - Instagram'];
@@ -102,7 +102,7 @@
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
-          monthlyModelled.push(Math.round(x.estimate, 2));
+          monthlyModeled.push(Math.round(x.estimate, 2));
           monthlyOnsite.push(x.onsite);
           monthlyFlickr.push(x.flickr);
           monthlyInstag.push(x.instag);
@@ -121,7 +121,7 @@
         let timeseriesMonthlyData = [monthlyDates];
 
         if (projectDataSources.includes('estimate')) {
-          timeseriesMonthlyData.push(monthlyModelled);
+          timeseriesMonthlyData.push(monthlyModeled);
         }
         if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
           timeseriesMonthlyData.push(monthlyOnsite);
@@ -162,7 +162,7 @@
       _prepareWeeklyData(trailName, weeklyVisitation, skipDate=false) {
         let self = this;
         let weeklyDates = ['date'];
-        let weeklyModelled = [trailName + ' - Modelled'];
+        let weeklyModeled = [trailName + ' - Modeled'];
         let weeklyOnsite = [trailName + ' - On Site'];
         let weeklyFlickr = [trailName + ' - Flickr'];
         let weeklyInstag = [trailName + ' - Instagram'];
@@ -177,7 +177,7 @@
 
         weeklyVisitation.forEach(x => {
           weeklyDates.push(x.weekstart);
-          weeklyModelled.push(Math.round(x.estimate, 2));
+          weeklyModeled.push(Math.round(x.estimate, 2));
           weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
           weeklyInstag.push(x.instag);
@@ -196,7 +196,7 @@
         let timeseriesWeeklyData = [weeklyDates];
 
         if (projectDataSources.includes('estimate')) {
-          timeseriesWeeklyData.push(weeklyModelled);
+          timeseriesWeeklyData.push(weeklyModeled);
         }
         if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
           timeseriesWeeklyData.push(weeklyOnsite);
