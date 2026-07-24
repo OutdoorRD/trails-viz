@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import geopandas as gpd
 import trailsvizapi.config.app_config as config
+from threading import Lock
 
 _PROJECT_FILES_ROOT = config.DATA_FILES_ROOT + 'projects/'
 _ALLSITES_POLYGONS_FILE = 'allsites.geojson'
@@ -24,6 +25,8 @@ _CHATBOT_DIR = config.DATA_FILES_ROOT + 'chatbot/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
+# Add a lock that will be used to prevent multiple threads attempting to load the same datasource at the same time
+DATA_SOURCE_LOCK = Lock()
 
 def _load_geo_df(geo_df_path, geo_df_list):
     '''Load a lines or access points file into a list of all geo dfs'''
@@ -31,9 +34,7 @@ def _load_geo_df(geo_df_path, geo_df_list):
         if geo_df_list is not None:
             geo_df_list = geo_df_list.append(gpd.read_file(geo_df_path), sort=False)
         else:
-            print('starting loading geo df', geo_df_path)
             geo_df_list = gpd.read_file(geo_df_path)
-            print('finished loaded geo df', geo_df_path)
     return geo_df_list
 
 
@@ -60,7 +61,6 @@ def _prepare_geo_dfs():
     lines = None
     access_points = None
     for item in os.listdir(_PROJECT_FILES_ROOT):
-        print('starting loading for item', item)
         if Path(_PROJECT_FILES_ROOT + item).is_dir():
             polygons_file = _PROJECT_FILES_ROOT + item + '/' + _ALLSITES_POLYGONS_FILE
             polygons = _load_geo_df(polygons_file, polygons)
@@ -310,21 +310,23 @@ def _prepare_project_readme():
 
 
 def get_from_data_source(key):
-    if key not in DATA_SOURCE:
-        DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
-        DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
-        DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
-        DATA_SOURCE['CHATBOT_DATA_DF'] = _prepare_chatbot_data_df()
-        DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
-        DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
-        DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
-        DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
-        DATA_SOURCE['ZCTA_DF'] = _prepare_zcta_df()
-        DATA_SOURCE['SVI_TRACT_DF'] = _prepare_svi_df(geographic_level='TRACT')
-        # currently dashboard does not use county level SVI
-        # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
-        DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
-        DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
-        DATA_SOURCE['DATA_SOURCE_README'] = _prepare_data_source_readme()
-        DATA_SOURCE['VISITATION_DOWNLOAD_README'] = _prepare_visitation_download_readme()
+    # Enable the lock to avoid rebuilding the cache at the same time
+    with DATA_SOURCE_LOCK:
+        if key not in DATA_SOURCE:
+            DATA_SOURCE['ALLSITES_DF'] = _prepare_geo_dfs()
+            DATA_SOURCE['MONTHLY_VISITATION_DF'] = _prepare_monthly_df()
+            DATA_SOURCE['WEEKLY_VISITATION_DF'] = _prepare_weekly_df()
+            DATA_SOURCE['CHATBOT_DATA_DF'] = _prepare_chatbot_data_df()
+            DATA_SOURCE['HOME_LOCATIONS_DF'] = _prepare_home_locations_df()
+            DATA_SOURCE['STATE_BOUNDARIES_DF'] = _prepare_state_boundaries_df()
+            DATA_SOURCE['COUNTIES_DF'] = _prepare_counties_df()
+            DATA_SOURCE['CENSUS_TRACT_DF'] = _prepare_census_tract_df()
+            DATA_SOURCE['ZCTA_DF'] = _prepare_zcta_df()
+            DATA_SOURCE['SVI_TRACT_DF'] = _prepare_svi_df(geographic_level='TRACT')
+            # currently dashboard does not use county level SVI
+            # DATA_SOURCE['SVI_COUNTY_DF'] = _prepare_svi_df(geographic_level='COUNTY')
+            DATA_SOURCE['SVI_ZCTA_DF'] = _prepare_svi_df(geographic_level='ZCTA')
+            DATA_SOURCE['PROJECT_README'] = _prepare_project_readme()
+            DATA_SOURCE['DATA_SOURCE_README'] = _prepare_data_source_readme()
+            DATA_SOURCE['VISITATION_DOWNLOAD_README'] = _prepare_visitation_download_readme()
     return DATA_SOURCE[key]

@@ -12,7 +12,6 @@ def get_all_projects():
 
 @app.route('/api/projects/<string:project>/sites/geojson')
 def get_geojson_data(project):
-    print('Getting geojson data for project', project)
     data = projects_and_sites.get_project_sites(project)
     return Response(data.to_json(), mimetype='application/json')
 
