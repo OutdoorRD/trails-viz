@@ -46,7 +46,7 @@ DATA_COLUMNS = {
     # 'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
     'NNM': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
     'KingCo': ['estimate', 'alltrails', 'ebird', 'wta', 'reveal', 'onsite'],
-    'NationalForests': ['estimate', 'flickr', 'ebird', 'alltrails', 'reveal', 'cuebiq', 'onsite'],
+    'NationalForests': ['estimate', 'flickr', 'ebird', 'alltrails', 'reveal', 'cuebiq'],
     'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
     'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
     'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
