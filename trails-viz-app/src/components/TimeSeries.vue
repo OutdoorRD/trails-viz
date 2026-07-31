@@ -333,10 +333,15 @@
               }
             },
             y: {
-              label: {
-                text: 'User-Days',
-                position: 'outer-middle'
-              }
+                tick: {
+                    format: function(d) {
+                        return d.toLocaleString('en-US');
+                    }
+                },
+                label: {
+                    text: 'User-Days',
+                    position: 'outer-middle'
+                }
             }
           },
           zoom: {

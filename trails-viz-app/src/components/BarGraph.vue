@@ -180,10 +180,15 @@
               height: 45
             },
             y: {
-              label: {
-                text: yAxisLabel,
-                position: 'outer-middle'
-              }
+                tick: {
+                    format: function(d) {
+                        return d.toLocaleString('en-US');
+                    }
+                },
+                label: {
+                    text: yAxisLabel,
+                    position: 'outer-middle'
+                }
             }
           },
           legend: {
