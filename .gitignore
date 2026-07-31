@@ -2,3 +2,6 @@
 
 *.DS_Store
 *Thumbs.db
+
+# GCP bucket credentials file
+gcp_bucket_cred.json
