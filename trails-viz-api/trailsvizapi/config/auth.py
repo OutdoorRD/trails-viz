@@ -86,17 +86,6 @@ _ROLE_ACCESS_MAPPING = {
 _KEY = app_config.AUTH_TOKEN_KEY.encode()
 _FERNET = Fernet(_KEY)
 
-def get_projects_from_request(flask_request):
-    '''
-    Extract the project from a project-specific request
-    Returns a list of projects. One in most cases.
-    '''
-    if flask_request.view_args:
-        if "siteid" in flask_request.view_args:
-            return get_project_from_site(flask_request.view_args["siteid"])
-        if "project" in flask_request.view_args:
-            return [flask_request.view_args["project"]]
-    return []
 
 def generate_auth_token(user_json):
     username = user_json['username']
@@ -112,6 +101,19 @@ def generate_auth_token(user_json):
     auth_token = _FERNET.encrypt(auth_token.encode()).decode()
 
     return auth_token
+
+
+def _get_projects_from_request(flask_request):
+    '''
+    Extract the project from a project-specific request
+    Returns a list of projects. One in most cases.
+    '''
+    if flask_request.view_args:
+        if "siteid" in flask_request.view_args:
+            return get_project_from_site(flask_request.view_args["siteid"])
+        if "project" in flask_request.view_args:
+            return [flask_request.view_args["project"]]
+    return []
 
 
 def _parse_auth_header(auth_header):
@@ -139,14 +141,14 @@ def authenticate_request():
         # also require authentication
         if endpoint in _VISITATION_DATA_ENDPOINTS:
             # Extract the project name from the request path
-            projects = get_projects_from_request(request)
+            projects = _get_projects_from_request(request)
             # Check that the project does not require login
             if any(item in PROJECT_VISITATION_REQUIRES_LOGIN for item in projects):
                 if auth_header == _ANON_AUTH_HEADER:
                     # Raise error if the project did require login
                     return Response(_unauthenticated_error_json(request.path), mimetype='application/json', status=401)
         return
-    
+
     # It if's a protected endpoint, check for authentication
     else:
         if auth_header == _ANON_AUTH_HEADER:

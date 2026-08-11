@@ -25,8 +25,10 @@ _CHATBOT_DIR = config.DATA_FILES_ROOT + 'chatbot/'
 
 DATA_SOURCE = {}  # A dict is used here for lazy initialization of all the data frames
 
-# Add a lock that will be used to prevent multiple threads attempting to load the same datasource at the same time
+# Add a lock that will be used to prevent multiple threads attempting to load
+# the same datasource at the same time
 DATA_SOURCE_LOCK = Lock()
+
 
 def _load_geo_df(geo_df_path, geo_df_list):
     '''Load a lines or access points file into a list of all geo dfs'''
