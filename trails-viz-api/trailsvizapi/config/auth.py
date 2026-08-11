@@ -7,6 +7,8 @@ from flask import request, Response
 
 from trailsvizapi import app
 from trailsvizapi.config import app_config
+from trailsvizapi.repository.projects_and_sites import get_project_from_site
+from trailsvizapi.config.app_config import PROJECT_VISITATION_REQUIRES_LOGIN
 
 _ANON_AUTH_HEADER = 'anon'
 _ANON_ENDPOINTS = {
@@ -60,6 +62,21 @@ _MANAGER_ENDPOINTS.update([
     'get_categorical_chatbot_data'
 ])
 
+# A subset of _ANON_ENDPOINTS
+# We want to restrict access to these for certain projects, even for anon 
+# viewers.
+_VISITATION_DATA_ENDPOINTS = {
+    'get_monthly_estimates',
+    'get_annual_estimates',
+    'get_project_monthly_estimates',
+    'get_project_annual_estimates',
+    'get_project_monthly_visitation',
+    'get_project_weekly_visitation',
+    'get_monthly_visitation',
+    'get_weekly_visitation',
+    'get_visitation_readme',
+}
+
 _ROLE_ACCESS_MAPPING = {
     'anon': _ANON_ENDPOINTS,
     'manager': _MANAGER_ENDPOINTS
@@ -69,6 +86,17 @@ _ROLE_ACCESS_MAPPING = {
 _KEY = app_config.AUTH_TOKEN_KEY.encode()
 _FERNET = Fernet(_KEY)
 
+def get_projects_from_request(flask_request):
+    '''
+    Extract the project from a project-specific request
+    Returns a list of projects. One in most cases.
+    '''
+    if flask_request.view_args:
+        if "siteid" in flask_request.view_args:
+            return get_project_from_site(flask_request.view_args["siteid"])
+        if "project" in flask_request.view_args:
+            return [flask_request.view_args["project"]]
+    return []
 
 def generate_auth_token(user_json):
     username = user_json['username']
@@ -104,6 +132,17 @@ def authenticate_request():
 
     # if unprotected endpoint, allow execution without any auth header
     if endpoint in _ROLE_ACCESS_MAPPING['anon']:
+        # If it's a visitation data endpoint, check that this project doesn't
+        # also require authentication
+        if endpoint in _VISITATION_DATA_ENDPOINTS:
+            # Extract the project name from the request path
+            projects = get_projects_from_request(request)
+
+            # Check that the project does not require login
+            if not any(item in PROJECT_VISITATION_REQUIRES_LOGIN for item in projects):
+                return
+            # Raise error if the project did require login
+            return Response(_unauthenticated_error_json(request.path), mimetype='application/json', status=401)
         return
 
     auth_header = request.headers.get('Authorization', default=_ANON_AUTH_HEADER)

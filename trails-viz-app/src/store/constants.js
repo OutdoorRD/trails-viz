@@ -73,3 +73,9 @@ export const DATA_SOURCES = {
   'Coronado': ['Chatbot (2022 - 2024)'],
   'Bridger-Teton': [] //should not show Visitor Characteristics
 }
+
+// These projects require the user to be logged in before accessing the 
+// visitation tab
+export const PROJECT_VISITATION_REQUIRES_LOGIN = {
+    'US National Forests': true,
+  };
