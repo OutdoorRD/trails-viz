@@ -63,7 +63,7 @@ _MANAGER_ENDPOINTS.update([
 ])
 
 # A subset of _ANON_ENDPOINTS
-# We want to restrict access to these for certain projects, even for anon 
+# We want to restrict access to these for certain projects, even for 'anon'
 # viewers.
 _VISITATION_DATA_ENDPOINTS = {
     'get_monthly_estimates',
@@ -130,7 +130,7 @@ def authenticate_request():
     if request.method == 'OPTIONS':
         # return true for pre flight options requests by browser
         return
-    
+
     endpoint = request.endpoint  # this would give the function name from the controller
     auth_header = request.headers.get('Authorization', default=_ANON_AUTH_HEADER)
     request_path = request.path
