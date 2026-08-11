@@ -339,7 +339,7 @@
                     }
                 },
                 label: {
-                    text: 'User-Days/Visits',
+                    text: 'User-Days / Visits',
                     position: 'outer-middle'
                 }
             }
