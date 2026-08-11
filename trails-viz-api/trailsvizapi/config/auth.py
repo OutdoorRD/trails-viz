@@ -128,7 +128,10 @@ def authenticate_request():
     if request.method == 'OPTIONS':
         # return true for pre flight options requests by browser
         return
+    
     endpoint = request.endpoint  # this would give the function name from the controller
+    auth_header = request.headers.get('Authorization', default=_ANON_AUTH_HEADER)
+    request_path = request.path
 
     # if unprotected endpoint, allow execution without any auth header
     if endpoint in _ROLE_ACCESS_MAPPING['anon']:
@@ -137,19 +140,16 @@ def authenticate_request():
         if endpoint in _VISITATION_DATA_ENDPOINTS:
             # Extract the project name from the request path
             projects = get_projects_from_request(request)
-
             # Check that the project does not require login
-            if not any(item in PROJECT_VISITATION_REQUIRES_LOGIN for item in projects):
-                return
-            # Raise error if the project did require login
-            return Response(_unauthenticated_error_json(request.path), mimetype='application/json', status=401)
+            if any(item in PROJECT_VISITATION_REQUIRES_LOGIN for item in projects):
+                if auth_header == _ANON_AUTH_HEADER:
+                    # Raise error if the project did require login
+                    return Response(_unauthenticated_error_json(request.path), mimetype='application/json', status=401)
         return
-
-    auth_header = request.headers.get('Authorization', default=_ANON_AUTH_HEADER)
-    request_path = request.path
-
-    if auth_header == _ANON_AUTH_HEADER:
-        if endpoint not in _ROLE_ACCESS_MAPPING['anon']:
+    
+    # It if's a protected endpoint, check for authentication
+    else:
+        if auth_header == _ANON_AUTH_HEADER:
             return Response(_unauthenticated_error_json(request_path), mimetype='application/json', status=401)
 
     username, role, expiration = _parse_auth_header(auth_header)

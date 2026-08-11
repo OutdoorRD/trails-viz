@@ -6,9 +6,6 @@ from trailsvizapi.repository.projects_and_sites import get_project_sites
 
 def get_monthly_visitation(siteid):
     monthly_df = get_from_data_source('MONTHLY_VISITATION_DF')
-    print('MONTHLY DF')
-    print(monthly_df)
-    print([c for c in monthly_df.columns])
     site_data = monthly_df[monthly_df['trail'] == siteid]
     return site_data
 
