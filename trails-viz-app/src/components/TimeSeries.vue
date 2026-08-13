@@ -43,6 +43,12 @@
     return s;
   };
 
+  // The api sends a data point with no value as null, so keep it null instead
+  // of letting Math.round turn it into a 0 that gets plotted as a real value.
+  function roundOrNull(value) {
+    return value === null || value === undefined ? value : Math.round(value);
+  }
+
   export default {
     name: "TimeSeries",
     data: function() {
@@ -100,7 +106,7 @@
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
-          monthlyModelled.push(Math.round(x.estimate, 2));
+          monthlyModelled.push(roundOrNull(x.estimate));
           monthlyOnsite.push(x.onsite);
           monthlyFlickr.push(x.flickr);
           monthlyInstag.push(x.instag);
@@ -170,7 +176,7 @@
 
         weeklyVisitation.forEach(x => {
           weeklyDates.push(x.weekstart);
-          weeklyModelled.push(Math.round(x.estimate, 2));
+          weeklyModelled.push(roundOrNull(x.estimate));
           weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
           weeklyInstag.push(x.instag);
