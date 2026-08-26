@@ -71,7 +71,7 @@
     methods: {
       _getColors: function(trailName, comparing=false) {
         let colors = {};
-        colors[trailName + ' - Modelled'] = comparing ? COLORS.COMPARE_MODELLED : COLORS.MODELLED;
+        colors[trailName + ' - Modeled'] = comparing ? COLORS.COMPARE_MODELED : COLORS.MODELED;
         colors[trailName + ' - On Site'] = comparing ? COLORS.COMPARE_ON_SITE : COLORS.ON_SITE;
         colors[trailName + ' - Flickr'] =  comparing ? COLORS.COMPARE_FLICKR : COLORS.FLICKR;
         colors[trailName + ' - Instagram'] =  comparing ? COLORS.COMPARE_INSTA : COLORS.INSTA;
@@ -81,12 +81,13 @@
         colors[trailName + ' - eBird'] =  comparing ? COLORS.COMPARE_EBIRD : COLORS.EBIRD;
         colors[trailName + ' - Gravy Analytics'] =  comparing ? COLORS.COMPARE_GRAVY : COLORS.GRAVY;
         colors[trailName + ' - Reveal'] =  comparing ? COLORS.COMPARE_REVEAL : COLORS.REVEAL;
+        colors[trailName + ' - Cuebiq'] =  comparing ? COLORS.COMPARE_CUEBIQ : COLORS.CUEBIQ;
         return colors
       },
       _prepareMonthlyData(trailName, monthlyVisitation, skipDate=false) {
         let self = this;
         let monthlyDates = ['date'];
-        let monthlyModelled = [trailName + ' - Modelled'];
+        let monthlyModeled = [trailName + ' - Modeled'];
         let monthlyOnsite = [trailName + ' - On Site'];
         let monthlyFlickr = [trailName + ' - Flickr'];
         let monthlyInstag = [trailName + ' - Instagram'];
@@ -96,11 +97,12 @@
         let monthlyeBird = [trailName + ' - eBird'];
         let monthlyGravy = [trailName + ' - Gravy Analytics'];
         let monthlyReveal = [trailName + ' - Reveal'];
+        let monthlyCuebiq = [trailName + ' - Cuebiq'];
 
 
         monthlyVisitation.forEach(x => {
           monthlyDates.push(x.year + '-' + x.month + '-1');
-          monthlyModelled.push(Math.round(x.estimate, 2));
+          monthlyModeled.push(Math.round(x.estimate, 2));
           monthlyOnsite.push(x.onsite);
           monthlyFlickr.push(x.flickr);
           monthlyInstag.push(x.instag);
@@ -110,6 +112,7 @@
           monthlyeBird.push(x.ebird);
           monthlyGravy.push(x.gravy);
           monthlyReveal.push(x.reveal);
+          monthlyCuebiq.push(x.cuebiq);
 
         });
         const projectDataSources = this.$store.getters.getSelectedProjectDataSources;
@@ -118,7 +121,7 @@
         let timeseriesMonthlyData = [monthlyDates];
 
         if (projectDataSources.includes('estimate')) {
-          timeseriesMonthlyData.push(monthlyModelled);
+          timeseriesMonthlyData.push(monthlyModeled);
         }
         if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
           timeseriesMonthlyData.push(monthlyOnsite);
@@ -147,6 +150,9 @@
         if (projectDataSources.includes('reveal')  && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesMonthlyData.push(monthlyReveal);
         }
+        if (projectDataSources.includes('cuebiq')  && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesMonthlyData.push(monthlyCuebiq);
+        }
         
         if (skipDate) {
           timeseriesMonthlyData.splice(0, 1)
@@ -156,7 +162,7 @@
       _prepareWeeklyData(trailName, weeklyVisitation, skipDate=false) {
         let self = this;
         let weeklyDates = ['date'];
-        let weeklyModelled = [trailName + ' - Modelled'];
+        let weeklyModeled = [trailName + ' - Modeled'];
         let weeklyOnsite = [trailName + ' - On Site'];
         let weeklyFlickr = [trailName + ' - Flickr'];
         let weeklyInstag = [trailName + ' - Instagram'];
@@ -166,11 +172,12 @@
         let weeklyeBird = [trailName + ' - eBird'];
         let weeklyGravy = [trailName + ' - Gravy Analytics'];
         let weeklyReveal = [trailName + ' - Reveal'];
+        let weeklyCuebiq = [trailName + ' - Cuebiq'];
 
 
         weeklyVisitation.forEach(x => {
           weeklyDates.push(x.weekstart);
-          weeklyModelled.push(Math.round(x.estimate, 2));
+          weeklyModeled.push(Math.round(x.estimate, 2));
           weeklyOnsite.push(x.onsite);
           weeklyFlickr.push(x.flickr);
           weeklyInstag.push(x.instag);
@@ -180,6 +187,7 @@
           weeklyeBird.push(x.ebird);
           weeklyGravy.push(x.gravy);
           weeklyReveal.push(x.reveal);
+          weeklyCuebiq.push(x.cuebiq);
 
         });
         const projectDataSources = self.$store.getters.getSelectedProjectDataSources;
@@ -188,7 +196,7 @@
         let timeseriesWeeklyData = [weeklyDates];
 
         if (projectDataSources.includes('estimate')) {
-          timeseriesWeeklyData.push(weeklyModelled);
+          timeseriesWeeklyData.push(weeklyModeled);
         }
         if (projectDataSources.includes('onsite') && vizMode !== VIZ_MODES.PROJECT) {
           timeseriesWeeklyData.push(weeklyOnsite);
@@ -216,6 +224,9 @@
         }
         if (projectDataSources.includes('reveal') && vizMode !== VIZ_MODES.COMPARE) {
           timeseriesWeeklyData.push(weeklyReveal);
+        }
+        if (projectDataSources.includes('cuebiq') && vizMode !== VIZ_MODES.COMPARE) {
+          timeseriesWeeklyData.push(weeklyCuebiq);
         }
 
         if (skipDate) {
@@ -322,10 +333,15 @@
               }
             },
             y: {
-              label: {
-                text: 'User-Days',
-                position: 'outer-middle'
-              }
+                tick: {
+                    format: function(d) {
+                        return d.toLocaleString('en-US');
+                    }
+                },
+                label: {
+                    text: 'User-Days / Visits',
+                    position: 'outer-middle'
+                }
             }
           },
           zoom: {

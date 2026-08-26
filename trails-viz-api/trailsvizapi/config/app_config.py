@@ -46,7 +46,7 @@ DATA_COLUMNS = {
     # 'OKW_GFA': ['flickr', 'twitter', 'instag', 'wta'],
     'NNM': ['estimate', 'flickr', 'twitter', 'instag', 'onsite'],
     'KingCo': ['estimate', 'alltrails', 'ebird', 'wta', 'reveal', 'onsite'],
-    'NationalForests': ['flickr', 'twitter', 'instag', 'alltrails'],
+    'NationalForests': ['estimate', 'flickr', 'ebird', 'alltrails', 'reveal', 'cuebiq', 'onsite'],
     'MBS_WILD': ['estimate', 'flickr', 'twitter', 'instag', 'wta', 'alltrails'],
     'WestCascades_MtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
     'WestCascades_SMtnLoop': ['estimate', 'flickr', 'twitter', 'instag', 'alltrails', 'ebird', 'wta', 'onsite'],
@@ -55,4 +55,10 @@ DATA_COLUMNS = {
     'Coronado': ['estimate', 'flickr', 'twitter', 'alltrails', 'ebird', 'onsite'],
     'BT': ['flickr', 'twitter', 'alltrails', 'ebird', 'gravy', 'onsite'],
     'MtBakerSnoqualmie': ['estimate', 'flickr', 'twitter', 'wta', 'alltrails', 'onsite', 'ebird']
+}
+
+# Set the projects that require a login to access any of the visitation endpoints
+# Should correspond to PROJECT_VISITATION_REQUIRES_LOGIN in app/src/store/constants.js
+PROJECT_VISITATION_REQUIRES_LOGIN = {
+    'NationalForests': True
 }

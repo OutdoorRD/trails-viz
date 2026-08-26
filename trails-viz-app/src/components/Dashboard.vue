@@ -28,11 +28,13 @@
         <b-col sm="5">
           <b-button-group class="app-button-group d-flex">
             <b-button
+              v-if="!projectVisitationRequiresLogin || this.$store.getters.getLoggedInUser !== 'anon'"
               v-on:click="showSelectedTab('visitation')"
               class="app-button"
               v-bind:class="{ active: visibleTabGroup === 'visitation' }"
-              >Visitation</b-button
             >
+            Visitation
+            </b-button>
             <b-button
               v-if="availableDataSources.length > 0"
               v-on:click="showSelectedTab('visitorCharacteristics')"
@@ -146,7 +148,7 @@ import DemographicsSummary from "../components/DemographicsSummary";
 import PartyCharacteristics from "../components/PartyCharacteristics";
 import InfoSource from "../components/InfoSource";
 
-import { VIZ_MODES, DATA_SOURCES } from "../store/constants";
+import { VIZ_MODES, DATA_SOURCES, PROJECT_VISITATION_REQUIRES_LOGIN } from "../store/constants";
 import { EventBus } from "../event-bus";
 
 export default {
@@ -173,6 +175,11 @@ export default {
     availableDataSources() {
       const projectCode = this.$route.params.project;
       return DATA_SOURCES[this.$store.getters.getProjectCodeToName[projectCode]] || [];
+    },
+    projectVisitationRequiresLogin() {
+      const projectCode = this.$route.params.project;
+      const projectName = this.$store.getters.getProjectCodeToName[projectCode];
+      return PROJECT_VISITATION_REQUIRES_LOGIN[projectName] || false;
     },
     selectedSource: {
       get() {
