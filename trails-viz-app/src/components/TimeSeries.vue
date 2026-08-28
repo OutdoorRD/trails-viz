@@ -22,9 +22,11 @@
     <div id="time-series"></div>
     <div class="text-center disclaimer">
       <p>
+        <strong>Click</strong> on any of the data sources in the legend above to show/hide them on the plot.
+        <br>
         <strong>"Modeled"</strong> values here are in draft form and will change, sometimes dramatically, as our methods and data improve.
         <br>
-        <strong>"On-site"</strong> values are estimates from infrared counters and parking lot counts, where available.
+        <strong>"On-site"</strong> values are estimates from a variety of sources (e.g., infrared counters, parking lot counts, NVUM surveys).
       </p>
     </div>
   </div>
@@ -309,12 +311,18 @@
           self.dataRange = "monthly";
           data = self.timeseriesMonthlyData
         }
+       
+        // Set the columns that are visible by default
+        const visibleColumns = [`${self.trailName} - Modeled`, `${self.trailName} - On Site`, 'date'];
+        const hiddenColumns = data.map(column => column[0]).filter(name => !visibleColumns.includes(name));
+        
         self.chart = c3.generate({
           bindto: '#time-series',
           data: {
             x: 'date',
             columns: data,
-            colors: Object.assign({}, colors)
+            colors: Object.assign({}, colors),
+            hide: hiddenColumns
           },
           axis: {
             x: {
