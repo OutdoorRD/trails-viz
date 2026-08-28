@@ -6,8 +6,14 @@
     </div>
     <b-row no-gutters class="align-items-top justify-content-end mt-2">
       <b-col cols="auto">
-        <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
-      </b-col>
+        <b-radio-group
+            v-model="dataRange"
+            :options="dateRangeOptions"
+            stacked
+            @input="switchDateRange"
+            :disabled="!monthlyVisitation && !weeklyVisitation"
+        ></b-radio-group>
+    </b-col>
       <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
       <b-button
         variant="outline-primary"
@@ -61,14 +67,19 @@
         comparingSite: null,
         comparingSiteMonthlyVisitation: null,
         comparingSiteWeeklyVisitation: null,
-        dataRange: '',
+        dataRange: 'monthly',
         chart: null,
         domain: null,
-        dateRangeOptions: [
-          {text: 'Monthly', value: 'monthly'},
-          {text: 'Weekly', value: 'weekly'}
-        ]
       }
+    },
+    computed: {
+        // Dynamically generate options for the monthly/weekly radio group
+        dateRangeOptions() {
+            return [
+                {text: "Monthly", value: "monthly", disabled: !this.monthlyVisitation || this.monthlyVisitation.length === 0},
+                {text: "Weekly", value: "weekly", disabled: !this.weeklyVisitation || this.weeklyVisitation.length === 0},
+            ];
+        },
     },
     methods: {
       _getColors: function(trailName, comparing=false) {
