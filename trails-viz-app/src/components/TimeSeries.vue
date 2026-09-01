@@ -28,7 +28,7 @@
     <div id="time-series"></div>
     <div class="text-center disclaimer">
       <p>
-        <strong>Click</strong> on grayed out data sources in legend above to show; click again to hide.
+        <strong>Click</strong> any grayed-out data source in the legend above to show it on the plot; click again to hide.
         <br>
         <strong>"Modeled"</strong> values here are in draft form and will change, sometimes dramatically, as our methods and data improve.
         <br>
@@ -456,16 +456,15 @@
     font-size: 14px;
   }
 </style>
-
 <style>
-    /* Make hidden/deselected legend items less hard-to-see */
-    .c3-legend-item-hidden {
-        opacity: 1.0 !important; 
-    }
-    /* Turn the line into a gray square box */
-    .c3-legend-item-hidden .c3-legend-item-tile {
-        stroke-dasharray: 10, 10, 10, 10 !important; 
-        stroke-width: 10px !important; 
-        stroke: #ccc !important; 
-    }
+  /* Make hidden/deselected legend items less hard-to-see */
+  #time-series .c3-legend-item-hidden {
+    opacity: 1.0 !important; 
+  }
+  /* Turn the line into a gray square box */
+  #time-series .c3-legend-item-hidden .c3-legend-item-tile {
+    stroke-dasharray: 10, 10, 10, 10 !important; 
+    stroke-width: 10px !important; 
+    stroke: #ccc !important; 
+  }
 </style>
