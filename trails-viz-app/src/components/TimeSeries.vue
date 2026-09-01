@@ -6,8 +6,14 @@
     </div>
     <b-row no-gutters class="align-items-top justify-content-end mt-2">
       <b-col cols="auto">
-        <b-radio-group v-model="dataRange" :options="dateRangeOptions" v-on:input="switchDateRange"></b-radio-group>
-      </b-col>
+        <b-radio-group
+            v-model="dataRange"
+            :options="dateRangeOptions"
+            stacked
+            @input="switchDateRange"
+            :disabled="!monthlyVisitation && !weeklyVisitation"
+        ></b-radio-group>
+    </b-col>
       <b-col cols="auto" v-if="$store.getters.getLoggedInUser !== 'anon'">
       <b-button
         variant="outline-primary"
@@ -22,9 +28,11 @@
     <div id="time-series"></div>
     <div class="text-center disclaimer">
       <p>
+        <strong>Click</strong> any grayed-out data source in the legend above to show it on the plot; click again to hide.
+        <br>
         <strong>"Modeled"</strong> values here are in draft form and will change, sometimes dramatically, as our methods and data improve.
         <br>
-        <strong>"On-site"</strong> values are estimates from infrared counters and parking lot counts, where available.
+        <strong>"On-site"</strong> values are estimates from a variety of sources (e.g., infrared counters, parking lot counts, NVUM surveys).
       </p>
     </div>
   </div>
@@ -59,14 +67,19 @@
         comparingSite: null,
         comparingSiteMonthlyVisitation: null,
         comparingSiteWeeklyVisitation: null,
-        dataRange: '',
+        dataRange: 'monthly',
         chart: null,
         domain: null,
-        dateRangeOptions: [
-          {text: 'Monthly', value: 'monthly'},
-          {text: 'Weekly', value: 'weekly'}
-        ]
       }
+    },
+    computed: {
+        // Dynamically generate options for the monthly/weekly radio group
+        dateRangeOptions() {
+            return [
+                {text: "Monthly", value: "monthly", disabled: !this.monthlyVisitation || this.monthlyVisitation.length === 0},
+                {text: "Weekly", value: "weekly", disabled: !this.weeklyVisitation || this.weeklyVisitation.length === 0},
+            ];
+        },
     },
     methods: {
       _getColors: function(trailName, comparing=false) {
@@ -309,12 +322,18 @@
           self.dataRange = "monthly";
           data = self.timeseriesMonthlyData
         }
+       
+        // Set the columns that are visible by default
+        const visibleColumns = [`${self.trailName} - Modeled`, `${self.trailName} - On Site`, 'date'];
+        const hiddenColumns = data.map(column => column[0]).filter(name => !visibleColumns.includes(name));
+        
         self.chart = c3.generate({
           bindto: '#time-series',
           data: {
             x: 'date',
             columns: data,
-            colors: Object.assign({}, colors)
+            colors: Object.assign({}, colors),
+            hide: hiddenColumns
           },
           axis: {
             x: {
@@ -339,7 +358,7 @@
                     }
                 },
                 label: {
-                    text: 'User-Days / Visits',
+                    text: 'User-Days or Visits',
                     position: 'outer-middle'
                 }
             }
@@ -434,6 +453,18 @@
   }
 
   .disclaimer {
-    font-size: 12px;
+    font-size: 14px;
+  }
+</style>
+<style>
+  /* Make hidden/deselected legend items less hard-to-see */
+  #time-series .c3-legend-item-hidden {
+    opacity: 1.0 !important; 
+  }
+  /* Turn the line into a gray square box */
+  #time-series .c3-legend-item-hidden .c3-legend-item-tile {
+    stroke-dasharray: 10, 10, 10, 10 !important; 
+    stroke-width: 10px !important; 
+    stroke: #ccc !important; 
   }
 </style>
