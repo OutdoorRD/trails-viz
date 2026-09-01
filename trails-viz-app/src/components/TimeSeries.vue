@@ -457,7 +457,6 @@
   }
 </style>
 
-
 <style>
     /* Make hidden/deselected legend items less hard-to-see */
     .c3-legend-item-hidden {
@@ -465,13 +464,8 @@
     }
     /* Turn the line into a gray square box */
     .c3-legend-item-hidden .c3-legend-item-tile {
-        /* Set stroke-dasharray to create a box shape outline */
         stroke-dasharray: 10, 10, 10, 10 !important; 
-        
-        /* Make the border slightly thicker so it stands out */
         stroke-width: 10px !important; 
-        
-        /* Change the color to a neutral gray outline */
         stroke: #ccc !important; 
     }
 </style>
